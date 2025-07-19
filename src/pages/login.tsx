@@ -1,16 +1,26 @@
 import { useState } from 'react';
 import { Eye, EyeOff, User, Lock, Shield, Building2, Mail, Users, ArrowLeft } from 'lucide-react';
 
-import { Link } from 'react-router-dom';
+// import { Link } from 'react-router-dom';
 import TaxpayerDashboard from '../componenets/taxpayerDashboard';
 import CorporateDashboard from '../componenets/CorporateDashboard';
 import ConsultantDashboard from '../componenets/ConsultantDashboard';
 import StaffDashboard from '../componenets/StaffDashboard';
 
+
+// Define roles explicitly
+type RoleType = 'taxpayer' | 'corporate' | 'consultant' | 'staff';
+
+interface FormDataType {
+  taxpayerId: string;
+  companyTaxpayerId: string;
+  email: string;
+  password: string;
+}
 export default function LoginPage() {
-  const [selectedRole, setSelectedRole] = useState('');
+   const [selectedRole, setSelectedRole] = useState<RoleType | ''>('');
   const [currentView, setCurrentView] = useState('login');
-  const [formData, setFormData] = useState({
+  const [formData, setFormData] = useState<FormDataType>({
     taxpayerId: '',
     companyTaxpayerId: '',
     email: '',
@@ -19,7 +29,7 @@ export default function LoginPage() {
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
 
-  const roles = [
+  const roles: { value: RoleType; label: string; icon: any }[] = [
     { value: 'taxpayer', label: 'Individual Taxpayer', icon: User },
     { value: 'corporate', label: 'Corporate Admin', icon: Building2 },
     { value: 'consultant', label: 'Consultant', icon: Users },
@@ -36,30 +46,35 @@ export default function LoginPage() {
         email: '',
         password: ''
       });
-    } else {
-      console.log('Back button clicked from login');
-      // For example: window.history.back() or navigate to specific route
     }
   };
 
+  const handleInputChange = (field: keyof FormDataType, value: string) => {
+    setFormData(prev => ({ ...prev, [field]: value }));
+  };
+
+  const handleRoleChange = (role: RoleType) => {
+    setSelectedRole(role);
+    setFormData({
+      taxpayerId: '',
+      companyTaxpayerId: '',
+      email: '',
+      password: ''
+    });
+  };
+
   const handleSubmit = async () => {
-    // Validate required fields based on role
     const isValid = validateForm();
     if (!isValid) {
       alert('Please fill in all required fields');
       return;
     }
-    
+
     setIsLoading(true);
-    
     try {
-      // Simulate API call
       await new Promise(resolve => setTimeout(resolve, 2000));
-      
-      // Simulate successful login and route to appropriate dashboard
       console.log(`Login successful for ${selectedRole}`);
-      
-      // Route to the appropriate dashboard based on role
+
       switch (selectedRole) {
         case 'taxpayer':
           setCurrentView('taxpayer-dashboard');
@@ -75,9 +90,7 @@ export default function LoginPage() {
           break;
         default:
           alert('Unknown role selected');
-          return;
       }
-      
     } catch (error) {
       console.error('Login failed:', error);
       alert('Login failed. Please try again.');
@@ -86,35 +99,19 @@ export default function LoginPage() {
     }
   };
 
-  const validateForm = () => {
+  const validateForm = (): boolean => {
     if (!selectedRole) return false;
-    
     switch (selectedRole) {
       case 'taxpayer':
       case 'consultant':
-        return formData.taxpayerId && formData.password;
+        return !!formData.taxpayerId && !!formData.password;
       case 'corporate':
-        return formData.companyTaxpayerId && formData.taxpayerId && formData.password;
+        return !!formData.companyTaxpayerId && !!formData.taxpayerId && !!formData.password;
       case 'staff':
-        return formData.email && formData.password;
+        return !!formData.email && !!formData.password;
       default:
         return false;
     }
-  };
-
-  const handleInputChange = (field, value) => {
-    setFormData(prev => ({ ...prev, [field]: value }));
-  };
-
-  const handleRoleChange = (role) => {
-    setSelectedRole(role);
-    // Reset form data when role changes
-    setFormData({
-      taxpayerId: '',
-      companyTaxpayerId: '',
-      email: '',
-      password: ''
-    });
   };
 
   // Render appropriate dashboard based on current view

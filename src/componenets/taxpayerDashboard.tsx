@@ -2,9 +2,19 @@ import { useState } from 'react';
 import {  Settings, Search, Download, FileText, Calendar, DollarSign, TrendingUp, AlertCircle } from 'lucide-react';
 // import { Link } from 'react-router-dom';
 
+interface SidebarSubItem {
+  label: string;
+  route: string;
+}
+
+interface SidebarItem {
+  label: string;
+  icon: string;
+  route?: string;
+  subMenu?: SidebarSubItem[];
+}
+
 export default function NigeriaTaxpayerDashboard() {
-  const [activeMenu, setActiveMenu] = useState('Profile');
-  const [expandedSubMenu, setExpandedSubMenu] = useState(null);
   
   const SidebarMenu = [
     {
@@ -79,12 +89,15 @@ export default function NigeriaTaxpayerDashboard() {
     }
   ];
 
-  const handleMenuClick = (item) => {
+ const [activeMenu, setActiveMenu] = useState<string>('Dashboard');
+  const [expandedSubMenu, setExpandedSubMenu] = useState<string | null>(null);
+
+  const handleMenuClick = (item: SidebarItem) => {
     if (item.label === 'Logout') {
       console.log('Logging out...');
       return;
     }
-    
+
     if (item.subMenu) {
       setExpandedSubMenu(expandedSubMenu === item.label ? null : item.label);
     } else {
@@ -93,7 +106,7 @@ export default function NigeriaTaxpayerDashboard() {
     }
   };
 
-  const handleSubMenuClick = (subItem, parentLabel) => {
+  const handleSubMenuClick = (subItem: SidebarSubItem, parentLabel: string) => {
     setActiveMenu(`${parentLabel} - ${subItem.label}`);
   };
 
