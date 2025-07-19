@@ -3,7 +3,7 @@ import { FileText, Receipt, Award, Menu, X, Home, Calculator, HelpCircle, Phone,
 import TaxCalculator from '../componenets/tax_calculator';
 import { Link } from 'react-router-dom';
 
-export default function LIRSLandingPage() {
+export default function IRSLandingPage() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
 
@@ -109,7 +109,7 @@ export default function LIRSLandingPage() {
               </span>
             </h1>
             <p className="text-xl md:text-2xl text-white/90 mb-8 max-w-3xl mx-auto leading-relaxed">
-              Simplifying tax compliance for Tax residents and businesses. Experience seamless digital tax services with LIRS.
+              Simplifying tax compliance for Tax residents and businesses. Experience seamless digital tax services with IRS.
             </p>
             
             {/* CTA Buttons */}
@@ -123,7 +123,7 @@ export default function LIRSLandingPage() {
             <div className="flex flex-wrap justify-center items-center gap-6 text-white/80">
               <div className="flex items-center space-x-2">
                 <Users className="w-5 h-5" />
-                <span className="text-sm">+4 LIRS Partnership</span>
+                <span className="text-sm">+4 IRS Partnership</span>
               </div>
               <div className="flex items-center space-x-2">
                 <TrendingUp className="w-5 h-5" />
@@ -213,7 +213,7 @@ export default function LIRSLandingPage() {
             <div>
               <h3 className="text-lg font-semibold mb-4">About TIRS</h3>
               <p className="mb-4" style={{ color: '#6c757d' }}>
-                The Tax Internal Revenue Service (LIRS) is committed to providing efficient tax services to the residents and businesses of Tax State. Our mission is to ensure compliance with tax laws while promoting voluntary tax payment through innovative digital solutions.
+                The Tax Internal Revenue Service (IRS) is committed to providing efficient tax services to the residents and businesses of Tax State. Our mission is to ensure compliance with tax laws while promoting voluntary tax payment through innovative digital solutions.
               </p>
               <div className="flex space-x-4">
                 <a href="#" className="transition-colors duration-200" style={{ color: '#6c757d' }} onMouseEnter={(e) =>(e.target as HTMLElement).style.color = '#a682ff'} onMouseLeave={(e) =>(e.target as HTMLElement).style.color = '#6c757d'}>
@@ -253,7 +253,7 @@ export default function LIRSLandingPage() {
               <p className="mb-2" style={{ color: '#6c757d' }}>Tax Internal Revenue Service</p>
               <p className="mb-2" style={{ color: '#6c757d' }}>123 Tax Avenue, Tax  Nigeria</p>
               <p className="mb-2" style={{ color: '#6c757d' }}>Phone: +234 123 4567</p>
-              <p className="mb-2" style={{ color: '#6c757d' }}>Email: <a href="mailto:info@lirs.gov.ng" className="text-white hover:underline" style={{ color: '#a682ff' }}>info@lirs.gov.ng</a></p>
+              <p className="mb-2" style={{ color: '#6c757d' }}>Email: <a href="mailto:info@irs.gov.ng" className="text-white hover:underline" style={{ color: '#a682ff' }}>info@irs.gov.ng</a></p>
             </div>
           </div>
           

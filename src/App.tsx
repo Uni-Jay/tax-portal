@@ -1,18 +1,18 @@
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
-import LIRSLandingPage from './pages/landing';
 import LoginPage from './pages/login';
 import RegistrationForm from './pages/registration';
 import TaxpayerDashboard from './componenets/taxpayerDashboard';
 import CorporateDashboard from './componenets/CorporateDashboard';
 import ConsultantDashboard from './componenets/ConsultantDashboard';
 import StaffDashboard from './componenets/StaffDashboard';
+import IRSLandingPage from './pages/landing';
 
 function App() {
   return (
     
       <BrowserRouter>
         <Routes>
-          <Route path="/" element={<LIRSLandingPage />} />
+          <Route path="/" element={<IRSLandingPage />} />
           <Route path='/login' element={<LoginPage/>}/>
           <Route path='/register' element={<RegistrationForm/>}/>
           <Route path='/taxpayer-dashboard' element={<TaxpayerDashboard/>} />

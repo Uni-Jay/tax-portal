@@ -33,7 +33,7 @@ export default function LoginPage() {
     { value: 'taxpayer', label: 'Individual Taxpayer', icon: User },
     { value: 'corporate', label: 'Corporate Admin', icon: Building2 },
     { value: 'consultant', label: 'Consultant', icon: Users },
-    { value: 'staff', label: 'LIRS Staff', icon: Shield }
+    { value: 'staff', label: 'IRS Staff', icon: Shield }
   ];
 
   const handleBack = () => {
@@ -232,7 +232,7 @@ export default function LoginPage() {
                   value={formData.email}
                   onChange={(e) => handleInputChange('email', e.target.value)}
                   className="w-full pl-10 pr-4 py-3 bg-white border border-gray-200 rounded-lg focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 transition-all duration-200"
-                  placeholder="staff@lirs.gov.ng"
+                  placeholder="staff@irs.gov.ng"
                 />
               </div>
             </div>
@@ -271,9 +271,9 @@ export default function LoginPage() {
               <Shield className="w-8 h-8 text-white" />
             </div>
             <h1 className="text-2xl font-bold bg-gradient-to-r from-blue-600 to-green-600 bg-clip-text text-transparent mb-2">
-              LIRS eTax Portal
+              IRS eTax Portal
             </h1>
-            <p className="text-gray-600 text-sm">Lagos Internal Revenue Service</p>
+            <p className="text-gray-600 text-sm"> Internal Revenue Service</p>
           </div>
 
           <div className="space-y-6">
@@ -389,7 +389,7 @@ export default function LoginPage() {
           {/* Footer */}
           <div className="mt-8 pt-6 border-t border-gray-200 text-center">
             <p className="text-xs text-gray-500">
-              © 2025 Lagos Internal Revenue Service
+              © 2025 Internal Revenue Service
             </p>
             <p className="text-xs text-gray-500 mt-1">
               Secure • Reliable • Efficient
