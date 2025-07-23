@@ -25,7 +25,16 @@ import {
   Plus,
   Save,
   Trash2,
-  Download
+  Download,
+  Calendar,
+  Clock,
+  Filter,
+  Search,
+  TrendingUp,
+  DollarSign,
+  ChevronRight,
+  AlertTriangle,
+  Info
 } from 'lucide-react';
 
 interface QuickAccessItem {
@@ -40,6 +49,26 @@ interface SummaryData {
     value: string;
     status: 'warning' | 'success' | 'info' | 'error';
     count: number;
+}
+
+interface Assessment {
+  id: string;
+  type: string;
+  taxYear: string;
+  amount: number;
+  status: 'pending' | 'approved' | 'disputed' | 'overdue';
+  dueDate: string;
+  issueDate: string;
+  description: string;
+  reference: string;
+}
+
+interface ObjectionForm {
+  assessmentId: string;
+  reason: string;
+  supportingEvidence: string;
+  requestedAmount: number;
+  additionalComments: string;
 }
 
 interface SidebarProps {
@@ -59,6 +88,9 @@ interface MainContentProps {
   notifications: any[];
   quickAccessItems: QuickAccessItem[];
   summaryData: SummaryData[];
+  unreadNotifications: number[];
+  markAsRead: (id: number) => void;
+  markAllAsRead: () => void;
 }
 
 // Sidebar Component
@@ -221,7 +253,10 @@ const MainContent: React.FC<MainContentProps> = ({
   userProfile,
   notifications,
   quickAccessItems,
-  summaryData
+  summaryData,
+  unreadNotifications,
+  markAsRead,
+  markAllAsRead
 }) => {
   // Profile Management State
   const [profileData, setProfileData] = useState({
@@ -248,9 +283,94 @@ const MainContent: React.FC<MainContentProps> = ({
     { id: 3, name: 'Grace Adebayo', relationship: 'Child', taxpayerId: 'TP001234570', status: 'Dependent' }
   ]);
 
+  // Assessment State
+  const [assessments, setAssessments] = useState<Assessment[]>([
+    {
+      id: 'ASS-2025-001',
+      type: 'Personal Income Tax',
+      taxYear: '2024',
+      amount: 450000,
+      status: 'pending',
+      dueDate: '2025-08-15',
+      issueDate: '2025-07-01',
+      description: 'Annual income tax assessment for 2024 tax year',
+      reference: 'PIT-2024-JA-001'
+    },
+    {
+      id: 'ASS-2025-002',
+      type: 'Withholding Tax',
+      taxYear: '2024',
+      amount: 75000,
+      status: 'overdue',
+      dueDate: '2025-06-30',
+      issueDate: '2025-06-01',
+      description: 'Withholding tax on professional services',
+      reference: 'WHT-2024-JA-002'
+    },
+    {
+      id: 'ASS-2024-003',
+      type: 'Capital Gains Tax',
+      taxYear: '2024',
+      amount: 120000,
+      status: 'approved',
+      dueDate: '2025-05-15',
+      issueDate: '2025-04-01',
+      description: 'Capital gains from property sale',
+      reference: 'CGT-2024-JA-003'
+    },
+    {
+      id: 'ASS-2024-004',
+      type: 'Personal Income Tax',
+      taxYear: '2023',
+      amount: 380000,
+      status: 'disputed',
+      dueDate: '2024-08-15',
+      issueDate: '2024-07-01',
+      description: 'Annual income tax assessment for 2023 tax year - Under Review',
+      reference: 'PIT-2023-JA-004'
+    }
+  ]);
+
+  const [selectedAssessment, setSelectedAssessment] = useState<Assessment | null>(null);
+  const [objectionForm, setObjectionForm] = useState<ObjectionForm>({
+    assessmentId: '',
+    reason: '',
+    supportingEvidence: '',
+    requestedAmount: 0,
+    additionalComments: ''
+  });
+
+  const [filterStatus, setFilterStatus] = useState<string>('all');
+  const [searchTerm, setSearchTerm] = useState('');
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [modalType, setModalType] = useState('');
   const [formData, setFormData] = useState({});
+  
+  // Bill generation
+  const [billForm, setBillForm] = useState({
+    agency: '',
+    revenueType: '',
+    taxYear: '2025',
+    amount: '',
+    description: ''
+  });
+  const [generatedBill, setGeneratedBill] = useState<any>(null);
+  const [showBillPreview, setShowBillPreview] = useState(false);
+  
+  // Payment form
+  const [paymentForm, setPaymentForm] = useState({
+    paymentMethod: '',
+    assessmentId: '',
+    amount: '',
+    description: ''
+  });
+  
+  // File upload
+  const [uploadProgress, setUploadProgress] = useState<number>(0);
+  const [isUploading, setIsUploading] = useState(false);
+  
+  // Profile update state
+  const [profileUpdateSuccess, setProfileUpdateSuccess] = useState(false);
 
   const openModal = (type: string, data = {}) => {
     setModalType(type);
@@ -267,6 +387,14 @@ const MainContent: React.FC<MainContentProps> = ({
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
     setFormData(prev => ({ ...prev, [name]: value }));
+  };
+
+  const handleObjectionInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
+    const { name, value } = e.target;
+    setObjectionForm(prev => ({ 
+      ...prev, 
+      [name]: name === 'requestedAmount' ? parseFloat(value) || 0 : value 
+    }));
   };
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -286,12 +414,211 @@ const MainContent: React.FC<MainContentProps> = ({
     closeModal();
   };
 
+  const submitObjection = (e: React.FormEvent) => {
+    e.preventDefault();
+    
+    // Update assessment status to disputed
+    setAssessments(prev => prev.map(assessment => 
+      assessment.id === objectionForm.assessmentId 
+        ? { ...assessment, status: 'disputed' }
+        : assessment
+    ));
+
+    // Reset form
+    setObjectionForm({
+      assessmentId: '',
+      reason: '',
+      supportingEvidence: '',
+      requestedAmount: 0,
+      additionalComments: ''
+    });
+
+    alert('Objection submitted successfully! You will receive a confirmation email shortly.');
+  };
+
   const deleteDocument = (id: number) => {
     setDocuments(prev => prev.filter(doc => doc.id !== id));
   };
 
   const deleteFamilyMember = (id: number) => {
     setFamilyMembers(prev => prev.filter(member => member.id !== id));
+  };
+
+  // Bill generation functions
+  const handleBillFormChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
+    const { name, value } = e.target;
+    setBillForm(prev => ({ ...prev, [name]: value }));
+  };
+
+  const generateBill = () => {
+    if (!billForm.agency || !billForm.revenueType || !billForm.amount) {
+      alert('Please fill in all required fields');
+      return;
+    }
+
+    const newBill = {
+      id: 'BILL-' + Date.now(),
+      ...billForm,
+      amount: parseFloat(billForm.amount),
+      dateGenerated: new Date().toISOString(),
+      status: 'generated',
+      reference: 'REF-' + Math.random().toString(36).substr(2, 9).toUpperCase()
+    };
+
+    setGeneratedBill(newBill);
+    alert('Bill generated successfully!');
+    
+    // Reset form
+    setBillForm({
+      agency: '',
+      revenueType: '',
+      taxYear: '2025',
+      amount: '',
+      description: ''
+    });
+  };
+
+  const previewBill = () => {
+    if (!billForm.agency || !billForm.revenueType || !billForm.amount) {
+      alert('Please fill in all required fields to preview');
+      return;
+    }
+    setShowBillPreview(true);
+  };
+
+  // Payment functions
+  const handlePaymentFormChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+    const { name, value } = e.target;
+    setPaymentForm(prev => ({ ...prev, [name]: value }));
+  };
+
+  const processPayment = () => {
+    if (!paymentForm.paymentMethod || !paymentForm.assessmentId || !paymentForm.amount) {
+      alert('Please fill in all required fields');
+      return;
+    }
+
+    // Simulate payment processing
+    alert('Payment processed successfully! You will receive a confirmation email shortly.');
+    
+    // Reset form
+    setPaymentForm({
+      paymentMethod: '',
+      assessmentId: '',
+      amount: '',
+      description: ''
+    });
+  };
+
+  // File upload simulation
+  const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const files = event.target.files;
+    if (!files || files.length === 0) return;
+
+    setIsUploading(true);
+    setUploadProgress(0);
+
+    // Simulate upload progress
+    const uploadInterval = setInterval(() => {
+      setUploadProgress(prev => {
+        if (prev >= 100) {
+          clearInterval(uploadInterval);
+          setIsUploading(false);
+          
+          // Add new document to list
+          const newDoc = {
+            id: documents.length + 1,
+            name: files[0].name,
+            type: files[0].type.includes('image') ? 'Photo' : 'Document',
+            uploadDate: new Date().toISOString().split('T')[0],
+            status: 'pending',
+            size: (files[0].size / 1024 / 1024).toFixed(1) + ' MB'
+          };
+          
+          setDocuments(prev => [...prev, newDoc]);
+          alert('File uploaded successfully!');
+          return 100;
+        }
+        return prev + 10;
+      });
+    }, 200);
+  };
+
+  // Search and filter functions
+  const handleSearch = (term: string) => {
+    setSearchTerm(term);
+  };
+
+  const handleStatusFilter = (status: string) => {
+    setFilterStatus(status);
+  };
+
+  // Export functions
+  const exportToPDF = () => {
+    alert('Exporting to PDF... This would generate a PDF in a real application.');
+  };
+
+  const downloadDocument = (docId: number) => {
+    const doc = documents.find(d => d.id === docId);
+    if (doc) {
+      alert(`Downloading ${doc.name}... This would download the file in a real application.`);
+    }
+  };
+
+  // Filter assessments based on status and search term
+  const filteredAssessments = assessments.filter(assessment => {
+    const matchesStatus = filterStatus === 'all' || assessment.status === filterStatus;
+    const matchesSearch = searchTerm === '' || 
+      assessment.type.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      assessment.reference.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      assessment.taxYear.includes(searchTerm);
+    return matchesStatus && matchesSearch;
+  });
+
+  const getStatusColor = (status: string) => {
+    switch (status) {
+      case 'pending':
+        return 'bg-yellow-100 text-yellow-800 border-yellow-200';
+      case 'approved':
+        return 'bg-green-100 text-green-800 border-green-200';
+      case 'disputed':
+        return 'bg-blue-100 text-blue-800 border-blue-200';
+      case 'overdue':
+        return 'bg-red-100 text-red-800 border-red-200';
+      default:
+        return 'bg-gray-100 text-gray-800 border-gray-200';
+    }
+  };
+
+  const getStatusIcon = (status: string) => {
+    switch (status) {
+      case 'pending':
+        return <Clock className="w-4 h-4" />;
+      case 'approved':
+        return <CheckCircle className="w-4 h-4" />;
+      case 'disputed':
+        return <AlertTriangle className="w-4 h-4" />;
+      case 'overdue':
+        return <AlertCircle className="w-4 h-4" />;
+      default:
+        return <Info className="w-4 h-4" />;
+    }
+  };
+
+  const formatCurrency = (amount: number) => {
+    return new Intl.NumberFormat('en-NG', {
+      style: 'currency',
+      currency: 'NGN',
+      minimumFractionDigits: 0
+    }).format(amount);
+  };
+
+  const formatDate = (dateString: string) => {
+    return new Date(dateString).toLocaleDateString('en-GB', {
+      day: '2-digit',
+      month: 'short',
+      year: 'numeric'
+    });
   };
 
   const sidebarSections = [
@@ -447,6 +774,7 @@ const MainContent: React.FC<MainContentProps> = ({
 
     // Define content for each subsection
     const subsectionContent: { [key: string]: React.ReactNode } = {
+      // Profile Management subsections
       'view-profile': (
         <div className="space-y-6">
           <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
@@ -514,7 +842,7 @@ const MainContent: React.FC<MainContentProps> = ({
                   type="text"
                   value={profileData.name}
                   onChange={(e) => setProfileData(prev => ({ ...prev, name: e.target.value }))}
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:border-transparent"
+                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                 />
               </div>
               
@@ -524,7 +852,7 @@ const MainContent: React.FC<MainContentProps> = ({
                   type="email"
                   value={profileData.email}
                   onChange={(e) => setProfileData(prev => ({ ...prev, email: e.target.value }))}
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:border-transparent"
+                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                 />
               </div>
               
@@ -534,7 +862,7 @@ const MainContent: React.FC<MainContentProps> = ({
                   type="tel"
                   value={profileData.phone}
                   onChange={(e) => setProfileData(prev => ({ ...prev, phone: e.target.value }))}
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:border-transparent"
+                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                 />
               </div>
               
@@ -544,7 +872,7 @@ const MainContent: React.FC<MainContentProps> = ({
                   type="date"
                   value={profileData.dateOfBirth}
                   onChange={(e) => setProfileData(prev => ({ ...prev, dateOfBirth: e.target.value }))}
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:border-transparent"
+                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                 />
               </div>
               
@@ -554,7 +882,7 @@ const MainContent: React.FC<MainContentProps> = ({
                   value={profileData.address}
                   onChange={(e) => setProfileData(prev => ({ ...prev, address: e.target.value }))}
                   rows={3}
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:border-transparent resize-none"
+                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none"
                 />
               </div>
               
@@ -564,7 +892,7 @@ const MainContent: React.FC<MainContentProps> = ({
                   type="text"
                   value={profileData.occupation}
                   onChange={(e) => setProfileData(prev => ({ ...prev, occupation: e.target.value }))}
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:border-transparent"
+                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                 />
               </div>
               
@@ -573,7 +901,7 @@ const MainContent: React.FC<MainContentProps> = ({
                 <select
                   value={profileData.maritalStatus}
                   onChange={(e) => setProfileData(prev => ({ ...prev, maritalStatus: e.target.value }))}
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:border-transparent"
+                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                 >
                   <option value="Single">Single</option>
                   <option value="Married">Married</option>
@@ -586,9 +914,9 @@ const MainContent: React.FC<MainContentProps> = ({
             <div className="flex justify-end mt-6">
               <button
                 onClick={() => {
-                  // Save the current profile data and show success message
                   console.log('Profile updated successfully:', profileData);
-                  alert('Profile updated successfully!');
+                  setProfileUpdateSuccess(true);
+                  setTimeout(() => setProfileUpdateSuccess(false), 3000);
                 }}
                 className="inline-flex items-center px-6 py-3 rounded-lg text-white font-medium hover:opacity-90 transition-opacity"
                 style={{ backgroundColor: '#102e4a' }}
@@ -597,6 +925,16 @@ const MainContent: React.FC<MainContentProps> = ({
                 Save Changes
               </button>
             </div>
+
+            {/* Success Message */}
+            {profileUpdateSuccess && (
+              <div className="mt-4 p-4 bg-green-50 border border-green-200 rounded-lg">
+                <div className="flex items-center space-x-2">
+                  <CheckCircle className="w-5 h-5 text-green-600" />
+                  <p className="text-sm font-medium text-green-800">Profile updated successfully!</p>
+                </div>
+              </div>
+            )}
           </div>
         </div>
       ),
@@ -605,23 +943,53 @@ const MainContent: React.FC<MainContentProps> = ({
           <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
             <div className="flex justify-between items-center mb-6">
               <h3 className="text-xl font-bold" style={{ color: '#102e4a' }}>Document Management</h3>
-              <button
-                className="inline-flex items-center px-4 py-2 rounded-lg text-white text-sm font-medium hover:opacity-90 transition-opacity"
-                style={{ backgroundColor: '#102e4a' }}
-              >
+              <label className="inline-flex items-center px-4 py-2 rounded-lg text-white text-sm font-medium hover:opacity-90 transition-opacity cursor-pointer"
+                style={{ backgroundColor: '#102e4a' }}>
                 <Upload className="w-4 h-4 mr-2" />
                 Upload New Document
-              </button>
+                <input
+                  type="file"
+                  onChange={handleFileUpload}
+                  className="hidden"
+                  accept=".pdf,.jpg,.jpeg,.png,.doc,.docx"
+                  multiple
+                />
+              </label>
             </div>
 
-            {/* Upload Area */}
             <div className="border-2 border-dashed border-gray-300 rounded-lg p-8 mb-6 text-center hover:border-gray-400 transition-colors">
-              <Upload className="w-12 h-12 mx-auto mb-4" style={{ color: '#6c757d' }} />
-              <p className="text-lg font-medium mb-2" style={{ color: '#102e4a' }}>Drop files here or click to upload</p>
-              <p className="text-sm" style={{ color: '#6c757d' }}>Supported formats: PDF, JPG, PNG (Max 10MB)</p>
+              <label className="cursor-pointer block">
+                <input
+                  type="file"
+                  onChange={handleFileUpload}
+                  className="hidden"
+                  accept=".pdf,.jpg,.jpeg,.png,.doc,.docx"
+                  multiple
+                />
+                <Upload className="w-12 h-12 mx-auto mb-4" style={{ color: '#6c757d' }} />
+                <p className="text-lg font-medium mb-2" style={{ color: '#102e4a' }}>Drop files here or click to upload</p>
+                <p className="text-sm" style={{ color: '#6c757d' }}>Supported formats: PDF, JPG, PNG, DOC, DOCX (Max 10MB)</p>
+              </label>
             </div>
 
-            {/* Documents List */}
+            {/* Upload Progress */}
+            {isUploading && (
+              <div className="mb-6 p-4 bg-blue-50 border border-blue-200 rounded-lg">
+                <div className="flex items-center space-x-3">
+                  <div className="flex-1">
+                    <p className="text-sm font-medium text-blue-800">Uploading...</p>
+                    <div className="w-full bg-blue-200 rounded-full h-2 mt-2">
+                      <div 
+                        className="bg-blue-600 h-2 rounded-full transition-all duration-300"
+                        style={{ width: `${uploadProgress}%` }}
+                      ></div>
+                    </div>
+                  </div>
+                  <span className="text-sm font-medium text-blue-800">{uploadProgress}%</span>
+                </div>
+              </div>
+            )}
+
             <div className="space-y-4">
               <h4 className="font-medium" style={{ color: '#102e4a' }}>Uploaded Documents</h4>
               {documents.map((doc) => (
@@ -654,6 +1022,7 @@ const MainContent: React.FC<MainContentProps> = ({
                       )}
                     </span>
                     <button
+                      onClick={() => downloadDocument(doc.id)}
                       className="p-2 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
                       title="Download"
                     >
@@ -729,55 +1098,877 @@ const MainContent: React.FC<MainContentProps> = ({
           </div>
         </div>
       ),
+
+      // Assessment subsections
+      'view-assessments': (
+        <div className="space-y-6">
+          {/* Assessment Summary Cards */}
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+            <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+              <div className="flex items-center space-x-3">
+                <div className="p-2 rounded-lg bg-yellow-100">
+                  <Clock className="w-5 h-5 text-yellow-600" />
+                </div>
+                <div>
+                  <p className="text-sm text-gray-600">Pending</p>
+                  <p className="text-2xl font-bold text-yellow-600">
+                    {assessments.filter(a => a.status === 'pending').length}
+                  </p>
+                </div>
+              </div>
+            </div>
+            <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+              <div className="flex items-center space-x-3">
+                <div className="p-2 rounded-lg bg-red-100">
+                  <AlertCircle className="w-5 h-5 text-red-600" />
+                </div>
+                <div>
+                  <p className="text-sm text-gray-600">Overdue</p>
+                  <p className="text-2xl font-bold text-red-600">
+                    {assessments.filter(a => a.status === 'overdue').length}
+                  </p>
+                </div>
+              </div>
+            </div>
+            <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+              <div className="flex items-center space-x-3">
+                <div className="p-2 rounded-lg bg-blue-100">
+                  <AlertTriangle className="w-5 h-5 text-blue-600" />
+                </div>
+                <div>
+                  <p className="text-sm text-gray-600">Disputed</p>
+                  <p className="text-2xl font-bold text-blue-600">
+                    {assessments.filter(a => a.status === 'disputed').length}
+                  </p>
+                </div>
+              </div>
+            </div>
+            <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+              <div className="flex items-center space-x-3">
+                <div className="p-2 rounded-lg bg-green-100">
+                  <CheckCircle className="w-5 h-5 text-green-600" />
+                </div>
+                <div>
+                  <p className="text-sm text-gray-600">Total Amount</p>
+                  <p className="text-lg font-bold text-green-600">
+                    {formatCurrency(assessments.reduce((sum, a) => sum + a.amount, 0))}
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Filter and Search */}
+          <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+            <div className="flex flex-col sm:flex-row gap-4 mb-6">
+              <div className="flex-1">
+                <div className="relative">
+                  <Search className="w-5 h-5 absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
+                  <input
+                    type="text"
+                    placeholder="Search by reference, type, or year..."
+                    value={searchTerm}
+                    onChange={(e) => handleSearch(e.target.value)}
+                    className="pl-10 pr-4 py-2 w-full border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  />
+                </div>
+              </div>
+              <div className="flex items-center space-x-2">
+                <Filter className="w-5 h-5 text-gray-400" />
+                <select
+                  value={filterStatus}
+                  onChange={(e) => handleStatusFilter(e.target.value)}
+                  className="border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                >
+                  <option value="all">All Status</option>
+                  <option value="pending">Pending</option>
+                  <option value="approved">Approved</option>
+                  <option value="disputed">Disputed</option>
+                  <option value="overdue">Overdue</option>
+                </select>
+              </div>
+            </div>
+
+            {/* Assessments List */}
+            <div className="space-y-4">
+              {filteredAssessments.map((assessment) => (
+                <div key={assessment.id} className="border border-gray-200 rounded-lg p-6 hover:shadow-md transition-shadow">
+                  <div className="flex items-start justify-between">
+                    <div className="flex-1">
+                      <div className="flex items-center space-x-3 mb-3">
+                        <h3 className="text-lg font-semibold" style={{ color: '#102e4a' }}>{assessment.type}</h3>
+                        <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium border ${getStatusColor(assessment.status)}`}>
+                          {getStatusIcon(assessment.status)}
+                          <span className="ml-1 capitalize">{assessment.status}</span>
+                        </span>
+                      </div>
+                      
+                      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+                        <div>
+                          <label className="text-sm font-medium text-gray-600">Reference</label>
+                          <p className="text-sm" style={{ color: '#102e4a' }}>{assessment.reference}</p>
+                        </div>
+                        <div>
+                          <label className="text-sm font-medium text-gray-600">Tax Year</label>
+                          <p className="text-sm" style={{ color: '#102e4a' }}>{assessment.taxYear}</p>
+                        </div>
+                        <div>
+                          <label className="text-sm font-medium text-gray-600">Issue Date</label>
+                          <p className="text-sm" style={{ color: '#102e4a' }}>{formatDate(assessment.issueDate)}</p>
+                        </div>
+                      </div>
+
+                      <p className="text-sm text-gray-600 mb-4">{assessment.description}</p>
+                      
+                      <div className="flex items-center justify-between">
+                        <div>
+                          <label className="text-sm font-medium text-gray-600">Amount Due</label>
+                          <p className="text-xl font-bold" style={{ color: '#102e4a' }}>
+                            {formatCurrency(assessment.amount)}
+                          </p>
+                        </div>
+                        <div className="text-right">
+                          <label className="text-sm font-medium text-gray-600">Due Date</label>
+                          <p className={`text-sm font-medium ${
+                            new Date(assessment.dueDate) < new Date() ? 'text-red-600' : 'text-gray-900'
+                          }`}>
+                            {formatDate(assessment.dueDate)}
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+                    
+                    <div className="flex flex-col space-y-2 ml-6">
+                      <button
+                        onClick={() => setSelectedAssessment(assessment)}
+                        className="inline-flex items-center px-3 py-2 text-sm font-medium text-blue-600 bg-blue-50 rounded-lg hover:bg-blue-100 transition-colors"
+                      >
+                        <Eye className="w-4 h-4 mr-1" />
+                        View Details
+                      </button>
+                      {(assessment.status === 'pending' || assessment.status === 'overdue') && (
+                        <button
+                          onClick={() => {
+                            setObjectionForm(prev => ({ ...prev, assessmentId: assessment.id }));
+                            onSubsectionClick('object-assessment');
+                          }}
+                          className="inline-flex items-center px-3 py-2 text-sm font-medium text-orange-600 bg-orange-50 rounded-lg hover:bg-orange-100 transition-colors"
+                        >
+                          <AlertCircle className="w-4 h-4 mr-1" />
+                          Object
+                        </button>
+                      )}
+                      {assessment.status !== 'disputed' && (
+                        <button
+                          onClick={() => onQuickAccess('make-payment')}
+                          className="inline-flex items-center px-3 py-2 text-sm font-medium text-white rounded-lg hover:opacity-90 transition-opacity"
+                          style={{ backgroundColor: '#102e4a' }}
+                        >
+                          <CreditCard className="w-4 h-4 mr-1" />
+                          Pay Now
+                        </button>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              ))}
+              
+              {filteredAssessments.length === 0 && (
+                <div className="text-center py-12">
+                  <BarChart3 className="w-16 h-16 mx-auto mb-4 text-gray-400" />
+                  <h3 className="text-lg font-medium text-gray-900 mb-2">No assessments found</h3>
+                  <p className="text-gray-600">Try adjusting your search or filter criteria.</p>
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+      ),
+
+      'object-assessment': (
+        <div className="space-y-6">
+          <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+            <div className="flex items-center space-x-3 mb-6">
+              <div className="p-2 rounded-lg bg-orange-100">
+                <AlertCircle className="w-6 h-6 text-orange-600" />
+              </div>
+              <div>
+                <h3 className="text-xl font-bold" style={{ color: '#102e4a' }}>Object to Assessment</h3>
+                <p className="text-sm text-gray-600">Submit a formal objection to a tax assessment</p>
+              </div>
+            </div>
+
+            {/* Assessment Selection */}
+            <div className="mb-8">
+              <label className="block text-sm font-medium mb-3" style={{ color: '#6c757d' }}>Select Assessment to Object</label>
+              <div className="space-y-3">
+                {assessments
+                  .filter(a => a.status === 'pending' || a.status === 'overdue')
+                  .map(assessment => (
+                    <div 
+                      key={assessment.id}
+                      className={`border rounded-lg p-4 cursor-pointer transition-all ${
+                        objectionForm.assessmentId === assessment.id 
+                          ? 'border-blue-500 bg-blue-50' 
+                          : 'border-gray-200 hover:border-gray-300'
+                      }`}
+                      onClick={() => setObjectionForm(prev => ({ 
+                        ...prev, 
+                        assessmentId: assessment.id,
+                        requestedAmount: assessment.amount 
+                      }))}
+                    >
+                      <div className="flex items-center justify-between">
+                        <div>
+                          <h4 className="font-medium" style={{ color: '#102e4a' }}>{assessment.type}</h4>
+                          <p className="text-sm text-gray-600">{assessment.reference} • {assessment.taxYear}</p>
+                          <p className="text-sm text-gray-600">{assessment.description}</p>
+                        </div>
+                        <div className="text-right">
+                          <p className="font-bold" style={{ color: '#102e4a' }}>{formatCurrency(assessment.amount)}</p>
+                          <p className="text-sm text-gray-600">Due: {formatDate(assessment.dueDate)}</p>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+              </div>
+            </div>
+
+            {/* Objection Form */}
+            {objectionForm.assessmentId && (
+              <form onSubmit={submitObjection} className="space-y-6">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div>
+                    <label className="block text-sm font-medium mb-2" style={{ color: '#6c757d' }}>
+                      Reason for Objection *
+                    </label>
+                    <select
+                      name="reason"
+                      value={objectionForm.reason}
+                      onChange={handleObjectionInputChange}
+                      required
+                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    >
+                      <option value="">Select reason</option>
+                      <option value="incorrect_calculation">Incorrect Calculation</option>
+                      <option value="double_taxation">Double Taxation</option>
+                      <option value="exemption_not_applied">Exemption Not Applied</option>
+                      <option value="wrong_tax_year">Wrong Tax Year</option>
+                      <option value="incorrect_income">Incorrect Income Assessment</option>
+                      <option value="other">Other</option>
+                    </select>
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium mb-2" style={{ color: '#6c757d' }}>
+                      Requested Amount (₦)
+                    </label>
+                    <input
+                      type="number"
+                      name="requestedAmount"
+                      value={objectionForm.requestedAmount}
+                      onChange={handleObjectionInputChange}
+                      min="0"
+                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                      placeholder="Enter corrected amount"
+                    />
+                  </div>
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium mb-2" style={{ color: '#6c757d' }}>
+                    Supporting Evidence/Documentation
+                  </label>
+                  <textarea
+                    name="supportingEvidence"
+                    value={objectionForm.supportingEvidence}
+                    onChange={handleObjectionInputChange}
+                    rows={4}
+                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none"
+                    placeholder="Describe the evidence supporting your objection (receipts, bank statements, etc.)"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium mb-2" style={{ color: '#6c757d' }}>
+                    Additional Comments
+                  </label>
+                  <textarea
+                    name="additionalComments"
+                    value={objectionForm.additionalComments}
+                    onChange={handleObjectionInputChange}
+                    rows={4}
+                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none"
+                    placeholder="Any additional information or comments"
+                  />
+                </div>
+
+                {/* File Upload Area */}
+                <div>
+                  <label className="block text-sm font-medium mb-2" style={{ color: '#6c757d' }}>
+                    Upload Supporting Documents
+                  </label>
+                  <div className="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center hover:border-gray-400 transition-colors">
+                    <Upload className="w-8 h-8 mx-auto mb-2 text-gray-400" />
+                    <p className="text-sm text-gray-600">Click to upload or drag and drop</p>
+                    <p className="text-xs text-gray-500 mt-1">PDF, DOC, JPG, PNG (Max 5MB each)</p>
+                  </div>
+                </div>
+
+                {/* Terms and Submit */}
+                <div className="border-t border-gray-200 pt-6">
+                  <div className="flex items-start space-x-3 mb-6">
+                    <input
+                      type="checkbox"
+                      id="terms"
+                      required
+                      className="mt-1 h-4 w-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
+                    />
+                    <label htmlFor="terms" className="text-sm text-gray-600">
+                      I declare that the information provided is true and accurate to the best of my knowledge. 
+                      I understand that providing false information may result in penalties.
+                    </label>
+                  </div>
+
+                  <div className="flex justify-end space-x-4">
+                    <button
+                      type="button"
+                      onClick={() => setObjectionForm({
+                        assessmentId: '',
+                        reason: '',
+                        supportingEvidence: '',
+                        requestedAmount: 0,
+                        additionalComments: ''
+                      })}
+                      className="px-6 py-3 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition-colors"
+                    >
+                      Reset Form
+                    </button>
+                    <button
+                      type="submit"
+                      className="inline-flex items-center px-6 py-3 rounded-lg text-white font-medium hover:opacity-90 transition-opacity"
+                      style={{ backgroundColor: '#102e4a' }}
+                    >
+                      <Send className="w-4 h-4 mr-2" />
+                      Submit Objection
+                    </button>
+                  </div>
+                </div>
+              </form>
+            )}
+
+            {!objectionForm.assessmentId && (
+              <div className="text-center py-8">
+                <AlertCircle className="w-16 h-16 mx-auto mb-4 text-gray-400" />
+                <h3 className="text-lg font-medium text-gray-900 mb-2">Select an Assessment</h3>
+                <p className="text-gray-600">Choose an assessment from the list above to begin your objection.</p>
+              </div>
+            )}
+          </div>
+        </div>
+      ),
+
+      'assessment-history': (
+        <div className="space-y-6">
+          {/* Summary Statistics */}
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+            <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+              <div className="flex items-center space-x-3">
+                <div className="p-2 rounded-lg bg-blue-100">
+                  <BarChart3 className="w-5 h-5 text-blue-600" />
+                </div>
+                <div>
+                  <p className="text-sm text-gray-600">Total Assessments</p>
+                  <p className="text-2xl font-bold" style={{ color: '#102e4a' }}>
+                    {assessments.length}
+                  </p>
+                </div>
+              </div>
+            </div>
+            <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+              <div className="flex items-center space-x-3">
+                <div className="p-2 rounded-lg bg-green-100">
+                  <DollarSign className="w-5 h-5 text-green-600" />
+                </div>
+                <div>
+                  <p className="text-sm text-gray-600">Total Amount</p>
+                  <p className="text-xl font-bold text-green-600">
+                    {formatCurrency(assessments.reduce((sum, a) => sum + a.amount, 0))}
+                  </p>
+                </div>
+              </div>
+            </div>
+            <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+              <div className="flex items-center space-x-3">
+                <div className="p-2 rounded-lg bg-yellow-100">
+                  <TrendingUp className="w-5 h-5 text-yellow-600" />
+                </div>
+                <div>
+                  <p className="text-sm text-gray-600">This Year</p>
+                  <p className="text-2xl font-bold text-yellow-600">
+                    {assessments.filter(a => a.taxYear === '2024').length}
+                  </p>
+                </div>
+              </div>
+            </div>
+            <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+              <div className="flex items-center space-x-3">
+                <div className="p-2 rounded-lg bg-red-100">
+                  <Calendar className="w-5 h-5 text-red-600" />
+                </div>
+                <div>
+                  <p className="text-sm text-gray-600">Avg. Processing</p>
+                  <p className="text-2xl font-bold text-red-600">
+                    15 days
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Timeline View */}
+          <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+            <div className="flex justify-between items-center mb-6">
+              <h3 className="text-xl font-bold" style={{ color: '#102e4a' }}>Assessment Timeline</h3>
+              <div className="flex space-x-2">
+                <button 
+                  onClick={exportToPDF}
+                  className="px-3 py-2 text-sm border border-gray-300 rounded-lg hover:bg-gray-50"
+                >
+                  Export PDF
+                </button>
+                <select 
+                  onChange={(e) => handleStatusFilter(e.target.value)}
+                  className="px-3 py-2 text-sm border border-gray-300 rounded-lg hover:bg-gray-50"
+                >
+                  <option value="all">All Years</option>
+                  <option value="2024">2024</option>
+                  <option value="2023">2023</option>
+                  <option value="2022">2022</option>
+                </select>
+              </div>
+            </div>
+
+            <div className="space-y-6">
+              {assessments
+                .sort((a, b) => new Date(b.issueDate).getTime() - new Date(a.issueDate).getTime())
+                .map((assessment, index) => (
+                  <div key={assessment.id} className="relative">
+                    {/* Timeline Line */}
+                    {index < assessments.length - 1 && (
+                      <div className="absolute left-6 top-12 w-0.5 h-16 bg-gray-200"></div>
+                    )}
+                    
+                    <div className="flex items-start space-x-4">
+                      {/* Timeline Dot */}
+                      <div className={`flex-shrink-0 w-12 h-12 rounded-full flex items-center justify-center border-4 border-white shadow-lg ${
+                        assessment.status === 'approved' ? 'bg-green-500' :
+                        assessment.status === 'pending' ? 'bg-yellow-500' :
+                        assessment.status === 'disputed' ? 'bg-blue-500' :
+                        assessment.status === 'overdue' ? 'bg-red-500' :
+                        'bg-gray-500'
+                      }`}>
+                        {getStatusIcon(assessment.status)}
+                      </div>
+
+                      {/* Content */}
+                      <div className="flex-1 min-w-0">
+                        <div className="bg-gray-50 rounded-lg p-4 border border-gray-200">
+                          <div className="flex items-start justify-between mb-3">
+                            <div>
+                              <h4 className="font-semibold" style={{ color: '#102e4a' }}>{assessment.type}</h4>
+                              <p className="text-sm text-gray-600">{assessment.reference}</p>
+                            </div>
+                            <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getStatusColor(assessment.status)}`}>
+                              {assessment.status.charAt(0).toUpperCase() + assessment.status.slice(1)}
+                            </span>
+                          </div>
+                          
+                          <div className="grid grid-cols-1 md:grid-cols-4 gap-4 text-sm">
+                            <div>
+                              <span className="font-medium text-gray-600">Tax Year:</span>
+                              <p style={{ color: '#102e4a' }}>{assessment.taxYear}</p>
+                            </div>
+                            <div>
+                              <span className="font-medium text-gray-600">Amount:</span>
+                              <p className="font-semibold" style={{ color: '#102e4a' }}>{formatCurrency(assessment.amount)}</p>
+                            </div>
+                            <div>
+                              <span className="font-medium text-gray-600">Issue Date:</span>
+                              <p style={{ color: '#102e4a' }}>{formatDate(assessment.issueDate)}</p>
+                            </div>
+                            <div>
+                              <span className="font-medium text-gray-600">Due Date:</span>
+                              <p className={new Date(assessment.dueDate) < new Date() ? 'text-red-600 font-medium' : 'text-gray-900'}>
+                                {formatDate(assessment.dueDate)}
+                              </p>
+                            </div>
+                          </div>
+
+                          <p className="text-sm text-gray-600 mt-3">{assessment.description}</p>
+
+                          <div className="flex justify-end mt-4 space-x-2">
+                            <button className="inline-flex items-center px-3 py-1.5 text-xs font-medium text-blue-600 bg-blue-50 rounded-md hover:bg-blue-100 transition-colors">
+                              <Eye className="w-3 h-3 mr-1" />
+                              View Details
+                            </button>
+                            <button className="inline-flex items-center px-3 py-1.5 text-xs font-medium text-gray-600 bg-gray-50 rounded-md hover:bg-gray-100 transition-colors">
+                              <Download className="w-3 h-3 mr-1" />
+                              Download
+                            </button>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+            </div>
+
+            {assessments.length === 0 && (
+              <div className="text-center py-12">
+                <History className="w-16 h-16 mx-auto mb-4 text-gray-400" />
+                <h3 className="text-lg font-medium text-gray-900 mb-2">No assessment history</h3>
+                <p className="text-gray-600">Your assessment history will appear here once assessments are issued.</p>
+              </div>
+            )}
+          </div>
+
+          {/* Yearly Summary */}
+          <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+            <h3 className="text-lg font-bold mb-6" style={{ color: '#102e4a' }}>Yearly Summary</h3>
+            
+            <div className="overflow-x-auto">
+              <table className="w-full">
+                <thead>
+                  <tr className="border-b border-gray-200">
+                    <th className="text-left py-3 px-4 font-medium text-gray-600">Tax Year</th>
+                    <th className="text-left py-3 px-4 font-medium text-gray-600">Assessments</th>
+                    <th className="text-left py-3 px-4 font-medium text-gray-600">Total Amount</th>
+                    <th className="text-left py-3 px-4 font-medium text-gray-600">Status</th>
+                    <th className="text-left py-3 px-4 font-medium text-gray-600">Actions</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {['2024', '2023', '2022'].map(year => {
+                    const yearAssessments = assessments.filter(a => a.taxYear === year);
+                    const totalAmount = yearAssessments.reduce((sum, a) => sum + a.amount, 0);
+                    const hasOverdue = yearAssessments.some(a => a.status === 'overdue');
+                    const hasPending = yearAssessments.some(a => a.status === 'pending');
+                    
+                    return (
+                      <tr key={year} className="border-b border-gray-100 hover:bg-gray-50">
+                        <td className="py-4 px-4 font-medium" style={{ color: '#102e4a' }}>{year}</td>
+                        <td className="py-4 px-4">{yearAssessments.length}</td>
+                        <td className="py-4 px-4 font-semibold">{formatCurrency(totalAmount)}</td>
+                        <td className="py-4 px-4">
+                          {hasOverdue ? (
+                            <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800">
+                              Has Overdue
+                            </span>
+                          ) : hasPending ? (
+                            <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800">
+                              Pending
+                            </span>
+                          ) : (
+                            <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                              Completed
+                            </span>
+                          )}
+                        </td>
+                        <td className="py-4 px-4">
+                          <button className="inline-flex items-center text-sm text-blue-600 hover:text-blue-800">
+                            View Details
+                            <ChevronRight className="w-4 h-4 ml-1" />
+                          </button>
+                        </td>
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      ),
+
+      // Payment subsections
       'generate-bill': (
         <div className="space-y-6">
           <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
             <h3 className="text-lg font-semibold mb-6" style={{ color: '#102e4a' }}>Generate New Bill</h3>
+            
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div>
-                <label className="block text-sm font-medium mb-2" style={{ color: '#6c757d' }}>Agency</label>
-                <select className="w-full border border-gray-300 rounded-md px-3 py-2 focus:ring-2 focus:ring-opacity-50">
-                  <option>Select Agency</option>
-                  <option>Tax Internal Revenue Service</option>
-                  <option>Federal Inland Revenue Service</option>
+                <label className="block text-sm font-medium mb-2" style={{ color: '#6c757d' }}>Agency *</label>
+                <select 
+                  name="agency"
+                  value={billForm.agency}
+                  onChange={handleBillFormChange}
+                  className="w-full border border-gray-300 rounded-md px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                >
+                  <option value="">Select Agency</option>
+                  <option value="Tax Internal Revenue Service">Tax Internal Revenue Service</option>
+                  <option value="Federal Inland Revenue Service">Federal Inland Revenue Service</option>
                 </select>
               </div>
               <div>
-                <label className="block text-sm font-medium mb-2" style={{ color: '#6c757d' }}>Revenue Type</label>
-                <select className="w-full border border-gray-300 rounded-md px-3 py-2">
-                  <option>Select Revenue Type</option>
-                  <option>Personal Income Tax</option>
-                  <option>Withholding Tax</option>
-                  <option>Capital Gains Tax</option>
+                <label className="block text-sm font-medium mb-2" style={{ color: '#6c757d' }}>Revenue Type *</label>
+                <select 
+                  name="revenueType"
+                  value={billForm.revenueType}
+                  onChange={handleBillFormChange}
+                  className="w-full border border-gray-300 rounded-md px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                >
+                  <option value="">Select Revenue Type</option>
+                  <option value="Personal Income Tax">Personal Income Tax</option>
+                  <option value="Withholding Tax">Withholding Tax</option>
+                  <option value="Capital Gains Tax">Capital Gains Tax</option>
                 </select>
               </div>
               <div>
                 <label className="block text-sm font-medium mb-2" style={{ color: '#6c757d' }}>Tax Year</label>
-                <select className="w-full border border-gray-300 rounded-md px-3 py-2">
-                  <option>2025</option>
-                  <option>2024</option>
-                  <option>2023</option>
+                <select 
+                  name="taxYear"
+                  value={billForm.taxYear}
+                  onChange={handleBillFormChange}
+                  className="w-full border border-gray-300 rounded-md px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                >
+                  <option value="2025">2025</option>
+                  <option value="2024">2024</option>
+                  <option value="2023">2023</option>
                 </select>
               </div>
               <div>
-                <label className="block text-sm font-medium mb-2" style={{ color: '#6c757d' }}>Amount (₦)</label>
-                <input type="number" className="w-full border border-gray-300 rounded-md px-3 py-2" placeholder="Enter amount" />
+                <label className="block text-sm font-medium mb-2" style={{ color: '#6c757d' }}>Amount (₦) *</label>
+                <input 
+                  type="number" 
+                  name="amount"
+                  value={billForm.amount}
+                  onChange={handleBillFormChange}
+                  className="w-full border border-gray-300 rounded-md px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent" 
+                  placeholder="Enter amount" 
+                />
+              </div>
+              <div className="md:col-span-2">
+                <label className="block text-sm font-medium mb-2" style={{ color: '#6c757d' }}>Description</label>
+                <textarea 
+                  name="description"
+                  value={billForm.description}
+                  onChange={handleBillFormChange}
+                  rows={3}
+                  className="w-full border border-gray-300 rounded-md px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  placeholder="Enter bill description (optional)"
+                />
               </div>
             </div>
+            
             <div className="mt-6 flex space-x-4">
               <button 
+                onClick={generateBill}
                 className="px-6 py-2 text-white rounded-md transition-all duration-200 hover:opacity-90"
                 style={{ backgroundColor: '#102e4a' }}
               >
                 Generate Bill
               </button>
-              <button className="px-6 py-2 border border-gray-300 rounded-md hover:bg-gray-50">
+              <button 
+                onClick={previewBill}
+                className="px-6 py-2 border border-gray-300 rounded-md hover:bg-gray-50"
+              >
                 Preview
               </button>
+            </div>
+
+            {/* Generated Bill Success */}
+            {generatedBill && (
+              <div className="mt-6 p-4 bg-green-50 border border-green-200 rounded-lg">
+                <div className="flex items-center space-x-2">
+                  <CheckCircle className="w-5 h-5 text-green-600" />
+                  <h4 className="font-medium text-green-800">Bill Generated Successfully!</h4>
+                </div>
+                <div className="mt-2 text-sm text-green-700">
+                  <p>Reference: {generatedBill.reference}</p>
+                  <p>Amount: {formatCurrency(generatedBill.amount)}</p>
+                </div>
+                <div className="mt-3 flex space-x-2">
+                  <button className="text-xs bg-green-600 text-white px-3 py-1 rounded">
+                    Download PDF
+                  </button>
+                  <button className="text-xs bg-blue-600 text-white px-3 py-1 rounded">
+                    Send via Email
+                  </button>
+                </div>
+              </div>
+            )}
+          </div>
+
+          {/* Bill Preview Modal */}
+          {showBillPreview && (
+            <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
+              <div className="bg-white rounded-lg shadow-2xl w-full max-w-2xl max-h-[90vh] overflow-y-auto">
+                <div className="p-6 border-b border-gray-200" style={{ backgroundColor: '#102e4a' }}>
+                  <div className="flex justify-between items-center">
+                    <h2 className="text-xl font-semibold text-white">Bill Preview</h2>
+                    <button 
+                      onClick={() => setShowBillPreview(false)} 
+                      className="text-white hover:bg-white hover:bg-opacity-20 p-2 rounded-lg"
+                    >
+                      <X className="w-5 h-5" />
+                    </button>
+                  </div>
+                </div>
+
+                <div className="p-6">
+                  <div className="border-2 border-gray-300 rounded-lg p-6">
+                    <div className="text-center mb-6">
+                      <h3 className="text-2xl font-bold" style={{ color: '#102e4a' }}>TAX BILL</h3>
+                      <p className="text-gray-600">Tax Internal Revenue Service</p>
+                    </div>
+                    
+                    <div className="grid grid-cols-2 gap-4 mb-6">
+                      <div>
+                        <p className="text-sm font-medium text-gray-600">Bill To:</p>
+                        <p className="font-semibold">{profileData.name}</p>
+                        <p className="text-sm text-gray-600">{profileData.taxpayerId}</p>
+                      </div>
+                      <div>
+                        <p className="text-sm font-medium text-gray-600">Bill Date:</p>
+                        <p>{new Date().toLocaleDateString()}</p>
+                        <p className="text-sm font-medium text-gray-600 mt-2">Due Date:</p>
+                        <p>{new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toLocaleDateString()}</p>
+                      </div>
+                    </div>
+
+                    <div className="border-t border-gray-200 pt-4">
+                      <div className="grid grid-cols-3 gap-4 font-semibold text-gray-700 mb-2">
+                        <div>Description</div>
+                        <div>Tax Year</div>
+                        <div className="text-right">Amount</div>
+                      </div>
+                      <div className="grid grid-cols-3 gap-4 py-2">
+                        <div>{billForm.revenueType}</div>
+                        <div>{billForm.taxYear}</div>
+                        <div className="text-right font-semibold">{formatCurrency(parseFloat(billForm.amount) || 0)}</div>
+                      </div>
+                    </div>
+
+                    <div className="border-t border-gray-200 pt-4 mt-4">
+                      <div className="flex justify-between items-center">
+                        <span className="text-lg font-semibold">Total Amount Due:</span>
+                        <span className="text-2xl font-bold" style={{ color: '#102e4a' }}>
+                          {formatCurrency(parseFloat(billForm.amount) || 0)}
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="flex justify-end space-x-4 mt-6">
+                    <button
+                      onClick={() => setShowBillPreview(false)}
+                      className="px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50"
+                    >
+                      Close
+                    </button>
+                    <button
+                      onClick={() => {
+                        setShowBillPreview(false);
+                        generateBill();
+                      }}
+                      className="px-4 py-2 rounded-lg text-white hover:opacity-90"
+                      style={{ backgroundColor: '#102e4a' }}
+                    >
+                      Generate Bill
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
+        </div>
+      ),
+
+      'make-payment': (
+        <div className="space-y-6">
+          <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+            <h3 className="text-lg font-semibold mb-6" style={{ color: '#102e4a' }}>Make Payment</h3>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div>
+                <label className="block text-sm font-medium mb-2" style={{ color: '#6c757d' }}>Payment Method *</label>
+                <select 
+                  name="paymentMethod"
+                  value={paymentForm.paymentMethod}
+                  onChange={handlePaymentFormChange}
+                  className="w-full border border-gray-300 rounded-md px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                >
+                  <option value="">Select Payment Method</option>
+                  <option value="Bank Transfer">Bank Transfer</option>
+                  <option value="Online Banking">Online Banking</option>
+                  <option value="Debit Card">Debit Card</option>
+                  <option value="USSD">USSD</option>
+                </select>
+              </div>
+              <div>
+                <label className="block text-sm font-medium mb-2" style={{ color: '#6c757d' }}>Assessment ID *</label>
+                <select 
+                  name="assessmentId"
+                  value={paymentForm.assessmentId}
+                  onChange={handlePaymentFormChange}
+                  className="w-full border border-gray-300 rounded-md px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                >
+                  <option value="">Select Assessment</option>
+                  {assessments.filter(a => a.status === 'pending' || a.status === 'overdue').map(assessment => (
+                    <option key={assessment.id} value={assessment.id}>
+                      {assessment.reference} - {formatCurrency(assessment.amount)}
+                    </option>
+                  ))}
+                </select>
+              </div>
+              <div className="md:col-span-2">
+                <label className="block text-sm font-medium mb-2" style={{ color: '#6c757d' }}>Amount (₦) *</label>
+                <input 
+                  type="number" 
+                  name="amount"
+                  value={paymentForm.amount}
+                  onChange={handlePaymentFormChange}
+                  className="w-full border border-gray-300 rounded-md px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent" 
+                  placeholder="Enter payment amount" 
+                />
+              </div>
+              <div className="md:col-span-2">
+                <label className="block text-sm font-medium mb-2" style={{ color: '#6c757d' }}>Payment Description</label>
+                <textarea 
+                  name="description"
+                  value={paymentForm.description}
+                  onChange={(e) => setPaymentForm(prev => ({ ...prev, description: e.target.value }))}
+                  rows={3}
+                  className="w-full border border-gray-300 rounded-md px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  placeholder="Enter payment description (optional)"
+                />
+              </div>
+            </div>
+            <div className="mt-6">
+              <button 
+                onClick={processPayment}
+                className="w-full md:w-auto px-8 py-3 text-white rounded-md transition-all duration-200 hover:opacity-90 font-medium"
+                style={{ backgroundColor: '#102e4a' }}
+              >
+                Proceed to Payment
+              </button>
+            </div>
+
+            {/* Payment Information */}
+            <div className="mt-6 p-4 bg-blue-50 border border-blue-200 rounded-lg">
+              <h4 className="font-medium text-blue-800 mb-2">Payment Information</h4>
+              <ul className="text-sm text-blue-700 space-y-1">
+                <li>• Payments are processed securely through encrypted channels</li>
+                <li>• You will receive a confirmation email after successful payment</li>
+                <li>• Payment reference will be generated for your records</li>
+                <li>• For support, contact: support@tirs.gov.ng</li>
+              </ul>
             </div>
           </div>
         </div>
       ),
+
       'payment-history': (
         <div className="space-y-6">
           <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
@@ -827,30 +2018,181 @@ const MainContent: React.FC<MainContentProps> = ({
           </div>
         </div>
       ),
+
+      'tax-details': (
+        <div className="space-y-6">
+          <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+            <h3 className="text-lg font-semibold mb-6" style={{ color: '#102e4a' }}>Tax Details Overview</h3>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              <div className="text-center p-4 border border-gray-200 rounded-lg">
+                <h4 className="text-sm font-medium text-gray-600 mb-2">Total Tax Liability</h4>
+                <p className="text-2xl font-bold" style={{ color: '#102e4a' }}>₦1,025,000</p>
+              </div>
+              <div className="text-center p-4 border border-gray-200 rounded-lg">
+                <h4 className="text-sm font-medium text-gray-600 mb-2">Tax Paid</h4>
+                <p className="text-2xl font-bold text-green-600">₦500,000</p>
+              </div>
+              <div className="text-center p-4 border border-gray-200 rounded-lg">
+                <h4 className="text-sm font-medium text-gray-600 mb-2">Outstanding</h4>
+                <p className="text-2xl font-bold text-red-600">₦525,000</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      ),
+
+      // Returns subsections
+      'file-returns': (
+        <div className="space-y-6">
+          <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+            <h3 className="text-lg font-semibold mb-6" style={{ color: '#102e4a' }}>File Tax Returns</h3>
+            <div className="text-center py-8">
+              <FileText className="w-16 h-16 mx-auto mb-4" style={{ color: '#a682ff' }} />
+              <h4 className="text-xl font-semibold mb-2" style={{ color: '#102e4a' }}>File Your Tax Returns</h4>
+              <p className="text-gray-600 mb-6">Submit your annual tax returns online</p>
+              <button 
+                className="px-6 py-3 text-white rounded-md transition-all duration-200 hover:opacity-90 font-medium"
+                style={{ backgroundColor: '#102e4a' }}
+              >
+                Start Filing
+              </button>
+            </div>
+          </div>
+        </div>
+      ),
+
+      'view-returns': (
+        <div className="space-y-6">
+          <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+            <h3 className="text-lg font-semibold mb-6" style={{ color: '#102e4a' }}>View Returns</h3>
+            <div className="text-center py-8">
+              <Eye className="w-16 h-16 mx-auto mb-4 text-gray-400" />
+              <h4 className="text-lg font-medium text-gray-900 mb-2">No returns found</h4>
+              <p className="text-gray-600">Your filed tax returns will appear here</p>
+            </div>
+          </div>
+        </div>
+      ),
+
+      'return-status': (
+        <div className="space-y-6">
+          <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+            <h3 className="text-lg font-semibold mb-6" style={{ color: '#102e4a' }}>Return Status</h3>
+            <div className="text-center py-8">
+              <CheckCircle className="w-16 h-16 mx-auto mb-4 text-gray-400" />
+              <h4 className="text-lg font-medium text-gray-900 mb-2">No returns to track</h4>
+              <p className="text-gray-600">Status updates for your returns will appear here</p>
+            </div>
+          </div>
+        </div>
+      ),
+
+      'return-history': (
+        <div className="space-y-6">
+          <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+            <h3 className="text-lg font-semibold mb-6" style={{ color: '#102e4a' }}>Return History</h3>
+            <div className="text-center py-8">
+              <History className="w-16 h-16 mx-auto mb-4 text-gray-400" />
+              <h4 className="text-lg font-medium text-gray-900 mb-2">No return history</h4>
+              <p className="text-gray-600">Your historical tax returns will appear here</p>
+            </div>
+          </div>
+        </div>
+      ),
+
+      // Messages subsections
       'inbox': (
         <div className="space-y-6">
           <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
             <div className="flex items-center justify-between mb-6">
               <h3 className="text-lg font-semibold" style={{ color: '#102e4a' }}>Inbox Messages</h3>
-              <span className="text-sm" style={{ color: '#6c757d' }}>3 unread</span>
+              <div className="flex items-center space-x-4">
+                <span className="text-sm" style={{ color: '#6c757d' }}>{unreadNotifications.length} unread</span>
+                {unreadNotifications.length > 0 && (
+                  <button
+                    onClick={markAllAsRead}
+                    className="text-sm text-blue-600 hover:text-blue-800"
+                  >
+                    Mark all as read
+                  </button>
+                )}
+              </div>
             </div>
             <div className="space-y-4">
               {notifications.map((notification) => (
-                <div key={notification.id} className="border border-gray-200 rounded-lg p-4 hover:bg-gray-50 cursor-pointer">
+                <div 
+                  key={notification.id} 
+                  className={`border rounded-lg p-4 hover:bg-gray-50 cursor-pointer transition-colors ${
+                    unreadNotifications.includes(notification.id) 
+                      ? 'border-blue-200 bg-blue-50' 
+                      : 'border-gray-200'
+                  }`}
+                >
                   <div className="flex items-start justify-between">
                     <div className="flex-1">
                       <div className="flex items-center space-x-2 mb-1">
                         <span className="text-sm font-medium" style={{ color: '#102e4a' }}>System Administrator</span>
-                        <span className={`w-2 h-2 rounded-full ${notification.type === 'warning' ? 'bg-yellow-500' : notification.type === 'success' ? 'bg-green-500' : 'bg-blue-500'}`}></span>
+                        <span className={`w-2 h-2 rounded-full ${
+                          notification.type === 'warning' ? 'bg-yellow-500' : 
+                          notification.type === 'success' ? 'bg-green-500' : 
+                          notification.type === 'error' ? 'bg-red-500' :
+                          'bg-blue-500'
+                        }`}></span>
+                        {unreadNotifications.includes(notification.id) && (
+                          <span className="text-xs bg-blue-500 text-white px-2 py-1 rounded-full">New</span>
+                        )}
                       </div>
                       <p className="text-sm" style={{ color: '#6c757d' }}>{notification.message}</p>
                       <p className="text-xs mt-2" style={{ color: '#6c757d' }}>{notification.time}</p>
                     </div>
-                    <button className="text-xs text-gray-500 hover:text-gray-700">
-                      Mark as read
+                    <button 
+                      onClick={() => markAsRead(notification.id)}
+                      className={`text-xs hover:text-gray-700 px-2 py-1 rounded ${
+                        unreadNotifications.includes(notification.id)
+                          ? 'text-blue-600 bg-blue-100 hover:bg-blue-200'
+                          : 'text-gray-500 hover:bg-gray-100'
+                      }`}
+                    >
+                      {unreadNotifications.includes(notification.id) ? 'Mark as read' : 'Read'}
                     </button>
                   </div>
                 </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      ),
+
+      'sent-messages': (
+        <div className="space-y-6">
+          <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+            <h3 className="text-lg font-semibold mb-6" style={{ color: '#102e4a' }}>Sent Messages</h3>
+            <div className="text-center py-8">
+              <Send className="w-16 h-16 mx-auto mb-4 text-gray-400" />
+              <h4 className="text-lg font-medium text-gray-900 mb-2">No sent messages</h4>
+              <p className="text-gray-600">Messages you send will appear here</p>
+            </div>
+          </div>
+        </div>
+      ),
+
+      'notifications': (
+        <div className="space-y-6">
+          <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+            <h3 className="text-lg font-semibold mb-6" style={{ color: '#102e4a' }}>All Notifications</h3>
+            <div className="space-y-4">
+              {notifications.map((notification) => (
+                <NotificationBadge key={notification.id} type={notification.type}>
+                  <div className="flex items-start justify-between">
+                    <div className="flex-1">
+                      <p className="font-medium">{notification.message}</p>
+                      <p className="text-xs mt-1 opacity-75">{notification.time}</p>
+                    </div>
+                    <button className="ml-4 text-xs opacity-75 hover:opacity-100">
+                      Mark as read
+                    </button>
+                  </div>
+                </NotificationBadge>
               ))}
             </div>
           </div>
@@ -937,7 +2279,7 @@ const MainContent: React.FC<MainContentProps> = ({
               <div className="flex items-center justify-between mb-6">
                 <h2 className="text-xl font-semibold" style={{ color: '#102e4a' }}>Recent Notifications</h2>
                 <span className="text-sm" style={{ color: '#6c757d' }} id="message-count">
-                  {notifications.length} unread
+                  {unreadNotifications.length} unread
                 </span>
               </div>
               <div className="space-y-4">
@@ -948,8 +2290,15 @@ const MainContent: React.FC<MainContentProps> = ({
                         <p className="font-medium">{notification.message}</p>
                         <p className="text-xs mt-1 opacity-75">{notification.time}</p>
                       </div>
-                      <button className="ml-4 text-xs opacity-75 hover:opacity-100">
-                        Mark as read
+                      <button 
+                        onClick={() => markAsRead(notification.id)}
+                        className={`ml-4 text-xs opacity-75 hover:opacity-100 px-2 py-1 rounded ${
+                          unreadNotifications.includes(notification.id)
+                            ? 'bg-blue-100 text-blue-600'
+                            : 'text-gray-500'
+                        }`}
+                      >
+                        {unreadNotifications.includes(notification.id) ? 'Mark as read' : 'Read'}
                       </button>
                     </div>
                   </NotificationBadge>
@@ -965,6 +2314,103 @@ const MainContent: React.FC<MainContentProps> = ({
                 </button>
               </div>
             </section>
+          </div>
+        ) : activeSection === 'assessment' && !activeSubsection ? (
+          <div className="space-y-6">
+            <h2 className="text-2xl font-bold" style={{ color: '#102e4a' }}>Assessment Overview</h2>
+            
+            {/* Assessment Summary Cards */}
+            <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+              <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+                <div className="flex items-center space-x-3">
+                  <div className="p-2 rounded-lg bg-yellow-100">
+                    <Clock className="w-5 h-5 text-yellow-600" />
+                  </div>
+                  <div>
+                    <p className="text-sm text-gray-600">Pending</p>
+                    <p className="text-2xl font-bold text-yellow-600">
+                      {assessments.filter(a => a.status === 'pending').length}
+                    </p>
+                  </div>
+                </div>
+              </div>
+              <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+                <div className="flex items-center space-x-3">
+                  <div className="p-2 rounded-lg bg-red-100">
+                    <AlertCircle className="w-5 h-5 text-red-600" />
+                  </div>
+                  <div>
+                    <p className="text-sm text-gray-600">Overdue</p>
+                    <p className="text-2xl font-bold text-red-600">
+                      {assessments.filter(a => a.status === 'overdue').length}
+                    </p>
+                  </div>
+                </div>
+              </div>
+              <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+                <div className="flex items-center space-x-3">
+                  <div className="p-2 rounded-lg bg-blue-100">
+                    <AlertTriangle className="w-5 h-5 text-blue-600" />
+                  </div>
+                  <div>
+                    <p className="text-sm text-gray-600">Disputed</p>
+                    <p className="text-2xl font-bold text-blue-600">
+                      {assessments.filter(a => a.status === 'disputed').length}
+                    </p>
+                  </div>
+                </div>
+              </div>
+              <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+                <div className="flex items-center space-x-3">
+                  <div className="p-2 rounded-lg bg-green-100">
+                    <DollarSign className="w-5 h-5 text-green-600" />
+                  </div>
+                  <div>
+                    <p className="text-sm text-gray-600">Total Amount</p>
+                    <p className="text-lg font-bold text-green-600">
+                      {formatCurrency(assessments.reduce((sum, a) => sum + a.amount, 0))}
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Recent Assessments */}
+            <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+              <div className="flex items-center justify-between mb-6">
+                <h3 className="text-lg font-semibold" style={{ color: '#102e4a' }}>Recent Assessments</h3>
+                <button 
+                  className="text-sm transition-colors duration-200 hover:opacity-75"
+                  style={{ color: '#a682ff' }}
+                  onClick={() => onSubsectionClick('view-assessments')}
+                >
+                  View All →
+                </button>
+              </div>
+              <div className="space-y-4">
+                {assessments.slice(0, 3).map((assessment) => (
+                  <div key={assessment.id} className="flex items-center justify-between p-4 border border-gray-200 rounded-lg">
+                    <div className="flex items-center space-x-4">
+                      <div className="w-10 h-10 rounded-lg flex items-center justify-center" style={{ backgroundColor: '#102e4a' }}>
+                        <BarChart3 className="w-5 h-5 text-white" />
+                      </div>
+                      <div>
+                        <p className="font-medium" style={{ color: '#102e4a' }}>{assessment.type}</p>
+                        <p className="text-sm" style={{ color: '#6c757d' }}>
+                          {assessment.reference} • Due: {formatDate(assessment.dueDate)}
+                        </p>
+                      </div>
+                    </div>
+                    <div className="text-right">
+                      <p className="font-bold" style={{ color: '#102e4a' }}>{formatCurrency(assessment.amount)}</p>
+                      <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getStatusColor(assessment.status)}`}>
+                        {assessment.status.charAt(0).toUpperCase() + assessment.status.slice(1)}
+                      </span>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
           </div>
         ) : activeSection === 'payment' && !activeSubsection ? (
           <div className="space-y-6">
@@ -1146,6 +2592,109 @@ const MainContent: React.FC<MainContentProps> = ({
           </div>
         </div>
       )}
+
+      {/* Assessment Detail Modal */}
+      {selectedAssessment && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
+          <div className="bg-white rounded-lg shadow-2xl w-full max-w-2xl max-h-[90vh] overflow-y-auto">
+            <div className="p-6 border-b border-gray-200" style={{ backgroundColor: '#102e4a' }}>
+              <div className="flex justify-between items-center">
+                <h2 className="text-xl font-semibold text-white">Assessment Details</h2>
+                <button 
+                  onClick={() => setSelectedAssessment(null)} 
+                  className="text-white hover:bg-white hover:bg-opacity-20 p-2 rounded-lg"
+                >
+                  <X className="w-5 h-5" />
+                </button>
+              </div>
+            </div>
+
+            <div className="p-6 space-y-6">
+              {/* Assessment Header */}
+              <div className="border-b border-gray-200 pb-6">
+                <div className="flex items-center justify-between mb-4">
+                  <h3 className="text-2xl font-bold" style={{ color: '#102e4a' }}>{selectedAssessment.type}</h3>
+                  <span className={`inline-flex items-center px-3 py-1 rounded-full text-sm font-medium ${getStatusColor(selectedAssessment.status)}`}>
+                    {getStatusIcon(selectedAssessment.status)}
+                    <span className="ml-2 capitalize">{selectedAssessment.status}</span>
+                  </span>
+                </div>
+                <p className="text-gray-600">{selectedAssessment.description}</p>
+              </div>
+
+              {/* Assessment Details Grid */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div>
+                  <label className="block text-sm font-medium text-gray-600 mb-1">Reference Number</label>
+                  <p className="text-lg font-semibold" style={{ color: '#102e4a' }}>{selectedAssessment.reference}</p>
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-600 mb-1">Tax Year</label>
+                  <p className="text-lg font-semibold" style={{ color: '#102e4a' }}>{selectedAssessment.taxYear}</p>
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-600 mb-1">Issue Date</label>
+                  <p className="text-lg font-semibold" style={{ color: '#102e4a' }}>{formatDate(selectedAssessment.issueDate)}</p>
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-600 mb-1">Due Date</label>
+                  <p className={`text-lg font-semibold ${
+                    new Date(selectedAssessment.dueDate) < new Date() ? 'text-red-600' : 'text-gray-900'
+                  }`}>
+                    {formatDate(selectedAssessment.dueDate)}
+                  </p>
+                </div>
+              </div>
+
+              {/* Amount Section */}
+              <div className="bg-gray-50 rounded-lg p-6">
+                <div className="text-center">
+                  <label className="block text-sm font-medium text-gray-600 mb-2">Assessment Amount</label>
+                  <p className="text-3xl font-bold" style={{ color: '#102e4a' }}>
+                    {formatCurrency(selectedAssessment.amount)}
+                  </p>
+                </div>
+              </div>
+
+              {/* Actions */}
+              <div className="flex justify-end space-x-4 pt-6 border-t border-gray-200">
+                <button
+                  onClick={() => setSelectedAssessment(null)}
+                  className="px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition-colors"
+                >
+                  Close
+                </button>
+                {(selectedAssessment.status === 'pending' || selectedAssessment.status === 'overdue') && (
+                  <>
+                    <button
+                      onClick={() => {
+                        setObjectionForm(prev => ({ ...prev, assessmentId: selectedAssessment.id }));
+                        setSelectedAssessment(null);
+                        onSubsectionClick('object-assessment');
+                      }}
+                      className="inline-flex items-center px-4 py-2 text-orange-600 bg-orange-50 rounded-lg hover:bg-orange-100 transition-colors"
+                    >
+                      <AlertCircle className="w-4 h-4 mr-2" />
+                      Object to Assessment
+                    </button>
+                    <button
+                      onClick={() => {
+                        setSelectedAssessment(null);
+                        onQuickAccess('make-payment');
+                      }}
+                      className="inline-flex items-center px-4 py-2 rounded-lg text-white hover:opacity-90 transition-opacity"
+                      style={{ backgroundColor: '#102e4a' }}
+                    >
+                      <CreditCard className="w-4 h-4 mr-2" />
+                      Pay Now
+                    </button>
+                  </>
+                )}
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </>
   );
 };
@@ -1156,7 +2705,9 @@ const TaxpayerDashboard = () => {
   const [activeSection, setActiveSection] = useState('dashboard');
   const [activeSubsection, setActiveSubsection] = useState<string | null>(null);
   const [showUserDropdown, setShowUserDropdown] = useState(false);
+  const [showNotificationDropdown, setShowNotificationDropdown] = useState(false);
   const [isLoggedIn, setIsLoggedIn] = useState(true);
+  const [unreadNotifications, setUnreadNotifications] = useState<number[]>([1, 2, 3]);
   const [notifications] = useState<
     { id: number; type: 'warning' | 'success' | 'info' | 'error'; message: string; time: string; }[]
   >([
@@ -1164,7 +2715,6 @@ const TaxpayerDashboard = () => {
     { id: 2, type: 'success', message: 'Payment of ₦150,000 processed successfully', time: '1 day ago' },
     { id: 3, type: 'info', message: 'New assessment available for review', time: '3 days ago' }
   ]);
-
   const userProfile = {
     name: 'John Adebayo',
     taxpayerType: 'Individual',
@@ -1190,7 +2740,6 @@ const TaxpayerDashboard = () => {
   ];
 
   const handleQuickAccess = (actionId: string) => {
-    // Map quick access items to their corresponding sections and subsections
     const quickAccessRoutes: { [key: string]: { section: string; subsection: string } } = {
       'generate-bill': { section: 'payment', subsection: 'generate-bill' },
       'file-returns': { section: 'returns', subsection: 'file-returns' },
@@ -1219,7 +2768,7 @@ const TaxpayerDashboard = () => {
 
   const handleSectionClick = (sectionId: string) => {
     setActiveSection(sectionId);
-    setActiveSubsection(null); // Reset subsection when changing sections
+    setActiveSubsection(null);
   };
 
   const handleSubsectionClick = (subsectionId: string) => {
@@ -1227,11 +2776,31 @@ const TaxpayerDashboard = () => {
     console.log(`Navigate to: ${activeSection}/${subsectionId}`);
   };
 
-  // Close dropdown when clicking outside
+  // Notification functions
+  const markAsRead = (notificationId: number) => {
+    setUnreadNotifications(prev => prev.filter(id => id !== notificationId));
+  };
+
+  const markAllAsRead = () => {
+    setUnreadNotifications([]);
+  };
+
+  const toggleNotificationDropdown = () => {
+    setShowNotificationDropdown(!showNotificationDropdown);
+  };
+
   React.useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
-      if (showUserDropdown && !(event.target as HTMLElement).closest('.relative')) {
+      const target = event.target as HTMLElement;
+      
+      // Handle user dropdown
+      if (showUserDropdown && !target.closest('.user-dropdown-container')) {
         setShowUserDropdown(false);
+      }
+      
+      // Handle notification dropdown
+      if (showNotificationDropdown && !target.closest('.notification-dropdown-container')) {
+        setShowNotificationDropdown(false);
       }
     };
 
@@ -1239,9 +2808,8 @@ const TaxpayerDashboard = () => {
     return () => {
       document.removeEventListener('mousedown', handleClickOutside);
     };
-  }, [showUserDropdown]);
+  }, [showUserDropdown, showNotificationDropdown]);
 
-  // If user is logged out, show login prompt
   if (!isLoggedIn) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
@@ -1291,19 +2859,84 @@ const TaxpayerDashboard = () => {
           </div>
           
           <div className="flex items-center space-x-4">
-            <div className="relative">
-              <Bell 
-                className="w-6 h-6 cursor-pointer hover:opacity-75 transition-opacity" 
-                style={{ color: '#6c757d' }}
-              />
-              {notifications.length > 0 && (
-                <span className="absolute -top-2 -right-2 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center" style={{ backgroundColor: '#a682ff' }}>
-                  {notifications.length}
-                </span>
+            <div className="relative notification-dropdown-container">
+              <button
+                onClick={toggleNotificationDropdown}
+                className="relative p-2 rounded-lg hover:bg-gray-100 transition-colors"
+                aria-label="Notifications"
+              >
+                <Bell 
+                  className="w-6 h-6 cursor-pointer hover:opacity-75 transition-opacity" 
+                  style={{ color: '#6c757d' }}
+                />
+                {unreadNotifications.length > 0 && (
+                  <span className="absolute -top-1 -right-1 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center" style={{ backgroundColor: '#a682ff' }}>
+                    {unreadNotifications.length}
+                  </span>
+                )}
+              </button>
+
+              {/* Notification Dropdown */}
+              {showNotificationDropdown && (
+                <div className="absolute right-0 mt-2 w-80 bg-white rounded-lg shadow-lg border border-gray-200 py-2 z-50 max-h-96 overflow-y-auto">
+                  <div className="px-4 py-3 border-b border-gray-100 flex items-center justify-between">
+                    <h3 className="font-semibold" style={{ color: '#102e4a' }}>Notifications</h3>
+                    {unreadNotifications.length > 0 && (
+                      <button
+                        onClick={markAllAsRead}
+                        className="text-xs text-blue-600 hover:text-blue-800"
+                      >
+                        Mark all as read
+                      </button>
+                    )}
+                  </div>
+                  
+                  <div className="py-2">
+                    {notifications.map((notification) => (
+                      <div
+                        key={notification.id}
+                        className={`px-4 py-3 hover:bg-gray-50 cursor-pointer border-l-4 ${
+                          unreadNotifications.includes(notification.id)
+                            ? 'border-blue-500 bg-blue-50'
+                            : 'border-transparent'
+                        }`}
+                        onClick={() => markAsRead(notification.id)}
+                      >
+                        <div className="flex items-start space-x-3">
+                          <div className={`w-2 h-2 rounded-full mt-2 ${
+                            notification.type === 'warning' ? 'bg-yellow-500' :
+                            notification.type === 'success' ? 'bg-green-500' :
+                            notification.type === 'error' ? 'bg-red-500' :
+                            'bg-blue-500'
+                          }`}></div>
+                          <div className="flex-1">
+                            <p className="text-sm font-medium text-gray-900">{notification.message}</p>
+                            <p className="text-xs text-gray-500 mt-1">{notification.time}</p>
+                          </div>
+                          {unreadNotifications.includes(notification.id) && (
+                            <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
+                          )}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                  
+                  <div className="border-t border-gray-100 pt-2">
+                    <button
+                      onClick={() => {
+                        setShowNotificationDropdown(false);
+                        handleSubsectionClick('notifications');
+                      }}
+                      className="w-full text-center py-2 text-sm text-blue-600 hover:text-blue-800"
+                    >
+                      View all notifications
+                    </button>
+                  </div>
+                </div>
               )}
             </div>
             
-            <div className="relative">
+            <div className="relative user-dropdown-container">
               <button
                 onClick={() => setShowUserDropdown(!showUserDropdown)}
                 className="flex items-center space-x-2 text-left hover:bg-gray-50 rounded-lg p-2 transition-colors"
@@ -1319,10 +2952,8 @@ const TaxpayerDashboard = () => {
                 <ChevronDown className={`w-4 h-4 transition-transform ${showUserDropdown ? 'rotate-180' : ''}`} style={{ color: '#6c757d' }} />
               </button>
 
-              {/* User Dropdown Menu */}
               {showUserDropdown && (
                 <div className="absolute right-0 mt-2 w-64 bg-white rounded-lg shadow-lg border border-gray-200 py-2 z-50">
-                  {/* User Info */}
                   <div className="px-4 py-3 border-b border-gray-100">
                     <div className="flex items-center space-x-3">
                       <div className="w-10 h-10 rounded-full flex items-center justify-center" style={{ backgroundColor: '#102e4a' }}>
@@ -1336,7 +2967,6 @@ const TaxpayerDashboard = () => {
                     </div>
                   </div>
 
-                  {/* Menu Items */}
                   <div className="py-2">
                     <button
                       onClick={() => {
@@ -1362,7 +2992,6 @@ const TaxpayerDashboard = () => {
                     </button>
                   </div>
 
-                  {/* Logout */}
                   <div className="border-t border-gray-100 pt-2">
                     <button
                       onClick={handleLogout}
@@ -1381,7 +3010,6 @@ const TaxpayerDashboard = () => {
       </header>
 
       <div className="flex">
-        {/* Sidebar Component */}
         <Sidebar 
           sidebarOpen={sidebarOpen}
           activeSection={activeSection}
@@ -1390,7 +3018,6 @@ const TaxpayerDashboard = () => {
           onSubsectionClick={handleSubsectionClick}
         />
 
-        {/* Main Content Component */}
         <MainContent 
           activeSection={activeSection}
           activeSubsection={activeSubsection}
@@ -1400,6 +3027,9 @@ const TaxpayerDashboard = () => {
           notifications={notifications}
           quickAccessItems={quickAccessItems}
           summaryData={summaryData}
+          unreadNotifications={unreadNotifications}
+          markAsRead={markAsRead}
+          markAllAsRead={markAllAsRead}
         />
       </div>
     </div>
