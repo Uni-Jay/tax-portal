@@ -2,10 +2,10 @@ import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import LoginPage from './pages/login';
 import RegistrationForm from './pages/registration';
 import TaxpayerDashboard from './componenets/taxpayerDashboard';
-import CorporateDashboard from './componenets/CorporateDashboard';
 import ConsultantDashboard from './componenets/ConsultantDashboard';
 import StaffDashboard from './componenets/StaffDashboard';
 import IRSLandingPage from './pages/landing';
+import ETaxDashboard from './componenets/CorporateDashboard';
 
 function App() {
   return (
@@ -15,8 +15,15 @@ function App() {
           <Route path="/" element={<IRSLandingPage />} />
           <Route path='/login' element={<LoginPage/>}/>
           <Route path='/register' element={<RegistrationForm/>}/>
-          <Route path='/taxpayer-dashboard' element={<TaxpayerDashboard/>} />
-          <Route path='/corporate-dashboard' element={<CorporateDashboard/>} />
+          <Route path='/taxpayer-dashboard' element={<TaxpayerDashboard/>}>
+            <Route index element={<TaxpayerDashboard />} />
+            <Route path='profile-management' element={<TaxpayerDashboard />} />
+            <Route path='view-profile' element={<TaxpayerDashboard />} />
+            <Route path='update-info' element={<TaxpayerDashboard />} />
+            <Route path='upload-documents' element={<TaxpayerDashboard />} />
+            <Route path='family-relations' element={<TaxpayerDashboard />} />
+          </Route>
+          <Route path='/corporate-dashboard' element={<ETaxDashboard/>} />
           <Route path='/consultant-dashboard' element={<ConsultantDashboard/>} />
           <Route path='/staff-dashboard' element={<StaffDashboard/>} />
 
