@@ -91,6 +91,12 @@ interface MainContentProps {
   unreadNotifications: number[];
   markAsRead: (id: number) => void;
   markAllAsRead: () => void;
+  openMessage: (message: any) => void;
+  viewPaymentHistory: () => void;
+  downloadReceipt: (paymentRef?: string) => void;
+  viewAssessment: () => void;
+  makePayment: () => void;
+  fileReturns: () => void;
 }
 
 // Sidebar Component
@@ -256,7 +262,13 @@ const MainContent: React.FC<MainContentProps> = ({
   summaryData,
   unreadNotifications,
   markAsRead,
-  markAllAsRead
+  markAllAsRead,
+  openMessage,
+  viewPaymentHistory,
+  downloadReceipt,
+  viewAssessment,
+  makePayment,
+  fileReturns
 }) => {
   // Profile Management State
   const [profileData, setProfileData] = useState({
@@ -2127,6 +2139,7 @@ const MainContent: React.FC<MainContentProps> = ({
                       ? 'border-blue-200 bg-blue-50' 
                       : 'border-gray-200'
                   }`}
+                  onClick={() => openMessage(notification)}
                 >
                   <div className="flex items-start justify-between">
                     <div className="flex-1">
@@ -2146,7 +2159,10 @@ const MainContent: React.FC<MainContentProps> = ({
                       <p className="text-xs mt-2" style={{ color: '#6c757d' }}>{notification.time}</p>
                     </div>
                     <button 
-                      onClick={() => markAsRead(notification.id)}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        markAsRead(notification.id);
+                      }}
                       className={`text-xs hover:text-gray-700 px-2 py-1 rounded ${
                         unreadNotifications.includes(notification.id)
                           ? 'text-blue-600 bg-blue-100 hover:bg-blue-200'
@@ -2286,12 +2302,18 @@ const MainContent: React.FC<MainContentProps> = ({
                 {notifications.map((notification) => (
                   <NotificationBadge key={notification.id} type={notification.type}>
                     <div className="flex items-start justify-between">
-                      <div className="flex-1">
+                      <div 
+                        className="flex-1 cursor-pointer"
+                        onClick={() => openMessage(notification)}
+                      >
                         <p className="font-medium">{notification.message}</p>
                         <p className="text-xs mt-1 opacity-75">{notification.time}</p>
                       </div>
                       <button 
-                        onClick={() => markAsRead(notification.id)}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          markAsRead(notification.id);
+                        }}
                         className={`ml-4 text-xs opacity-75 hover:opacity-100 px-2 py-1 rounded ${
                           unreadNotifications.includes(notification.id)
                             ? 'bg-blue-100 text-blue-600'
@@ -2708,6 +2730,8 @@ const TaxpayerDashboard = () => {
   const [showNotificationDropdown, setShowNotificationDropdown] = useState(false);
   const [isLoggedIn, setIsLoggedIn] = useState(true);
   const [unreadNotifications, setUnreadNotifications] = useState<number[]>([1, 2, 3]);
+  const [selectedMessage, setSelectedMessage] = useState<any>(null);
+  const [showMessageModal, setShowMessageModal] = useState(false);
   const [notifications] = useState<
     { id: number; type: 'warning' | 'success' | 'info' | 'error'; message: string; time: string; }[]
   >([
@@ -2787,6 +2811,97 @@ const TaxpayerDashboard = () => {
 
   const toggleNotificationDropdown = () => {
     setShowNotificationDropdown(!showNotificationDropdown);
+  };
+
+  const openMessage = (message: any) => {
+    setSelectedMessage(message);
+    setShowMessageModal(true);
+    setShowNotificationDropdown(false);
+    // Mark as read when opening
+    markAsRead(message.id);
+  };
+
+  const closeMessage = () => {
+    setSelectedMessage(null);
+    setShowMessageModal(false);
+  };
+
+  const viewPaymentHistory = () => {
+    setActiveSection('payment');
+    setActiveSubsection('payment-history');
+    closeMessage();
+  };
+
+  const downloadReceipt = (paymentRef: string = 'PAY-2025-001234') => {
+    // Simulate receipt download
+    const receiptData = {
+      reference: paymentRef,
+      amount: '₦150,000',
+      date: new Date().toLocaleDateString(),
+      taxpayer: userProfile.name,
+      taxpayerId: userProfile.taxpayerId,
+      transactionId: 'TXN-789456123',
+      paymentMethod: 'Bank Transfer',
+      status: 'Completed'
+    };
+
+    // Create a simple receipt content
+    const receiptContent = `
+TIRS e-Tax Portal - Payment Receipt
+=====================================
+
+Receipt Number: ${receiptData.reference}
+Transaction ID: ${receiptData.transactionId}
+Date: ${receiptData.date}
+
+Taxpayer Information:
+Name: ${receiptData.taxpayer}
+Taxpayer ID: ${receiptData.taxpayerId}
+
+Payment Details:
+Amount: ${receiptData.amount}
+Payment Method: ${receiptData.paymentMethod}
+Status: ${receiptData.status}
+
+Tax Type: Personal Income Tax
+Tax Year: 2024
+
+=====================================
+Thank you for your payment.
+For inquiries, contact: support@tirs.gov.ng
+`;
+
+    // Create and download the receipt
+    const blob = new Blob([receiptContent], { type: 'text/plain' });
+    const url = window.URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = `Receipt_${receiptData.reference}.txt`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    window.URL.revokeObjectURL(url);
+
+    // Show success message
+    alert('Receipt downloaded successfully!');
+  };
+
+  const viewAssessment = () => {
+    setActiveSection('assessment');
+    setActiveSubsection('view-assessments');
+    closeMessage();
+  };
+
+  const makePayment = () => {
+    setActiveSection('payment');
+    setActiveSubsection('make-payment');
+    closeMessage();
+  };
+
+  const fileReturns = () => {
+    setActiveSection('returns');
+    setActiveSubsection('file-returns');
+    closeMessage();
   };
 
   React.useEffect(() => {
@@ -2895,12 +3010,12 @@ const TaxpayerDashboard = () => {
                     {notifications.map((notification) => (
                       <div
                         key={notification.id}
-                        className={`px-4 py-3 hover:bg-gray-50 cursor-pointer border-l-4 ${
+                        className={`px-4 py-3 hover:bg-gray-50 cursor-pointer border-l-4 transition-colors ${
                           unreadNotifications.includes(notification.id)
                             ? 'border-blue-500 bg-blue-50'
                             : 'border-transparent'
                         }`}
-                        onClick={() => markAsRead(notification.id)}
+                        onClick={() => openMessage(notification)}
                       >
                         <div className="flex items-start space-x-3">
                           <div className={`w-2 h-2 rounded-full mt-2 ${
@@ -3030,8 +3145,167 @@ const TaxpayerDashboard = () => {
           unreadNotifications={unreadNotifications}
           markAsRead={markAsRead}
           markAllAsRead={markAllAsRead}
+          openMessage={openMessage}
+          viewPaymentHistory={viewPaymentHistory}
+          downloadReceipt={downloadReceipt}
+          viewAssessment={viewAssessment}
+          makePayment={makePayment}
+          fileReturns={fileReturns}
         />
       </div>
+
+      {/* Message Detail Modal */}
+      {showMessageModal && selectedMessage && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
+          <div className="bg-white rounded-lg shadow-2xl w-full max-w-2xl max-h-[90vh] overflow-y-auto">
+            <div className="p-6 border-b border-gray-200" style={{ backgroundColor: '#102e4a' }}>
+              <div className="flex justify-between items-center">
+                <h2 className="text-xl font-semibold text-white">Message Details</h2>
+                <button 
+                  onClick={closeMessage} 
+                  className="text-white hover:bg-white hover:bg-opacity-20 p-2 rounded-lg"
+                >
+                  <X className="w-5 h-5" />
+                </button>
+              </div>
+            </div>
+
+            <div className="p-6 space-y-6">
+              {/* Message Header */}
+              <div className="border-b border-gray-200 pb-6">
+                <div className="flex items-center justify-between mb-4">
+                  <div className="flex items-center space-x-3">
+                    <div className="w-12 h-12 rounded-full flex items-center justify-center" style={{ backgroundColor: '#102e4a' }}>
+                      <User className="w-6 h-6 text-white" />
+                    </div>
+                    <div>
+                      <h3 className="text-lg font-semibold" style={{ color: '#102e4a' }}>System Administrator</h3>
+                      <p className="text-sm text-gray-600">TIRS e-Tax Portal</p>
+                    </div>
+                  </div>
+                  <div className="text-right">
+                    <span className={`inline-flex items-center px-3 py-1 rounded-full text-sm font-medium ${
+                      selectedMessage.type === 'warning' ? 'bg-yellow-100 text-yellow-800' :
+                      selectedMessage.type === 'success' ? 'bg-green-100 text-green-800' :
+                      selectedMessage.type === 'error' ? 'bg-red-100 text-red-800' :
+                      'bg-blue-100 text-blue-800'
+                    }`}>
+                      {selectedMessage.type === 'warning' ? <AlertTriangle className="w-4 h-4 mr-1" /> :
+                       selectedMessage.type === 'success' ? <CheckCircle className="w-4 h-4 mr-1" /> :
+                       selectedMessage.type === 'error' ? <AlertCircle className="w-4 h-4 mr-1" /> :
+                       <Info className="w-4 h-4 mr-1" />}
+                      {selectedMessage.type.charAt(0).toUpperCase() + selectedMessage.type.slice(1)}
+                    </span>
+                    <p className="text-sm text-gray-500 mt-1">{selectedMessage.time}</p>
+                  </div>
+                </div>
+              </div>
+
+              {/* Message Content */}
+              <div className="space-y-4">
+                <div>
+                  <h4 className="text-lg font-semibold mb-3" style={{ color: '#102e4a' }}>Message</h4>
+                  <p className="text-gray-700 leading-relaxed">{selectedMessage.message}</p>
+                </div>
+
+                {/* Additional Details Based on Message Type */}
+                {selectedMessage.type === 'warning' && (
+                  <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
+                    <h5 className="font-medium text-yellow-800 mb-2">Action Required</h5>
+                    <p className="text-sm text-yellow-700">
+                      Please ensure you file your annual tax returns before the due date to avoid penalties. 
+                      You can file your returns using the "File Returns" section in your dashboard.
+                    </p>
+                    <div className="mt-3">
+                      <button 
+                        onClick={() => {
+                          closeMessage();
+                          // Navigate to file returns - you can implement this
+                        }}
+                        className="text-sm bg-yellow-600 text-white px-3 py-1 rounded hover:bg-yellow-700"
+                      >
+                        File Returns Now
+                      </button>
+                    </div>
+                  </div>
+                )}
+
+                {selectedMessage.type === 'success' && (
+                  <div className="bg-green-50 border border-green-200 rounded-lg p-4">
+                    <h5 className="font-medium text-green-800 mb-2">Payment Confirmation</h5>
+                    <div className="text-sm text-green-700 space-y-1">
+                      <p><strong>Amount:</strong> ₦150,000</p>
+                      <p><strong>Reference:</strong> PAY-2025-001234</p>
+                      <p><strong>Transaction ID:</strong> TXN-789456123</p>
+                      <p><strong>Payment Method:</strong> Bank Transfer</p>
+                    </div>
+                    <div className="mt-3">
+                      <button 
+                        onClick={() => downloadReceipt('PAY-2025-001234')}
+                        className="text-sm bg-green-600 text-white px-3 py-1 rounded hover:bg-green-700 mr-2"
+                      >
+                        Download Receipt
+                      </button>
+                      <button 
+                        onClick={viewPaymentHistory}
+                        className="text-sm border border-green-600 text-green-600 px-3 py-1 rounded hover:bg-green-50"
+                      >
+                        View Payment History
+                      </button>
+                    </div>
+                  </div>
+                )}
+
+                {selectedMessage.type === 'info' && (
+                  <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                    <h5 className="font-medium text-blue-800 mb-2">Assessment Information</h5>
+                    <p className="text-sm text-blue-700">
+                      A new tax assessment has been generated for the 2024 tax year. Please review the assessment details 
+                      and make payment by the due date or submit an objection if you disagree with the assessment.
+                    </p>
+                    <div className="mt-3">
+                      <button 
+                        onClick={() => {
+                          closeMessage();
+                          // Navigate to assessments - you can implement this
+                        }}
+                        className="text-sm bg-blue-600 text-white px-3 py-1 rounded hover:bg-blue-700 mr-2"
+                      >
+                        View Assessment
+                      </button>
+                      <button className="text-sm border border-blue-600 text-blue-600 px-3 py-1 rounded hover:bg-blue-50">
+                        Make Payment
+                      </button>
+                    </div>
+                  </div>
+                )}
+              </div>
+
+              {/* Actions */}
+              <div className="flex justify-end space-x-4 pt-6 border-t border-gray-200">
+                <button
+                  onClick={closeMessage}
+                  className="px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition-colors"
+                >
+                  Close
+                </button>
+                <button
+                  onClick={() => {
+                    // Mark as read if not already
+                    markAsRead(selectedMessage.id);
+                    // You can add more actions here like forward, reply, etc.
+                  }}
+                  className="inline-flex items-center px-4 py-2 rounded-lg text-white hover:opacity-90 transition-opacity"
+                  style={{ backgroundColor: '#102e4a' }}
+                >
+                  <CheckCircle className="w-4 h-4 mr-2" />
+                  Mark as Handled
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
