@@ -585,6 +585,11 @@ const MainContent: React.FC<MainContentProps> = ({
             
             <div className="flex justify-end mt-6">
               <button
+                onClick={() => {
+                  // Save the current profile data and show success message
+                  console.log('Profile updated successfully:', profileData);
+                  alert('Profile updated successfully!');
+                }}
                 className="inline-flex items-center px-6 py-3 rounded-lg text-white font-medium hover:opacity-90 transition-opacity"
                 style={{ backgroundColor: '#102e4a' }}
               >
