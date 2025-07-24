@@ -264,11 +264,10 @@ const MainContent: React.FC<MainContentProps> = ({
   markAsRead,
   markAllAsRead,
   openMessage,
-  viewPaymentHistory,
-  downloadReceipt,
-  viewAssessment,
-  makePayment,
-  fileReturns
+  // viewPaymentHistory,
+  // downloadReceipt,
+  // viewAssessment,
+  // fileReturns
 }) => {
   // Profile Management State
   const [profileData, setProfileData] = useState({

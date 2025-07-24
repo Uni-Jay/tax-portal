@@ -3,9 +3,9 @@ import LoginPage from './pages/login';
 import RegistrationForm from './pages/registration';
 import TaxpayerDashboard from './componenets/taxpayerDashboard';
 import ConsultantDashboard from './componenets/ConsultantDashboard';
-import StaffDashboard from './componenets/StaffDashboard';
 import IRSLandingPage from './pages/landing';
 import ETaxDashboard from './componenets/CorporateDashboard';
+import ETaxAdminDashboard from './componenets/StaffDashboard';
 
 function App() {
   return (
@@ -25,7 +25,7 @@ function App() {
           </Route>
           <Route path='/corporate-dashboard' element={<ETaxDashboard/>} />
           <Route path='/consultant-dashboard' element={<ConsultantDashboard/>} />
-          <Route path='/staff-dashboard' element={<StaffDashboard/>} />
+          <Route path='/staff-dashboard' element={<ETaxAdminDashboard/>} />
 
         </Routes>
       </BrowserRouter>
