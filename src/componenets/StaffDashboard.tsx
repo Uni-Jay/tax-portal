@@ -1,17 +1,21 @@
 import { useState } from 'react';
 import { 
   Home, 
+  RotateCcw,
+  Bell,
   BarChart3, 
   Users, 
-  Building2, 
+  Building2,
   GitMerge, 
   FileText, 
-  DollarSign, 
+  DollarSign,
+  MessageCircle, 
   CreditCard, 
   Shield, 
   TrendingUp, 
   UserCheck, 
   Eye,
+  Calendar,
   ClipboardList,
   Calculator,
   Banknote,
@@ -21,7 +25,6 @@ import {
   TrendingDown,
   FileQuestion,
   Globe,
-  Clock,
   MessageSquare,
   Download,
   ChevronDown,
@@ -724,7 +727,7 @@ const ETaxAdminDashboard = () => {
     return (
       <div className="p-8">
         <div className="mb-8">
-          <h1 className="text-3xl font-bold mb-2" style={{ color: '#102e4a' }}>Staff Admin Dashboard</h1>
+          <h1 className="text-3xl font-bold mb-2" style={{ color: '#2f363dff' }}>Staff Admin Dashboard</h1>
           <p style={{ color: '#6c757d' }}>Welcome to the E-TAX Staff Administration Portal</p>
         </div>
 
@@ -1328,6 +1331,167 @@ const ETaxAdminDashboard = () => {
       </div>
     );
   };
+
+  const TaxServicesInterface = () => {
+  const [taxPayerNumber, setTaxPayerNumber] = useState('');
+  const [showActions, setShowActions] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+
+  const handleContinue = async () => {
+    if (!taxPayerNumber.trim()) return;
+    
+    setIsLoading(true);
+    // Simulate API call
+    await new Promise(resolve => setTimeout(resolve, 1000));
+    setIsLoading(false);
+    setShowActions(true);
+  };
+
+  const handleBack = () => {
+    setShowActions(false);
+    setTaxPayerNumber('');
+  };
+
+  const handleRevalidateId = () => {
+    alert('Revalidating ID...');
+  };
+
+  const handleResetPassword = () => {
+    alert('Resetting password...');
+  };
+
+  const handleSendNotification = () => {
+    alert('Sending notification...');
+  };
+
+  return (
+    <div className="min-h-screen bg-gray-100">
+      {/* Header */}
+      <div className="bg-white shadow-sm border-b">
+        <div className="max-w-7xl mx-auto px-4 py-4">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center space-x-3">
+              <div className="w-10 h-10 bg-green-500 rounded-full flex items-center justify-center">
+                <Building2 className="w-6 h-6 text-white" />
+              </div>
+              <h1 className="text-xl font-semibold text-gray-800">Tax Services</h1>
+            </div>
+            <div className="w-8 h-8 bg-gray-200 rounded-full flex items-center justify-center">
+              <span className="text-sm font-medium text-gray-600">👤</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Main Content */}
+      <div className="p-8">
+        <div className="max-w-2xl mx-auto">
+          <div className="bg-white rounded-lg shadow-sm border p-8">
+            {/* Card Header */}
+            <div className="flex items-center justify-between mb-8">
+              <div className="flex items-center space-x-4">
+                <div className="w-16 h-16 bg-green-500 rounded-lg flex items-center justify-center">
+                  <Building2 className="w-8 h-8 text-white" />
+                </div>
+                <div>
+                  <h2 className="text-xl font-semibold text-gray-800">Tax Services For</h2>
+                </div>
+              </div>
+              {showActions && (
+                <button
+                  onClick={handleBack}
+                  className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+                >
+                  <ArrowLeft className="w-5 h-5 text-gray-600" />
+                </button>
+              )}
+            </div>
+
+            {!showActions ? (
+              /* Initial Form */
+              <div className="space-y-6">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Enter Tax Payer Number
+                  </label>
+                  <input
+                    type="text"
+                    value={taxPayerNumber}
+                    onChange={(e) => setTaxPayerNumber(e.target.value)}
+                    placeholder="Enter Tax Payer Number"
+                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent outline-none transition-all"
+                  />
+                </div>
+                
+                <div className="flex justify-end pt-4">
+                  <button
+                    onClick={handleContinue}
+                    disabled={!taxPayerNumber.trim() || isLoading}
+                    className="px-8 py-3 bg-green-500 text-white font-medium rounded-lg hover:bg-green-600 disabled:bg-gray-300 disabled:cursor-not-allowed transition-colors flex items-center space-x-2"
+                  >
+                    {isLoading ? (
+                      <>
+                        <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                        <span>Loading...</span>
+                      </>
+                    ) : (
+                      <span>CONTINUE</span>
+                    )}
+                  </button>
+                </div>
+              </div>
+            ) : (
+              /* Action Buttons */
+              <div className="space-y-6">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Enter Tax Payer Number
+                  </label>
+                  <div className="text-lg font-semibold text-gray-800 py-2">
+                    {taxPayerNumber}
+                  </div>
+                </div>
+                
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4 pt-4">
+                  <button
+                    onClick={handleRevalidateId}
+                    className="flex items-center justify-center space-x-2 px-6 py-4 bg-purple-600 text-white font-medium rounded-lg hover:bg-purple-700 transition-colors"
+                  >
+                    <CheckCircle className="w-5 h-5" />
+                    <span>REVALIDATE ID</span>
+                  </button>
+                  
+                  <button
+                    onClick={handleResetPassword}
+                    className="flex items-center justify-center space-x-2 px-6 py-4 bg-orange-500 text-white font-medium rounded-lg hover:bg-orange-600 transition-colors"
+                  >
+                    <RotateCcw className="w-5 h-5" />
+                    <span>RESET PASSWORD</span>
+                  </button>
+                  
+                  <button
+                    onClick={handleSendNotification}
+                    className="flex items-center justify-center space-x-2 px-6 py-4 bg-purple-600 text-white font-medium rounded-lg hover:bg-purple-700 transition-colors"
+                  >
+                    <Bell className="w-5 h-5" />
+                    <span>SEND NOTIFICATION</span>
+                  </button>
+                </div>
+              </div>
+            )}
+          </div>
+        </div>
+      </div>
+
+      {/* Footer */}
+      <div className="pb-8">
+        <div className="max-w-2xl mx-auto text-center">
+          <p className="text-gray-500 text-sm">© 2025 e-Tax. All Rights Reserved.</p>
+        </div>
+      </div>
+    </div>
+  );
+  }
 
   // Individual Tax Payers (Inactive) Content
   const IndividualTaxPayersInactiveContent = () => {
@@ -2616,188 +2780,215 @@ const ETaxAdminDashboard = () => {
     );
   };
 
-  // Bulk Individual Registration Content
-//   const BulkIndividualRegistrationContent = () => {
-//     const [filters, setFilters] = useState({
-//       label: '',
-//       reference: ''
-//     });
-//     const [registrationTasks, setRegistrationTasks] = useState<any[]>([]);
+  const MergeRequestsInterface = () => {
+  const [taxId, setTaxId] = useState('');
+  const [fromDate, setFromDate] = useState('');
+  const [toDate, setToDate] = useState('');
+  const [status, setStatus] = useState('');
+  const [officer, setOfficer] = useState('Search Officer');
 
-//     const handleFilterChange = (field: string, value: string) => {
-//       setFilters(prev => ({ ...prev, [field]: value }));
-//     };
+  const handleMakeNewRequest = () => {
+    alert('Creating new merge request...');
+  };
 
-//     const handleReset = () => {
-//       setFilters({
-//         label: '',
-//         reference: ''
-//       });
-//       showNotification('Filters cleared');
-//     };
+  const handleFilter = () => {
+    alert('Applying filters...');
+  };
 
-//     const handleDownloadTemplate = (templateType: string) => {
-//       // Create a sample CSV content
-//       const csvContent = templateType === 'BVN' 
-//         ? 'First Name,Last Name,Email,Phone,BVN,Address\nJohn,Doe,john@email.com,08012345678,12345678901,Lagos'
-//         : 'First Name,Last Name,Email,Phone,NIN,Address\nJane,Smith,jane@email.com,08087654321,12345678901,Abuja';
-      
-//       const blob = new Blob([csvContent], { type: 'text/csv' });
-//       const url = window.URL.createObjectURL(blob);
-//       const a = document.createElement('a');
-//       a.href = url;
-//       a.download = `${templateType}_Registration_Template.csv`;
-//       document.body.appendChild(a);
-//       a.click();
-//       document.body.removeChild(a);
-//       window.URL.revokeObjectURL(url);
-      
-//       showNotification(`${templateType} template downloaded successfully`);
-//     };
+  const handleReset = () => {
+    setTaxId('');
+    setFromDate('');
+    setToDate('');
+    setStatus('');
+    setOfficer('Search Officer');
+  };
 
-//     const handleUploadCSV = () => {
-//       const input = document.createElement('input');
-//       input.type = 'file';
-//       input.accept = '.csv';
-//       input.onchange = (e) => {
-//         const file = (e.target as HTMLInputElement).files?.[0];
-//         if (file) {
-//           showNotification(`CSV file "${file.name}" uploaded successfully`);
-//           // Here you would typically process the file
-//         }
-//       };
-//       input.click();
-//     };
+  return (
+    <div className="min-h-screen bg-gray-100">
+      {/* Header */}
+      <div className="bg-white shadow-sm border-b">
+        <div className="max-w-7xl mx-auto px-4 py-4">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center space-x-3">
+              <div className="w-10 h-10 bg-green-500 rounded-full flex items-center justify-center">
+                <Users className="w-6 h-6 text-white" />
+              </div>
+              <h1 className="text-xl font-semibold text-gray-800">Merge Requests</h1>
+            </div>
+            <div className="w-8 h-8 bg-gray-200 rounded-full flex items-center justify-center">
+              <span className="text-sm font-medium text-gray-600">👤</span>
+            </div>
+          </div>
+        </div>
+      </div>
 
-//     const handleFilter = () => {
-//       const hasFilters = Object.values(filters).some(value => value.trim() !== '');
-      
-//       if (!hasFilters) {
-//         showNotification('Please enter at least one filter criteria');
-//         return;
-//       }
-
-//       // Simulate filtering results
-//       showNotification('Filtering registration tasks...');
-//     };
-
-//     return (
-//       <div className="p-8">
-//         {/* Header */}
-//         <div className="flex items-center justify-between mb-8">
-//           <h1 className="text-3xl font-bold" style={{ color: '#102e4a' }}>Bulk Individual Registrations</h1>
-//           <div className="w-10 h-10 rounded-full flex items-center justify-center" style={{ backgroundColor: '#f8f9fa' }}>
-//             <Users style={{ color: '#102e4a' }} size={20} />
-//           </div>
-//         </div>
-
-//         {/* Main Content Card */}
-//         <div className="bg-white rounded-lg shadow-lg p-6 mb-6">
-//           <div className="flex items-center mb-6">
-//             <div className="w-16 h-16 rounded bg-green-500 flex items-center justify-center mr-4">
-//               <Users style={{ color: 'white' }} size={32} />
-//             </div>
-//             <h2 className="text-xl font-semibold" style={{ color: '#102e4a' }}>
-//               Bulk Individual Tasks Report
-//             </h2>
-//           </div>
-
-//           {/* Template Download Buttons */}
-//           <div className="flex flex-wrap gap-4 mb-6">
-//             <button 
-//               onClick={() => handleDownloadTemplate('BVN')}
-//               className="px-6 py-3 bg-orange-500 text-white rounded-lg hover:bg-orange-600 transition-all font-medium flex items-center space-x-2"
-//             >
-//               <span>BVN BULK REGISTRATION TEMPLATE</span>
-//               <Download size={16} />
-//             </button>
-//             <button 
-//               onClick={() => handleDownloadTemplate('NIN')}
-//               className="px-6 py-3 bg-orange-500 text-white rounded-lg hover:bg-orange-600 transition-all font-medium flex items-center space-x-2"
-//             >
-//               <span>NIN BULK REGISTRATION TEMPLATE</span>
-//               <Download size={16} />
-//             </button>
-//             <button 
-//               onClick={handleUploadCSV}
-//               className="px-6 py-3 bg-green-500 text-white rounded-lg hover:bg-green-600 transition-all font-medium flex items-center space-x-2"
-//             >
-//               <span>UPLOAD CSV</span>
-//               <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
-//                 <path d="M14,2H6A2,2 0 0,0 4,4V20A2,2 0 0,0 6,22H18A2,2 0 0,0 20,20V8L14,2M18,20H6V4H13V9H18V20Z"/>
-//               </svg>
-//             </button>
-//           </div>
-
-//           {/* Note */}
-//           <div className="mb-8 p-4 bg-blue-50 rounded-lg">
-//             <p className="text-sm" style={{ color: '#102e4a' }}>
-//               Kindly ensure to upload the updated template in CSV format
-//             </p>
-//           </div>
-//         </div>
-
-//         {/* Registrations Tasks Section */}
-//         <div className="bg-white rounded-lg shadow-lg p-6">
-//           <h3 className="text-xl font-semibold mb-6" style={{ color: '#102e4a' }}>Registrations Tasks</h3>
+      {/* Main Content */}
+      <div className="p-8">
+        <div className="max-w-7xl mx-auto space-y-6">
           
-//           {/* Filters */}
-//           <div className="mb-6">
-//             <div className="mb-4">
-//               <span className="text-sm font-medium" style={{ color: '#6c757d' }}>Filters:</span>
-//             </div>
+          {/* Stats Card */}
+          <div className="bg-white rounded-lg shadow-sm border p-6">
+            <div className="flex items-center space-x-4">
+              <div className="w-20 h-20 bg-orange-500 rounded-lg flex items-center justify-center">
+                <div className="text-white">
+                  <div className="w-8 h-1 bg-white mb-1"></div>
+                  <div className="w-6 h-1 bg-white mb-1"></div>
+                  <div className="w-8 h-1 bg-white"></div>
+                </div>
+              </div>
+              <div className="flex-1">
+                <div className="text-right">
+                  <div className="text-sm text-gray-500 mb-1">All Requests</div>
+                  <div className="text-4xl font-bold text-gray-800">0</div>
+                </div>
+              </div>
+            </div>
+          </div>
 
-//             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
-//               <input
-//                 type="text"
-//                 placeholder="Label"
-//                 value={filters.label}
-//                 onChange={(e) => handleFilterChange('label', e.target.value)}
-//                 className="p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-//                 style={{ color: '#102e4a' }}
-//               />
-//               <input
-//                 type="text"
-//                 placeholder="Reference"
-//                 value={filters.reference}
-//                 onChange={(e) => handleFilterChange('reference', e.target.value)}
-//                 className="p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-//                 style={{ color: '#102e4a' }}
-//               />
-//             </div>
+          {/* Main Dashboard Card */}
+          <div className="bg-white rounded-lg shadow-sm border">
+            {/* Card Header */}
+            <div className="p-6 border-b border-gray-200">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center space-x-4">
+                  <div className="w-16 h-16 bg-green-500 rounded-lg flex items-center justify-center">
+                    <Users className="w-8 h-8 text-white" />
+                  </div>
+                  <div>
+                    <h2 className="text-xl font-semibold text-gray-800">Merge Requests</h2>
+                  </div>
+                </div>
+                <button
+                  onClick={handleMakeNewRequest}
+                  className="px-6 py-3 bg-cyan-500 text-white font-medium rounded-lg hover:bg-cyan-600 transition-colors"
+                >
+                  MAKE NEW REQUEST
+                </button>
+              </div>
+            </div>
 
-//             <div className="flex justify-end gap-4">
-//               <button 
-//                 onClick={handleReset}
-//                 className="px-6 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition-all font-medium"
-//               >
-//                 RESET
-//               </button>
-//               <button 
-//                 onClick={handleFilter}
-//                 className="px-6 py-2 text-white rounded-lg hover:shadow-lg transition-all font-medium"
-//                 style={{ backgroundColor: '#102e4a' }}
-//                 onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#a682ff'}
-//                 onMouseLeave={(e) => e.currentTarget.style.backgroundColor = '#102e4a'}
-//               >
-//                 FILTER
-//               </button>
-//             </div>
-//           </div>
+            {/* Filters Section */}
+            <div className="p-6 border-b border-gray-200 bg-gray-50">
+              <div className="grid grid-cols-1 md:grid-cols-5 gap-4 items-end">
+                {/* Tax ID Filter */}
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Filters: Tax ID
+                  </label>
+                  <input
+                    type="text"
+                    value={taxId}
+                    onChange={(e) => setTaxId(e.target.value)}
+                    placeholder="Tax ID"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none"
+                  />
+                </div>
 
-//           {/* No Data Message */}
-//           <div className="text-center py-12">
-//             <p style={{ color: '#6c757d' }}>There are currently no entries to display at the moment.</p>
-//           </div>
-//         </div>
+                {/* From Date */}
+                <div>
+                  <label className="flex items-center text-sm font-medium text-gray-700 mb-2">
+                    <Calendar className="w-4 h-4 mr-1" />
+                    From
+                  </label>
+                  <input
+                    type="date"
+                    value={fromDate}
+                    onChange={(e) => setFromDate(e.target.value)}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none"
+                  />
+                </div>
 
-//         {/* Footer */}
-//         <div className="mt-8 text-center">
-//           <p className="text-sm" style={{ color: '#6c757d' }}>© 2025 e-Tax. All Rights Reserved.</p>
-//         </div>
-//       </div>
-//     );
-//   };
+                {/* To Date */}
+                <div>
+                  <label className="flex items-center text-sm font-medium text-gray-700 mb-2">
+                    <Calendar className="w-4 h-4 mr-1" />
+                    To
+                  </label>
+                  <input
+                    type="date"
+                    value={toDate}
+                    onChange={(e) => setToDate(e.target.value)}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none"
+                  />
+                </div>
+
+                {/* Status Dropdown */}
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Status
+                  </label>
+                  <div className="relative">
+                    <select
+                      value={status}
+                      onChange={(e) => setStatus(e.target.value)}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none appearance-none bg-white"
+                    >
+                      <option value="">Status</option>
+                      <option value="pending">Pending</option>
+                      <option value="approved">Approved</option>
+                      <option value="rejected">Rejected</option>
+                    </select>
+                    <ChevronDown className="absolute right-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none" />
+                  </div>
+                </div>
+
+                {/* Action Buttons */}
+                <div className="flex space-x-2">
+                  <button
+                    onClick={handleReset}
+                    className="px-6 py-2 bg-red-500 text-white font-medium rounded-lg hover:bg-red-600 transition-colors"
+                  >
+                    RESET
+                  </button>
+                  <button
+                    onClick={handleFilter}
+                    className="px-6 py-2 bg-green-500 text-white font-medium rounded-lg hover:bg-green-600 transition-colors"
+                  >
+                    FILTER
+                  </button>
+                </div>
+              </div>
+
+              {/* Officer Search */}
+              <div className="mt-4">
+                <div className="relative max-w-xs">
+                  <select
+                    value={officer}
+                    onChange={(e) => setOfficer(e.target.value)}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none appearance-none bg-white text-gray-600"
+                  >
+                    <option value="Search Officer">Search Officer</option>
+                    <option value="officer1">Officer Smith</option>
+                    <option value="officer2">Officer Johnson</option>
+                    <option value="officer3">Officer Williams</option>
+                  </select>
+                  <ChevronDown className="absolute right-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none" />
+                </div>
+              </div>
+            </div>
+
+            {/* Content Area */}
+            <div className="p-8">
+              <div className="text-center py-16">
+                <div className="text-gray-500 text-lg">
+                  There are currently no requests.
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Footer */}
+      <div className="pb-8">
+        <div className="max-w-7xl mx-auto text-center">
+          <p className="text-gray-500 text-sm">© 2025 e-Tax. All Rights Reserved.</p>
+        </div>
+      </div>
+    </div>
+  );
+};
+
 
   // Modal Component
   const Modal = ({ isOpen, onClose, type }: { isOpen: boolean; onClose: () => void; type: string }) => {
@@ -2934,6 +3125,379 @@ const ETaxAdminDashboard = () => {
     </div>
   );
 
+  const GenerateNewBillInterface = () => {
+  const [taxPayerNumber, setTaxPayerNumber] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
+
+  const handleContinue = async () => {
+    if (!taxPayerNumber.trim()) return;
+    
+    setIsLoading(true);
+    // Simulate API call
+    await new Promise(resolve => setTimeout(resolve, 1500));
+    setIsLoading(false);
+    alert('Bill generation process started...');
+  };
+
+  return (
+    <div className="min-h-screen bg-gray-100">
+      {/* Header */}
+      <div className="bg-white shadow-sm border-b">
+        <div className="max-w-7xl mx-auto px-4 py-4">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center space-x-3">
+              <div className="w-10 h-10 bg-green-500 rounded-full flex items-center justify-center">
+                <Receipt className="w-6 h-6 text-white" />
+              </div>
+              <h1 className="text-xl font-semibold text-gray-800">Generate A New Bill</h1>
+            </div>
+            <div className="w-8 h-8 bg-gray-200 rounded-full flex items-center justify-center">
+              <span className="text-sm font-medium text-gray-600">👤</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Main Content */}
+      <div className="p-8">
+        <div className="max-w-2xl mx-auto">
+          <div className="bg-white rounded-lg shadow-sm border p-8">
+            {/* Card Header */}
+            <div className="flex items-center space-x-4 mb-8">
+              <div className="w-16 h-16 bg-green-500 rounded-lg flex items-center justify-center">
+                <Receipt className="w-8 h-8 text-white" />
+              </div>
+              <div>
+                <h2 className="text-xl font-semibold text-gray-800">Generate A New Bill</h2>
+              </div>
+            </div>
+
+            {/* Form */}
+            <div className="space-y-6">
+              <div>
+                <input
+                  type="text"
+                  value={taxPayerNumber}
+                  onChange={(e) => setTaxPayerNumber(e.target.value)}
+                  placeholder="Tax Payer Number"
+                  className="w-full px-4 py-3 border-b-2 border-gray-300 focus:border-green-500 outline-none transition-colors bg-transparent text-gray-700 placeholder-gray-400"
+                />
+              </div>
+              
+              <div className="flex justify-end pt-6">
+                <button
+                  onClick={handleContinue}
+                  disabled={!taxPayerNumber.trim() || isLoading}
+                  className="px-8 py-3 bg-green-500 text-white font-medium rounded-lg hover:bg-green-600 disabled:bg-gray-300 disabled:cursor-not-allowed transition-colors flex items-center space-x-2 min-w-[120px] justify-center"
+                >
+                  {isLoading ? (
+                    <>
+                      <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                      <span>Loading...</span>
+                    </>
+                  ) : (
+                    <span>CONTINUE</span>
+                  )}
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Chat Support Button */}
+      <div className="fixed bottom-6 right-6">
+        <button className="w-14 h-14 bg-cyan-500 rounded-full flex items-center justify-center shadow-lg hover:bg-cyan-600 transition-colors">
+          <MessageCircle className="w-6 h-6 text-white" />
+        </button>
+      </div>
+
+      {/* Footer */}
+      <div className="pb-8">
+        <div className="max-w-2xl mx-auto text-center">
+          <p className="text-gray-500 text-sm">© 2025 e-Tax. All Rights Reserved.</p>
+        </div>
+      </div>
+    </div>
+  );
+  };
+
+  const LASPPPARequestsInterface = () => {
+  const [taxPayerId, setTaxPayerId] = useState('');
+  const [status, setStatus] = useState('');
+  const [year, setYear] = useState('');
+  const [selectLevel, setSelectLevel] = useState('Select Level');
+  const [applicationType, setApplicationType] = useState('');
+  const [startDate, setStartDate] = useState('');
+  const [endDate, setEndDate] = useState('');
+
+  const handleCreateNewRequest = () => {
+    alert('Creating new LASPPPA request...');
+  };
+
+  const handleFilter = () => {
+    alert('Applying filters...');
+  };
+
+  const handleClear = () => {
+    setTaxPayerId('');
+    setStatus('');
+    setYear('');
+    setSelectLevel('Select Level');
+    setApplicationType('');
+    setStartDate('');
+    setEndDate('');
+  };
+
+  return (
+    <div className="min-h-screen bg-gray-100">
+      {/* Header */}
+      <div className="bg-white shadow-sm border-b">
+        <div className="max-w-7xl mx-auto px-4 py-4">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center space-x-3">
+              <div className="w-10 h-10 bg-green-500 rounded-full flex items-center justify-center">
+                <BarChart3 className="w-6 h-6 text-white" />
+              </div>
+              <h1 className="text-xl font-semibold text-gray-800">LASPPPA Requests</h1>
+            </div>
+            <div className="w-8 h-8 bg-gray-200 rounded-full flex items-center justify-center">
+              <span className="text-sm font-medium text-gray-600">👤</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Main Content */}
+      <div className="p-8">
+        <div className="max-w-7xl mx-auto space-y-6">
+          
+          {/* Stats Card */}
+          <div className="bg-white rounded-lg shadow-sm border p-6">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center space-x-4">
+                <div className="w-20 h-20 bg-orange-500 rounded-lg flex items-center justify-center">
+                  <div className="text-white">
+                    <div className="w-8 h-1 bg-white mb-1"></div>
+                    <div className="w-6 h-1 bg-white mb-1"></div>
+                    <div className="w-8 h-1 bg-white"></div>
+                  </div>
+                </div>
+              </div>
+              <div className="text-right">
+                <div className="text-sm text-gray-500 mb-1">Total Count</div>
+                <div className="text-4xl font-bold text-gray-800">0</div>
+              </div>
+            </div>
+          </div>
+
+          {/* Main Dashboard Card */}
+          <div className="bg-white rounded-lg shadow-sm border">
+            {/* Card Header */}
+            <div className="p-6 border-b border-gray-200">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center space-x-4">
+                  <div className="w-16 h-16 bg-green-500 rounded-lg flex items-center justify-center">
+                    <BarChart3 className="w-8 h-8 text-white" />
+                  </div>
+                  <div>
+                    <h2 className="text-xl font-semibold text-gray-800">LASPPPA Requests</h2>
+                  </div>
+                </div>
+                <button
+                  onClick={handleCreateNewRequest}
+                  className="px-6 py-3 bg-purple-600 text-white font-medium rounded-lg hover:bg-purple-700 transition-colors"
+                >
+                  CREATE NEW REQUEST
+                </button>
+              </div>
+            </div>
+
+            {/* Filters Section */}
+            <div className="p-6 border-b border-gray-200 bg-gray-50">
+              <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-4">
+                {/* Tax Payer ID Filter */}
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Filters: Tax Payer ID
+                  </label>
+                  <input
+                    type="text"
+                    value={taxPayerId}
+                    onChange={(e) => setTaxPayerId(e.target.value)}
+                    placeholder="Tax Payer ID"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none"
+                  />
+                </div>
+
+                {/* Status Dropdown */}
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Status
+                  </label>
+                  <div className="relative">
+                    <select
+                      value={status}
+                      onChange={(e) => setStatus(e.target.value)}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none appearance-none bg-white"
+                    >
+                      <option value="">Status</option>
+                      <option value="pending">Pending</option>
+                      <option value="approved">Approved</option>
+                      <option value="rejected">Rejected</option>
+                    </select>
+                    <ChevronDown className="absolute right-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none" />
+                  </div>
+                </div>
+
+                {/* Year Dropdown */}
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Year
+                  </label>
+                  <div className="relative">
+                    <select
+                      value={year}
+                      onChange={(e) => setYear(e.target.value)}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none appearance-none bg-white"
+                    >
+                      <option value="">Year</option>
+                      <option value="2025">2025</option>
+                      <option value="2024">2024</option>
+                      <option value="2023">2023</option>
+                    </select>
+                    <ChevronDown className="absolute right-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none" />
+                  </div>
+                </div>
+
+                {/* Select Level Dropdown */}
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Level
+                  </label>
+                  <div className="relative">
+                    <select
+                      value={selectLevel}
+                      onChange={(e) => setSelectLevel(e.target.value)}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none appearance-none bg-white"
+                    >
+                      <option value="Select Level">Select Level</option>
+                      <option value="level1">Level 1</option>
+                      <option value="level2">Level 2</option>
+                      <option value="level3">Level 3</option>
+                    </select>
+                    <ChevronDown className="absolute right-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none" />
+                  </div>
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4 items-end">
+                {/* Start Date */}
+                <div>
+                  <label className="flex items-center text-sm font-medium text-gray-700 mb-2">
+                    <Calendar className="w-4 h-4 mr-1" />
+                    Start Date
+                  </label>
+                  <input
+                    type="date"
+                    value={startDate}
+                    onChange={(e) => setStartDate(e.target.value)}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none"
+                  />
+                </div>
+
+                {/* End Date */}
+                <div>
+                  <label className="flex items-center text-sm font-medium text-gray-700 mb-2">
+                    <Calendar className="w-4 h-4 mr-1" />
+                    End Date
+                  </label>
+                  <input
+                    type="date"
+                    value={endDate}
+                    onChange={(e) => setEndDate(e.target.value)}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none"
+                  />
+                </div>
+
+                {/* Application Type */}
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Application Type
+                  </label>
+                  <div className="relative">
+                    <select
+                      value={applicationType}
+                      onChange={(e) => setApplicationType(e.target.value)}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none appearance-none bg-white"
+                    >
+                      <option value="">Application Type</option>
+                      <option value="new">New Application</option>
+                      <option value="renewal">Renewal</option>
+                      <option value="modification">Modification</option>
+                    </select>
+                    <ChevronDown className="absolute right-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none" />
+                  </div>
+                </div>
+              </div>
+
+              {/* Action Buttons */}
+              <div className="flex justify-end space-x-2 mt-4">
+                <button
+                  onClick={handleClear}
+                  className="px-6 py-2 bg-red-500 text-white font-medium rounded-lg hover:bg-red-600 transition-colors"
+                >
+                  CLEAR
+                </button>
+                <button
+                  onClick={handleFilter}
+                  className="px-6 py-2 bg-green-500 text-white font-medium rounded-lg hover:bg-green-600 transition-colors"
+                >
+                  FILTER
+                </button>
+              </div>
+            </div>
+
+            {/* Content Area */}
+            <div className="p-6">
+              <div className="flex justify-between items-center mb-4">
+                <div className="text-sm text-gray-600">
+                  Showing 1 to 0 of 0 entries
+                </div>
+                <div className="flex items-center space-x-2">
+                  <div className="w-8 h-8 bg-green-500 text-white rounded-full flex items-center justify-center text-sm font-medium">
+                    1
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Chat Support Button */}
+      <div className="fixed bottom-6 right-6">
+        <div className="relative">
+          <button className="w-14 h-14 bg-cyan-500 rounded-full flex items-center justify-center shadow-lg hover:bg-cyan-600 transition-colors">
+            <MessageCircle className="w-6 h-6 text-white" />
+          </button>
+          <div className="absolute -top-1 -right-1 w-5 h-5 bg-red-500 rounded-full flex items-center justify-center">
+            <span className="text-xs text-white font-bold">1</span>
+          </div>
+        </div>
+      </div>
+
+      {/* Footer */}
+      <div className="pb-8">
+        <div className="max-w-7xl mx-auto text-center">
+          <p className="text-gray-500 text-sm">© 2025 e-Tax. All Rights Reserved.</p>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+
   // Main content renderer
   const renderContent = () => {
     switch (activeItem) {
@@ -2952,19 +3516,19 @@ const ETaxAdminDashboard = () => {
       case 'tax-verification':
         return <TaxPayerVerificationContent />;
       case 'payments':
-        return <GenericContent title="Payments" description="Track and manage tax payments" icon={CreditCard} />;
+        return <GenerateNewBillInterface />;
       case 'tax-services':
-        return <GenericContent title="Tax Services" description="Manage and configure available tax services" icon={FileText} />;
+        return <TaxServicesInterface/>;
       case 'tax-offices':
         return <GenericContent title="Tax Offices" description="Manage tax office locations and staff assignments" icon={Building2} />;
       case 'merge-requests':
-        return <GenericContent title="Merge Requests" description="Handle taxpayer profile merge requests" icon={GitMerge} />;
+        return <MergeRequestsInterface/>;
       case 'tama-registration':
         return <GenericContent title="TAMA Registration" description="Tax Agent and Multiplier Agent registration system" icon={Shield} />;
       case 'rmu-revenue':
         return <GenericContent title="RMU Revenue" description="Revenue Mobilization Unit tracking and reports" icon={TrendingUp} />;
       case 'laspppa':
-        return <GenericContent title="LASPPPA" description="Lagos State Pension Protection Agency integration" icon={Shield} />;
+        return <LASPPPARequestsInterface />;
       case 'directors':
         return <GenericContent title="Directors Report" description="Corporate directors and compliance reporting" icon={BarChart3} />;
       case 'debts':
