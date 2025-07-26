@@ -53,393 +53,393 @@ const ETaxAdminDashboard = () => {
   };
 
   // Individual Tax Payers Content
-  const IndividualTaxPayersContent = () => {
-    const [searchType, setSearchType] = useState('Taxpayer ID');
-    const [searchValue, setSearchValue] = useState('');
-    const [showProfileDetail, setShowProfileDetail] = useState(false);
-    const [selectedTaxpayerId, setSelectedTaxpayerId] = useState('');
-    const [filters, setFilters] = useState({
-      taxId: '',
-      tinNumber: '',
-      firstName: '',
-      middleName: '',
-      lastName: '',
-      email: '',
-      phoneNumber: '',
-      idNumber: ''
-    });
-    const [allTaxpayers] = useState([
-      {
-        id: 'N-4401681',
-        tinNumber: '1061131973',
-        fullName: 'Mr. Moshood Olalekan Bello',
-        email: 'belloalalekan@gmail.com',
-        phoneNumber: '08023129633',
-        idNumber: '222*******9',
-        idType: 'BVN'
-      },
-      {
-        id: 'N-4401682',
-        tinNumber: '1061131974',
-        fullName: 'Mrs. Sarah Ahmed Johnson',
-        email: 'sarah.johnson@gmail.com',
-        phoneNumber: '08033445566',
-        idNumber: '333*******1',
-        idType: 'NIN'
-      },
-      {
-        id: 'N-4401683',
-        tinNumber: '1061131975',
-        fullName: 'Mr. David Emmanuel Okafor',
-        email: 'david.okafor@yahoo.com',
-        phoneNumber: '08044556677',
-        idNumber: '444*******2',
-        idType: 'BVN'
-      }
-    ]);
-    const [filteredTaxpayers, setFilteredTaxpayers] = useState<typeof allTaxpayers>([]);
-    const [showResults, setShowResults] = useState(false);
+//   const IndividualTaxPayersContent = () => {
+//     const [searchType, setSearchType] = useState('Taxpayer ID');
+//     const [searchValue, setSearchValue] = useState('');
+//     const [showProfileDetail, setShowProfileDetail] = useState(false);
+//     const [selectedTaxpayerId, setSelectedTaxpayerId] = useState('');
+//     const [filters, setFilters] = useState({
+//       taxId: '',
+//       tinNumber: '',
+//       firstName: '',
+//       middleName: '',
+//       lastName: '',
+//       email: '',
+//       phoneNumber: '',
+//       idNumber: ''
+//     });
+//     const [allTaxpayers] = useState([
+//       {
+//         id: 'N-4401681',
+//         tinNumber: '1061131973',
+//         fullName: 'Mr. Moshood Olalekan Bello',
+//         email: 'belloalalekan@gmail.com',
+//         phoneNumber: '08023129633',
+//         idNumber: '222*******9',
+//         idType: 'BVN'
+//       },
+//       {
+//         id: 'N-4401682',
+//         tinNumber: '1061131974',
+//         fullName: 'Mrs. Sarah Ahmed Johnson',
+//         email: 'sarah.johnson@gmail.com',
+//         phoneNumber: '08033445566',
+//         idNumber: '333*******1',
+//         idType: 'NIN'
+//       },
+//       {
+//         id: 'N-4401683',
+//         tinNumber: '1061131975',
+//         fullName: 'Mr. David Emmanuel Okafor',
+//         email: 'david.okafor@yahoo.com',
+//         phoneNumber: '08044556677',
+//         idNumber: '444*******2',
+//         idType: 'BVN'
+//       }
+//     ]);
+//     const [filteredTaxpayers, setFilteredTaxpayers] = useState<typeof allTaxpayers>([]);
+//     const [showResults, setShowResults] = useState(false);
 
-    const handleFilterChange = (field: string, value: string) => {
-      setFilters(prev => ({ ...prev, [field]: value }));
-    };
+//     const handleFilterChange = (field: string, value: string) => {
+//       setFilters(prev => ({ ...prev, [field]: value }));
+//     };
 
-    const handleAdvancedSearch = () => {
-      if (!searchValue.trim()) {
-        showNotification('Please enter a search value');
-        return;
-      }
+//     const handleAdvancedSearch = () => {
+//       if (!searchValue.trim()) {
+//         showNotification('Please enter a search value');
+//         return;
+//       }
       
-      const results = allTaxpayers.filter(taxpayer => {
-        switch (searchType) {
-          case 'Taxpayer ID':
-            return taxpayer.id.toLowerCase().includes(searchValue.toLowerCase());
-          case 'TIN Number':
-            return taxpayer.tinNumber.includes(searchValue);
-          case 'Full Name':
-            return taxpayer.fullName.toLowerCase().includes(searchValue.toLowerCase());
-          case 'Email':
-            return taxpayer.email.toLowerCase().includes(searchValue.toLowerCase());
-          default:
-            return true;
-        }
-      });
+//       const results = allTaxpayers.filter(taxpayer => {
+//         switch (searchType) {
+//           case 'Taxpayer ID':
+//             return taxpayer.id.toLowerCase().includes(searchValue.toLowerCase());
+//           case 'TIN Number':
+//             return taxpayer.tinNumber.includes(searchValue);
+//           case 'Full Name':
+//             return taxpayer.fullName.toLowerCase().includes(searchValue.toLowerCase());
+//           case 'Email':
+//             return taxpayer.email.toLowerCase().includes(searchValue.toLowerCase());
+//           default:
+//             return true;
+//         }
+//       });
       
-      setFilteredTaxpayers(results);
-      setShowResults(true);
-      showNotification(`Found ${results.length} taxpayer(s)`);
-    };
+//       setFilteredTaxpayers(results);
+//       setShowResults(true);
+//       showNotification(`Found ${results.length} taxpayer(s)`);
+//     };
 
-    const handleFilter = () => {
-      const hasFilters = Object.values(filters).some(value => value.trim() !== '');
+//     const handleFilter = () => {
+//       const hasFilters = Object.values(filters).some(value => value.trim() !== '');
       
-      if (!hasFilters) {
-        showNotification('Please enter at least one filter criteria');
-        return;
-      }
+//       if (!hasFilters) {
+//         showNotification('Please enter at least one filter criteria');
+//         return;
+//       }
 
-      const results = allTaxpayers.filter(taxpayer => {
-        return (
-          (!filters.taxId || taxpayer.id.toLowerCase().includes(filters.taxId.toLowerCase())) &&
-          (!filters.tinNumber || taxpayer.tinNumber.includes(filters.tinNumber)) &&
-          (!filters.firstName || taxpayer.fullName.toLowerCase().includes(filters.firstName.toLowerCase())) &&
-          (!filters.middleName || taxpayer.fullName.toLowerCase().includes(filters.middleName.toLowerCase())) &&
-          (!filters.lastName || taxpayer.fullName.toLowerCase().includes(filters.lastName.toLowerCase())) &&
-          (!filters.email || taxpayer.email.toLowerCase().includes(filters.email.toLowerCase())) &&
-          (!filters.phoneNumber || taxpayer.phoneNumber.includes(filters.phoneNumber)) &&
-          (!filters.idNumber || taxpayer.idNumber.includes(filters.idNumber))
-        );
-      });
+//       const results = allTaxpayers.filter(taxpayer => {
+//         return (
+//           (!filters.taxId || taxpayer.id.toLowerCase().includes(filters.taxId.toLowerCase())) &&
+//           (!filters.tinNumber || taxpayer.tinNumber.includes(filters.tinNumber)) &&
+//           (!filters.firstName || taxpayer.fullName.toLowerCase().includes(filters.firstName.toLowerCase())) &&
+//           (!filters.middleName || taxpayer.fullName.toLowerCase().includes(filters.middleName.toLowerCase())) &&
+//           (!filters.lastName || taxpayer.fullName.toLowerCase().includes(filters.lastName.toLowerCase())) &&
+//           (!filters.email || taxpayer.email.toLowerCase().includes(filters.email.toLowerCase())) &&
+//           (!filters.phoneNumber || taxpayer.phoneNumber.includes(filters.phoneNumber)) &&
+//           (!filters.idNumber || taxpayer.idNumber.includes(filters.idNumber))
+//         );
+//       });
 
-      setFilteredTaxpayers(results);
-      setShowResults(true);
-      showNotification(`Filtered results: ${results.length} taxpayer(s)`);
-    };
+//       setFilteredTaxpayers(results);
+//       setShowResults(true);
+//       showNotification(`Filtered results: ${results.length} taxpayer(s)`);
+//     };
 
-    const handleReset = () => {
-      setFilters({
-        taxId: '',
-        tinNumber: '',
-        firstName: '',
-        middleName: '',
-        lastName: '',
-        email: '',
-        phoneNumber: '',
-        idNumber: ''
-      });
-      setSearchValue('');
-      setShowResults(false);
-      setFilteredTaxpayers([]);
-      showNotification('Filters cleared');
-    };
+//     const handleReset = () => {
+//       setFilters({
+//         taxId: '',
+//         tinNumber: '',
+//         firstName: '',
+//         middleName: '',
+//         lastName: '',
+//         email: '',
+//         phoneNumber: '',
+//         idNumber: ''
+//       });
+//       setSearchValue('');
+//       setShowResults(false);
+//       setFilteredTaxpayers([]);
+//       showNotification('Filters cleared');
+//     };
 
-    const handleAddTaxpayer = () => {
-      setModalType('add-taxpayer');
-      setShowModal(true);
-    };
+//     const handleAddTaxpayer = () => {
+//       setModalType('add-taxpayer');
+//       setShowModal(true);
+//     };
 
-    const handleTaxIdClick = (taxpayerId: string) => {
-      setSelectedTaxpayerId(taxpayerId);
-      setShowProfileDetail(true);
-    };
+//     const handleTaxIdClick = (taxpayerId: string) => {
+//       setSelectedTaxpayerId(taxpayerId);
+//       setShowProfileDetail(true);
+//     };
 
-    const handleBackFromProfile = () => {
-      setShowProfileDetail(false);
-      setSelectedTaxpayerId('');
-    };
+//     const handleBackFromProfile = () => {
+//       setShowProfileDetail(false);
+//       setSelectedTaxpayerId('');
+//     };
 
-    const handleAddCompany = () => {
-      setModalType('add-company');
-      setShowModal(true);
-    };
+//     const handleAddCompany = () => {
+//       setModalType('add-company');
+//       setShowModal(true);
+//     };
 
-    // If showing profile detail, render that component
-    if (showProfileDetail) {
-      return (
-        <TaxPayerProfileDetailContent 
-          taxpayerId={selectedTaxpayerId} 
-          onBack={handleBackFromProfile} 
-        />
-      );
-    }
+//     // If showing profile detail, render that component
+//     if (showProfileDetail) {
+//       return (
+//         <TaxPayerProfileDetailContent 
+//           taxpayerId={selectedTaxpayerId} 
+//           onBack={handleBackFromProfile} 
+//         />
+//       );
+//     }
 
-    return (
-      <div className="p-8">
-        {/* Header */}
-        <div className="flex items-center justify-between mb-8">
-          <h1 className="text-3xl font-bold" style={{ color: '#102e4a' }}>Individual Tax Payers</h1>
-          <div className="w-10 h-10 rounded-full flex items-center justify-center" style={{ backgroundColor: '#f8f9fa' }}>
-            <Users style={{ color: '#102e4a' }} size={20} />
-          </div>
-        </div>
+//     return (
+//       <div className="p-8">
+//         {/* Header */}
+//         <div className="flex items-center justify-between mb-8">
+//           <h1 className="text-3xl font-bold" style={{ color: '#102e4a' }}>Individual Tax Payers</h1>
+//           <div className="w-10 h-10 rounded-full flex items-center justify-center" style={{ backgroundColor: '#f8f9fa' }}>
+//             <Users style={{ color: '#102e4a' }} size={20} />
+//           </div>
+//         </div>
 
-        {/* Advanced Search Section */}
-        <div className="bg-white rounded-lg shadow-lg p-6 mb-6">
-          <div className="flex items-center mb-4">
-            <div className="w-8 h-8 rounded flex items-center justify-center mr-3" style={{ backgroundColor: '#102e4a' }}>
-              <Users style={{ color: 'white' }} size={16} />
-            </div>
-            <div>
-              <h2 className="text-xl font-semibold" style={{ color: '#102e4a' }}>Individual Tax Payers</h2>
-              <p className="text-sm" style={{ color: '#6c757d' }}>Advanced Search Type</p>
-            </div>
-          </div>
+//         {/* Advanced Search Section */}
+//         <div className="bg-white rounded-lg shadow-lg p-6 mb-6">
+//           <div className="flex items-center mb-4">
+//             <div className="w-8 h-8 rounded flex items-center justify-center mr-3" style={{ backgroundColor: '#102e4a' }}>
+//               <Users style={{ color: 'white' }} size={16} />
+//             </div>
+//             <div>
+//               <h2 className="text-xl font-semibold" style={{ color: '#102e4a' }}>Individual Tax Payers</h2>
+//               <p className="text-sm" style={{ color: '#6c757d' }}>Advanced Search Type</p>
+//             </div>
+//           </div>
 
-          <div className="flex gap-4 items-end">
-            <div className="flex-1">
-              <select 
-                value={searchType} 
-                onChange={(e) => setSearchType(e.target.value)}
-                className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                style={{ color: '#102e4a' }}
-              >
-                <option>Taxpayer ID</option>
-                <option>TIN Number</option>
-                <option>Full Name</option>
-                <option>Email</option>
-              </select>
-            </div>
-            <div className="flex-1">
-              <input
-                type="text"
-                placeholder="Taxpayer ID"
-                value={searchValue}
-                onChange={(e) => setSearchValue(e.target.value)}
-                className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                style={{ color: '#102e4a' }}
-              />
-            </div>
-            <button 
-              onClick={handleAdvancedSearch}
-              className="px-6 py-3 text-white rounded-lg hover:shadow-lg transition-all font-medium"
-              style={{ backgroundColor: '#102e4a' }}
-              onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#a682ff'}
-              onMouseLeave={(e) => e.currentTarget.style.backgroundColor = '#102e4a'}
-            >
-              ADVANCED SEARCH
-            </button>
-            <button 
-              onClick={handleAddTaxpayer}
-              className="w-12 h-12 text-white rounded-lg hover:shadow-lg transition-all flex items-center justify-center"
-              style={{ backgroundColor: '#102e4a' }}
-              onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#a682ff'}
-              onMouseLeave={(e) => e.currentTarget.style.backgroundColor = '#102e4a'}
-              title="Add New Taxpayer"
-            >
-              +
-            </button>
-          </div>
-        </div>
+//           <div className="flex gap-4 items-end">
+//             <div className="flex-1">
+//               <select 
+//                 value={searchType} 
+//                 onChange={(e) => setSearchType(e.target.value)}
+//                 className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+//                 style={{ color: '#102e4a' }}
+//               >
+//                 <option>Taxpayer ID</option>
+//                 <option>TIN Number</option>
+//                 <option>Full Name</option>
+//                 <option>Email</option>
+//               </select>
+//             </div>
+//             <div className="flex-1">
+//               <input
+//                 type="text"
+//                 placeholder="Taxpayer ID"
+//                 value={searchValue}
+//                 onChange={(e) => setSearchValue(e.target.value)}
+//                 className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+//                 style={{ color: '#102e4a' }}
+//               />
+//             </div>
+//             <button 
+//               onClick={handleAdvancedSearch}
+//               className="px-6 py-3 text-white rounded-lg hover:shadow-lg transition-all font-medium"
+//               style={{ backgroundColor: '#102e4a' }}
+//               onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#a682ff'}
+//               onMouseLeave={(e) => e.currentTarget.style.backgroundColor = '#102e4a'}
+//             >
+//               ADVANCED SEARCH
+//             </button>
+//             <button 
+//               onClick={handleAddTaxpayer}
+//               className="w-12 h-12 text-white rounded-lg hover:shadow-lg transition-all flex items-center justify-center"
+//               style={{ backgroundColor: '#102e4a' }}
+//               onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#a682ff'}
+//               onMouseLeave={(e) => e.currentTarget.style.backgroundColor = '#102e4a'}
+//               title="Add New Taxpayer"
+//             >
+//               +
+//             </button>
+//           </div>
+//         </div>
 
-        {/* Search Results Header */}
-        <div className="mb-4">
-          <h3 className="text-lg font-semibold" style={{ color: '#102e4a' }}>Search Results (EBSRCM)</h3>
-        </div>
+//         {/* Search Results Header */}
+//         <div className="mb-4">
+//           <h3 className="text-lg font-semibold" style={{ color: '#102e4a' }}>Search Results (EBSRCM)</h3>
+//         </div>
 
-        {/* Search Existing Users */}
-        <div className="bg-white rounded-lg shadow-lg p-6 mb-6">
-          <h3 className="text-lg font-semibold mb-4" style={{ color: '#102e4a' }}>Search Existing users</h3>
+//         {/* Search Existing Users */}
+//         <div className="bg-white rounded-lg shadow-lg p-6 mb-6">
+//           <h3 className="text-lg font-semibold mb-4" style={{ color: '#102e4a' }}>Search Existing users</h3>
           
-          <div className="mb-4">
-            <span className="text-sm font-medium" style={{ color: '#6c757d' }}>Filters:</span>
-          </div>
+//           <div className="mb-4">
+//             <span className="text-sm font-medium" style={{ color: '#6c757d' }}>Filters:</span>
+//           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
-            <input
-              type="text"
-              placeholder="Tax ID"
-              value={filters.taxId}
-              onChange={(e) => handleFilterChange('taxId', e.target.value)}
-              className="p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-              style={{ color: '#102e4a' }}
-            />
-            <input
-              type="text"
-              placeholder="TIN Number"
-              value={filters.tinNumber}
-              onChange={(e) => handleFilterChange('tinNumber', e.target.value)}
-              className="p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-              style={{ color: '#102e4a' }}
-            />
-            <input
-              type="text"
-              placeholder="First Name"
-              value={filters.firstName}
-              onChange={(e) => handleFilterChange('firstName', e.target.value)}
-              className="p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-              style={{ color: '#102e4a' }}
-            />
-            <input
-              type="text"
-              placeholder="Middle Name"
-              value={filters.middleName}
-              onChange={(e) => handleFilterChange('middleName', e.target.value)}
-              className="p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-              style={{ color: '#102e4a' }}
-            />
-            <input
-              type="text"
-              placeholder="Last Name"
-              value={filters.lastName}
-              onChange={(e) => handleFilterChange('lastName', e.target.value)}
-              className="p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-              style={{ color: '#102e4a' }}
-            />
-            <input
-              type="email"
-              placeholder="Email"
-              value={filters.email}
-              onChange={(e) => handleFilterChange('email', e.target.value)}
-              className="p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-              style={{ color: '#102e4a' }}
-            />
-            <input
-              type="text"
-              placeholder="Phone Number"
-              value={filters.phoneNumber}
-              onChange={(e) => handleFilterChange('phoneNumber', e.target.value)}
-              className="p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-              style={{ color: '#102e4a' }}
-            />
-            <input
-              type="text"
-              placeholder="ID Number"
-              value={filters.idNumber}
-              onChange={(e) => handleFilterChange('idNumber', e.target.value)}
-              className="p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-              style={{ color: '#102e4a' }}
-            />
-          </div>
+//           <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+//             <input
+//               type="text"
+//               placeholder="Tax ID"
+//               value={filters.taxId}
+//               onChange={(e) => handleFilterChange('taxId', e.target.value)}
+//               className="p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+//               style={{ color: '#102e4a' }}
+//             />
+//             <input
+//               type="text"
+//               placeholder="TIN Number"
+//               value={filters.tinNumber}
+//               onChange={(e) => handleFilterChange('tinNumber', e.target.value)}
+//               className="p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+//               style={{ color: '#102e4a' }}
+//             />
+//             <input
+//               type="text"
+//               placeholder="First Name"
+//               value={filters.firstName}
+//               onChange={(e) => handleFilterChange('firstName', e.target.value)}
+//               className="p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+//               style={{ color: '#102e4a' }}
+//             />
+//             <input
+//               type="text"
+//               placeholder="Middle Name"
+//               value={filters.middleName}
+//               onChange={(e) => handleFilterChange('middleName', e.target.value)}
+//               className="p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+//               style={{ color: '#102e4a' }}
+//             />
+//             <input
+//               type="text"
+//               placeholder="Last Name"
+//               value={filters.lastName}
+//               onChange={(e) => handleFilterChange('lastName', e.target.value)}
+//               className="p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+//               style={{ color: '#102e4a' }}
+//             />
+//             <input
+//               type="email"
+//               placeholder="Email"
+//               value={filters.email}
+//               onChange={(e) => handleFilterChange('email', e.target.value)}
+//               className="p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+//               style={{ color: '#102e4a' }}
+//             />
+//             <input
+//               type="text"
+//               placeholder="Phone Number"
+//               value={filters.phoneNumber}
+//               onChange={(e) => handleFilterChange('phoneNumber', e.target.value)}
+//               className="p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+//               style={{ color: '#102e4a' }}
+//             />
+//             <input
+//               type="text"
+//               placeholder="ID Number"
+//               value={filters.idNumber}
+//               onChange={(e) => handleFilterChange('idNumber', e.target.value)}
+//               className="p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+//               style={{ color: '#102e4a' }}
+//             />
+//           </div>
 
-          <div className="flex justify-end gap-4">
-            <button 
-              onClick={handleReset}
-              className="px-6 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition-all font-medium"
-            >
-              RESET
-            </button>
-            <button 
-              onClick={handleFilter}
-              className="px-6 py-2 text-white rounded-lg hover:shadow-lg transition-all font-medium"
-              style={{ backgroundColor: '#102e4a' }}
-              onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#a682ff'}
-              onMouseLeave={(e) => e.currentTarget.style.backgroundColor = '#102e4a'}
-            >
-              FILTER
-            </button>
-          </div>
-        </div>
+//           <div className="flex justify-end gap-4">
+//             <button 
+//               onClick={handleReset}
+//               className="px-6 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition-all font-medium"
+//             >
+//               RESET
+//             </button>
+//             <button 
+//               onClick={handleFilter}
+//               className="px-6 py-2 text-white rounded-lg hover:shadow-lg transition-all font-medium"
+//               style={{ backgroundColor: '#102e4a' }}
+//               onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#a682ff'}
+//               onMouseLeave={(e) => e.currentTarget.style.backgroundColor = '#102e4a'}
+//             >
+//               FILTER
+//             </button>
+//           </div>
+//         </div>
 
-        {/* Results Table */}
-        {showResults ? (
-          <div className="bg-white rounded-lg shadow-lg overflow-hidden">
-            <div className="overflow-x-auto">
-              <table className="w-full">
-                <thead style={{ backgroundColor: '#f8f9fa' }}>
-                  <tr>
-                    <th className="px-6 py-4 text-left text-sm font-semibold" style={{ color: '#102e4a' }}>Tax Payer ID</th>
-                    <th className="px-6 py-4 text-left text-sm font-semibold" style={{ color: '#102e4a' }}>TIN Number</th>
-                    <th className="px-6 py-4 text-left text-sm font-semibold" style={{ color: '#102e4a' }}>Full Name</th>
-                    <th className="px-6 py-4 text-left text-sm font-semibold" style={{ color: '#102e4a' }}>Email</th>
-                    <th className="px-6 py-4 text-left text-sm font-semibold" style={{ color: '#102e4a' }}>Phone Number</th>
-                    <th className="px-6 py-4 text-left text-sm font-semibold" style={{ color: '#102e4a' }}>ID Number</th>
-                    <th className="px-6 py-4 text-left text-sm font-semibold" style={{ color: '#102e4a' }}>ID Type</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {(showResults ? filteredTaxpayers : []).map((taxpayer, index) => (
-                    <tr key={taxpayer.id} className="border-t border-gray-200 hover:bg-gray-50">
-                      <td className="px-6 py-4">
-                        <span 
-                          className="text-blue-600 hover:underline cursor-pointer"
-                          onClick={() => handleTaxIdClick(taxpayer.id)}
-                        >
-                          {taxpayer.id}
-                        </span>
-                      </td>
-                      <td className="px-6 py-4" style={{ color: '#102e4a' }}>{taxpayer.tinNumber}</td>
-                      <td className="px-6 py-4" style={{ color: '#102e4a' }}>{taxpayer.fullName}</td>
-                      <td className="px-6 py-4" style={{ color: '#6c757d' }}>{taxpayer.email}</td>
-                      <td className="px-6 py-4" style={{ color: '#6c757d' }}>{taxpayer.phoneNumber}</td>
-                      <td className="px-6 py-4" style={{ color: '#6c757d' }}>{taxpayer.idNumber}</td>
-                      <td className="px-6 py-4" style={{ color: '#6c757d' }}>{taxpayer.idType}</td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
+//         {/* Results Table */}
+//         {showResults ? (
+//           <div className="bg-white rounded-lg shadow-lg overflow-hidden">
+//             <div className="overflow-x-auto">
+//               <table className="w-full">
+//                 <thead style={{ backgroundColor: '#f8f9fa' }}>
+//                   <tr>
+//                     <th className="px-6 py-4 text-left text-sm font-semibold" style={{ color: '#102e4a' }}>Tax Payer ID</th>
+//                     <th className="px-6 py-4 text-left text-sm font-semibold" style={{ color: '#102e4a' }}>TIN Number</th>
+//                     <th className="px-6 py-4 text-left text-sm font-semibold" style={{ color: '#102e4a' }}>Full Name</th>
+//                     <th className="px-6 py-4 text-left text-sm font-semibold" style={{ color: '#102e4a' }}>Email</th>
+//                     <th className="px-6 py-4 text-left text-sm font-semibold" style={{ color: '#102e4a' }}>Phone Number</th>
+//                     <th className="px-6 py-4 text-left text-sm font-semibold" style={{ color: '#102e4a' }}>ID Number</th>
+//                     <th className="px-6 py-4 text-left text-sm font-semibold" style={{ color: '#102e4a' }}>ID Type</th>
+//                   </tr>
+//                 </thead>
+//                 <tbody>
+//                   {(showResults ? filteredTaxpayers : []).map((taxpayer, index) => (
+//                     <tr key={taxpayer.id} className="border-t border-gray-200 hover:bg-gray-50">
+//                       <td className="px-6 py-4">
+//                         <span 
+//                           className="text-blue-600 hover:underline cursor-pointer"
+//                           onClick={() => handleTaxIdClick(taxpayer.id)}
+//                         >
+//                           {taxpayer.id}
+//                         </span>
+//                       </td>
+//                       <td className="px-6 py-4" style={{ color: '#102e4a' }}>{taxpayer.tinNumber}</td>
+//                       <td className="px-6 py-4" style={{ color: '#102e4a' }}>{taxpayer.fullName}</td>
+//                       <td className="px-6 py-4" style={{ color: '#6c757d' }}>{taxpayer.email}</td>
+//                       <td className="px-6 py-4" style={{ color: '#6c757d' }}>{taxpayer.phoneNumber}</td>
+//                       <td className="px-6 py-4" style={{ color: '#6c757d' }}>{taxpayer.idNumber}</td>
+//                       <td className="px-6 py-4" style={{ color: '#6c757d' }}>{taxpayer.idType}</td>
+//                     </tr>
+//                   ))}
+//                 </tbody>
+//               </table>
+//             </div>
 
-            {/* Pagination */}
-            <div className="flex items-center justify-between px-6 py-4 border-t border-gray-200">
-              <div className="text-sm" style={{ color: '#6c757d' }}>
-                Showing 1 to {filteredTaxpayers.length} of {filteredTaxpayers.length} entries
-              </div>
-              <div className="flex items-center space-x-2">
-                <button 
-                  className="w-8 h-8 rounded-full text-white flex items-center justify-center text-sm font-medium"
-                  style={{ backgroundColor: '#102e4a' }}
-                >
-                  1
-                </button>
-              </div>
-            </div>
-          </div>
-        ) : (
-          <div className="bg-white rounded-lg shadow-lg p-8 text-center">
-            <p style={{ color: '#6c757d' }}>There are currently no entries to display at the moment.</p>
-            <div className="mt-4 text-sm" style={{ color: '#6c757d' }}>
-              Showing 1 to 0 of 0 entries
-            </div>
-          </div>
-        )}
+//             {/* Pagination */}
+//             <div className="flex items-center justify-between px-6 py-4 border-t border-gray-200">
+//               <div className="text-sm" style={{ color: '#6c757d' }}>
+//                 Showing 1 to {filteredTaxpayers.length} of {filteredTaxpayers.length} entries
+//               </div>
+//               <div className="flex items-center space-x-2">
+//                 <button 
+//                   className="w-8 h-8 rounded-full text-white flex items-center justify-center text-sm font-medium"
+//                   style={{ backgroundColor: '#102e4a' }}
+//                 >
+//                   1
+//                 </button>
+//               </div>
+//             </div>
+//           </div>
+//         ) : (
+//           <div className="bg-white rounded-lg shadow-lg p-8 text-center">
+//             <p style={{ color: '#6c757d' }}>There are currently no entries to display at the moment.</p>
+//             <div className="mt-4 text-sm" style={{ color: '#6c757d' }}>
+//               Showing 1 to 0 of 0 entries
+//             </div>
+//           </div>
+//         )}
 
-        {/* Footer */}
-        <div className="mt-8 text-center">
-          <p className="text-sm" style={{ color: '#6c757d' }}>© 2025 e-Tax. All Rights Reserved.</p>
-        </div>
-      </div>
-    );
-  };
+//         {/* Footer */}
+//         <div className="mt-8 text-center">
+//           <p className="text-sm" style={{ color: '#6c757d' }}>© 2025 e-Tax. All Rights Reserved.</p>
+//         </div>
+//       </div>
+//     );
+//   };
 
   const menuItems = [
     {
@@ -1936,317 +1936,317 @@ const ETaxAdminDashboard = () => {
       </div>
     );
   };
-//   const IndividualTaxPayersContent = () => {
-//     const [searchType, setSearchType] = useState('Taxpayer ID');
-//     const [searchValue, setSearchValue] = useState('');
-//     const [showProfileDetail, setShowProfileDetail] = useState(false);
-//     const [selectedTaxpayerId, setSelectedTaxpayerId] = useState('');
-//     const [filters, setFilters] = useState({
-//       taxId: '',
-//       tinNumber: '',
-//       firstName: '',
-//       middleName: '',
-//       lastName: '',
-//       email: '',
-//       phoneNumber: '',
-//       idNumber: ''
-//     });
-//     const [taxpayers, setTaxpayers] = useState([
-//       {
-//         id: 'N-4401681',
-//         tinNumber: '1061131973',
-//         fullName: 'Mr. Moshood Olalekan Bello',
-//         email: 'belloalalekan@gmail.com',
-//         phoneNumber: '08023129633',
-//         idNumber: '222*******9',
-//         idType: 'BVN'
-//       }
-//     ]);
-//     const [showResults, setShowResults] = useState(false);
+   const IndividualTaxPayersContent = () => {
+    const [searchType, setSearchType] = useState('Taxpayer ID');
+    const [searchValue, setSearchValue] = useState('');
+    const [showProfileDetail, setShowProfileDetail] = useState(false);
+    const [selectedTaxpayerId, setSelectedTaxpayerId] = useState('');
+    const [filters, setFilters] = useState({
+      taxId: '',
+      tinNumber: '',
+      firstName: '',
+      middleName: '',
+      lastName: '',
+      email: '',
+      phoneNumber: '',
+      idNumber: ''
+    });
+    const [taxpayers, setTaxpayers] = useState([
+      {
+        id: 'N-4401681',
+        tinNumber: '1061131973',
+        fullName: 'Mr. Moshood Olalekan Bello',
+        email: 'belloalalekan@gmail.com',
+        phoneNumber: '08023129633',
+        idNumber: '222*******9',
+        idType: 'BVN'
+      }
+    ]);
+    const [showResults, setShowResults] = useState(false);
 
-//     const handleFilterChange = (field: string, value: string) => {
-//       setFilters(prev => ({ ...prev, [field]: value }));
-//     };
+    const handleFilterChange = (field: string, value: string) => {
+      setFilters(prev => ({ ...prev, [field]: value }));
+    };
 
-//     const handleAdvancedSearch = () => {
-//       setShowResults(true);
-//     };
+    const handleAdvancedSearch = () => {
+      setShowResults(true);
+    };
 
-//     const handleFilter = () => {
-//       // Filter logic would go here
-//       setShowResults(true);
-//     };
+    const handleFilter = () => {
+      // Filter logic would go here
+      setShowResults(true);
+    };
 
-//     const handleReset = () => {
-//       setFilters({
-//         taxId: '',
-//         tinNumber: '',
-//         firstName: '',
-//         middleName: '',
-//         lastName: '',
-//         email: '',
-//         phoneNumber: '',
-//         idNumber: ''
-//       });
-//       setSearchValue('');
-//       setShowResults(false);
-//     };
+    const handleReset = () => {
+      setFilters({
+        taxId: '',
+        tinNumber: '',
+        firstName: '',
+        middleName: '',
+        lastName: '',
+        email: '',
+        phoneNumber: '',
+        idNumber: ''
+      });
+      setSearchValue('');
+      setShowResults(false);
+    };
 
-//     const handleTaxIdClick = (taxpayerId: string) => {
-//       setSelectedTaxpayerId(taxpayerId);
-//       setShowProfileDetail(true);
-//     };
+    const handleTaxIdClick = (taxpayerId: string) => {
+      setSelectedTaxpayerId(taxpayerId);
+      setShowProfileDetail(true);
+    };
 
-//     const handleBackFromProfile = () => {
-//       setShowProfileDetail(false);
-//       setSelectedTaxpayerId('');
-//     };
+    const handleBackFromProfile = () => {
+      setShowProfileDetail(false);
+      setSelectedTaxpayerId('');
+    };
 
-//     // If showing profile detail, render that component
-//     if (showProfileDetail) {
-//       return (
-//         <TaxPayerProfileDetailContent 
-//           taxpayerId={selectedTaxpayerId} 
-//           onBack={handleBackFromProfile} 
-//         />
-//       );
-//     }
+    // If showing profile detail, render that component
+    if (showProfileDetail) {
+      return (
+        <TaxPayerProfileDetailContent 
+          taxpayerId={selectedTaxpayerId} 
+          onBack={handleBackFromProfile} 
+        />
+      );
+    }
 
-//     return (
-//       <div className="p-8">
-//         {/* Header */}
-//         <div className="flex items-center justify-between mb-8">
-//           <h1 className="text-3xl font-bold" style={{ color: '#102e4a' }}>Individual Tax Payers</h1>
-//           <div className="w-10 h-10 rounded-full flex items-center justify-center" style={{ backgroundColor: '#f8f9fa' }}>
-//             <Users style={{ color: '#102e4a' }} size={20} />
-//           </div>
-//         </div>
+    return (
+      <div className="p-8">
+        {/* Header */}
+        <div className="flex items-center justify-between mb-8">
+          <h1 className="text-3xl font-bold" style={{ color: '#102e4a' }}>Individual Tax Payers</h1>
+          <div className="w-10 h-10 rounded-full flex items-center justify-center" style={{ backgroundColor: '#f8f9fa' }}>
+            <Users style={{ color: '#102e4a' }} size={20} />
+          </div>
+        </div>
 
-//         {/* Advanced Search Section */}
-//         <div className="bg-white rounded-lg shadow-lg p-6 mb-6">
-//           <div className="flex items-center mb-4">
-//             <div className="w-8 h-8 rounded flex items-center justify-center mr-3" style={{ backgroundColor: '#102e4a' }}>
-//               <Users style={{ color: 'white' }} size={16} />
-//             </div>
-//             <div>
-//               <h2 className="text-xl font-semibold" style={{ color: '#102e4a' }}>Individual Tax Payers</h2>
-//               <p className="text-sm" style={{ color: '#6c757d' }}>Advanced Search Type</p>
-//             </div>
-//           </div>
+        {/* Advanced Search Section */}
+        <div className="bg-white rounded-lg shadow-lg p-6 mb-6">
+          <div className="flex items-center mb-4">
+            <div className="w-8 h-8 rounded flex items-center justify-center mr-3" style={{ backgroundColor: '#102e4a' }}>
+              <Users style={{ color: 'white' }} size={16} />
+            </div>
+            <div>
+              <h2 className="text-xl font-semibold" style={{ color: '#102e4a' }}>Individual Tax Payers</h2>
+              <p className="text-sm" style={{ color: '#6c757d' }}>Advanced Search Type</p>
+            </div>
+          </div>
 
-//           <div className="flex gap-4 items-end">
-//             <div className="flex-1">
-//               <select 
-//                 value={searchType} 
-//                 onChange={(e) => setSearchType(e.target.value)}
-//                 className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-//                 style={{ color: '#102e4a' }}
-//               >
-//                 <option>Taxpayer ID</option>
-//                 <option>TIN Number</option>
-//                 <option>Full Name</option>
-//                 <option>Email</option>
-//               </select>
-//             </div>
-//             <div className="flex-1">
-//               <input
-//                 type="text"
-//                 placeholder="Taxpayer ID"
-//                 value={searchValue}
-//                 onChange={(e) => setSearchValue(e.target.value)}
-//                 className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-//                 style={{ color: '#102e4a' }}
-//               />
-//             </div>
-//             <button 
-//               onClick={handleAdvancedSearch}
-//               className="px-6 py-3 text-white rounded-lg hover:shadow-lg transition-all font-medium"
-//               style={{ backgroundColor: '#102e4a' }}
-//               onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#a682ff'}
-//               onMouseLeave={(e) => e.currentTarget.style.backgroundColor = '#102e4a'}
-//             >
-//               ADVANCED SEARCH
-//             </button>
-//             <button 
-//               className="w-12 h-12 text-white rounded-lg hover:shadow-lg transition-all flex items-center justify-center"
-//               style={{ backgroundColor: '#102e4a' }}
-//               onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#a682ff'}
-//               onMouseLeave={(e) => e.currentTarget.style.backgroundColor = '#102e4a'}
-//             >
-//               +
-//             </button>
-//           </div>
-//         </div>
+          <div className="flex gap-4 items-end">
+            <div className="flex-1">
+              <select 
+                value={searchType} 
+                onChange={(e) => setSearchType(e.target.value)}
+                className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                style={{ color: '#102e4a' }}
+              >
+                <option>Taxpayer ID</option>
+                <option>TIN Number</option>
+                <option>Full Name</option>
+                <option>Email</option>
+              </select>
+            </div>
+            <div className="flex-1">
+              <input
+                type="text"
+                placeholder="Taxpayer ID"
+                value={searchValue}
+                onChange={(e) => setSearchValue(e.target.value)}
+                className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                style={{ color: '#102e4a' }}
+              />
+            </div>
+            <button 
+              onClick={handleAdvancedSearch}
+              className="px-6 py-3 text-white rounded-lg hover:shadow-lg transition-all font-medium"
+              style={{ backgroundColor: '#102e4a' }}
+              onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#a682ff'}
+              onMouseLeave={(e) => e.currentTarget.style.backgroundColor = '#102e4a'}
+            >
+              ADVANCED SEARCH
+            </button>
+            <button 
+              className="w-12 h-12 text-white rounded-lg hover:shadow-lg transition-all flex items-center justify-center"
+              style={{ backgroundColor: '#102e4a' }}
+              onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#a682ff'}
+              onMouseLeave={(e) => e.currentTarget.style.backgroundColor = '#102e4a'}
+            >
+              +
+            </button>
+          </div>
+        </div>
 
-//         {/* Search Results Header */}
-//         <div className="mb-4">
-//           <h3 className="text-lg font-semibold" style={{ color: '#102e4a' }}>Search Results (EBSRCM)</h3>
-//         </div>
+        {/* Search Results Header */}
+        <div className="mb-4">
+          <h3 className="text-lg font-semibold" style={{ color: '#102e4a' }}>Search Results (EBSRCM)</h3>
+        </div>
 
-//         {/* Search Existing Users */}
-//         <div className="bg-white rounded-lg shadow-lg p-6 mb-6">
-//           <h3 className="text-lg font-semibold mb-4" style={{ color: '#102e4a' }}>Search Existing users</h3>
+        {/* Search Existing Users */}
+        <div className="bg-white rounded-lg shadow-lg p-6 mb-6">
+          <h3 className="text-lg font-semibold mb-4" style={{ color: '#102e4a' }}>Search Existing users</h3>
           
-//           <div className="mb-4">
-//             <span className="text-sm font-medium" style={{ color: '#6c757d' }}>Filters:</span>
-//           </div>
+          <div className="mb-4">
+            <span className="text-sm font-medium" style={{ color: '#6c757d' }}>Filters:</span>
+          </div>
 
-//           <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
-//             <input
-//               type="text"
-//               placeholder="Tax ID"
-//               value={filters.taxId}
-//               onChange={(e) => handleFilterChange('taxId', e.target.value)}
-//               className="p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-//               style={{ color: '#102e4a' }}
-//             />
-//             <input
-//               type="text"
-//               placeholder="TIN Number"
-//               value={filters.tinNumber}
-//               onChange={(e) => handleFilterChange('tinNumber', e.target.value)}
-//               className="p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-//               style={{ color: '#102e4a' }}
-//             />
-//             <input
-//               type="text"
-//               placeholder="First Name"
-//               value={filters.firstName}
-//               onChange={(e) => handleFilterChange('firstName', e.target.value)}
-//               className="p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-//               style={{ color: '#102e4a' }}
-//             />
-//             <input
-//               type="text"
-//               placeholder="Middle Name"
-//               value={filters.middleName}
-//               onChange={(e) => handleFilterChange('middleName', e.target.value)}
-//               className="p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-//               style={{ color: '#102e4a' }}
-//             />
-//             <input
-//               type="text"
-//               placeholder="Last Name"
-//               value={filters.lastName}
-//               onChange={(e) => handleFilterChange('lastName', e.target.value)}
-//               className="p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-//               style={{ color: '#102e4a' }}
-//             />
-//             <input
-//               type="email"
-//               placeholder="Email"
-//               value={filters.email}
-//               onChange={(e) => handleFilterChange('email', e.target.value)}
-//               className="p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-//               style={{ color: '#102e4a' }}
-//             />
-//             <input
-//               type="text"
-//               placeholder="Phone Number"
-//               value={filters.phoneNumber}
-//               onChange={(e) => handleFilterChange('phoneNumber', e.target.value)}
-//               className="p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-//               style={{ color: '#102e4a' }}
-//             />
-//             <input
-//               type="text"
-//               placeholder="ID Number"
-//               value={filters.idNumber}
-//               onChange={(e) => handleFilterChange('idNumber', e.target.value)}
-//               className="p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-//               style={{ color: '#102e4a' }}
-//             />
-//           </div>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+            <input
+              type="text"
+              placeholder="Tax ID"
+              value={filters.taxId}
+              onChange={(e) => handleFilterChange('taxId', e.target.value)}
+              className="p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+              style={{ color: '#102e4a' }}
+            />
+            <input
+              type="text"
+              placeholder="TIN Number"
+              value={filters.tinNumber}
+              onChange={(e) => handleFilterChange('tinNumber', e.target.value)}
+              className="p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+              style={{ color: '#102e4a' }}
+            />
+            <input
+              type="text"
+              placeholder="First Name"
+              value={filters.firstName}
+              onChange={(e) => handleFilterChange('firstName', e.target.value)}
+              className="p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+              style={{ color: '#102e4a' }}
+            />
+            <input
+              type="text"
+              placeholder="Middle Name"
+              value={filters.middleName}
+              onChange={(e) => handleFilterChange('middleName', e.target.value)}
+              className="p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+              style={{ color: '#102e4a' }}
+            />
+            <input
+              type="text"
+              placeholder="Last Name"
+              value={filters.lastName}
+              onChange={(e) => handleFilterChange('lastName', e.target.value)}
+              className="p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+              style={{ color: '#102e4a' }}
+            />
+            <input
+              type="email"
+              placeholder="Email"
+              value={filters.email}
+              onChange={(e) => handleFilterChange('email', e.target.value)}
+              className="p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+              style={{ color: '#102e4a' }}
+            />
+            <input
+              type="text"
+              placeholder="Phone Number"
+              value={filters.phoneNumber}
+              onChange={(e) => handleFilterChange('phoneNumber', e.target.value)}
+              className="p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+              style={{ color: '#102e4a' }}
+            />
+            <input
+              type="text"
+              placeholder="ID Number"
+              value={filters.idNumber}
+              onChange={(e) => handleFilterChange('idNumber', e.target.value)}
+              className="p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+              style={{ color: '#102e4a' }}
+            />
+          </div>
 
-//           <div className="flex justify-end gap-4">
-//             <button 
-//               onClick={handleReset}
-//               className="px-6 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition-all font-medium"
-//             >
-//               RESET
-//             </button>
-//             <button 
-//               onClick={handleFilter}
-//               className="px-6 py-2 text-white rounded-lg hover:shadow-lg transition-all font-medium"
-//               style={{ backgroundColor: '#102e4a' }}
-//               onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#a682ff'}
-//               onMouseLeave={(e) => e.currentTarget.style.backgroundColor = '#102e4a'}
-//             >
-//               FILTER
-//             </button>
-//           </div>
-//         </div>
+          <div className="flex justify-end gap-4">
+            <button 
+              onClick={handleReset}
+              className="px-6 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition-all font-medium"
+            >
+              RESET
+            </button>
+            <button 
+              onClick={handleFilter}
+              className="px-6 py-2 text-white rounded-lg hover:shadow-lg transition-all font-medium"
+              style={{ backgroundColor: '#102e4a' }}
+              onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#a682ff'}
+              onMouseLeave={(e) => e.currentTarget.style.backgroundColor = '#102e4a'}
+            >
+              FILTER
+            </button>
+          </div>
+        </div>
 
-//         {/* Results Table */}
-//         {showResults ? (
-//           <div className="bg-white rounded-lg shadow-lg overflow-hidden">
-//             <div className="overflow-x-auto">
-//               <table className="w-full">
-//                 <thead style={{ backgroundColor: '#f8f9fa' }}>
-//                   <tr>
-//                     <th className="px-6 py-4 text-left text-sm font-semibold" style={{ color: '#102e4a' }}>Tax Payer ID</th>
-//                     <th className="px-6 py-4 text-left text-sm font-semibold" style={{ color: '#102e4a' }}>TIN Number</th>
-//                     <th className="px-6 py-4 text-left text-sm font-semibold" style={{ color: '#102e4a' }}>Full Name</th>
-//                     <th className="px-6 py-4 text-left text-sm font-semibold" style={{ color: '#102e4a' }}>Email</th>
-//                     <th className="px-6 py-4 text-left text-sm font-semibold" style={{ color: '#102e4a' }}>Phone Number</th>
-//                     <th className="px-6 py-4 text-left text-sm font-semibold" style={{ color: '#102e4a' }}>ID Number</th>
-//                     <th className="px-6 py-4 text-left text-sm font-semibold" style={{ color: '#102e4a' }}>ID Type</th>
-//                   </tr>
-//                 </thead>
-//                 <tbody>
-//                   {taxpayers.map((taxpayer, index) => (
-//                     <tr key={taxpayer.id} className="border-t border-gray-200 hover:bg-gray-50">
-//                       <td className="px-6 py-4">
-//                         <span 
-//                           className="text-blue-600 hover:underline cursor-pointer"
-//                           onClick={() => handleTaxIdClick(taxpayer.id)}
-//                         >
-//                           {taxpayer.id}
-//                         </span>
-//                       </td>
-//                       <td className="px-6 py-4" style={{ color: '#102e4a' }}>{taxpayer.tinNumber}</td>
-//                       <td className="px-6 py-4" style={{ color: '#102e4a' }}>{taxpayer.fullName}</td>
-//                       <td className="px-6 py-4" style={{ color: '#6c757d' }}>{taxpayer.email}</td>
-//                       <td className="px-6 py-4" style={{ color: '#6c757d' }}>{taxpayer.phoneNumber}</td>
-//                       <td className="px-6 py-4" style={{ color: '#6c757d' }}>{taxpayer.idNumber}</td>
-//                       <td className="px-6 py-4" style={{ color: '#6c757d' }}>{taxpayer.idType}</td>
-//                     </tr>
-//                   ))}
-//                 </tbody>
-//               </table>
-//             </div>
+        {/* Results Table */}
+        {showResults ? (
+          <div className="bg-white rounded-lg shadow-lg overflow-hidden">
+            <div className="overflow-x-auto">
+              <table className="w-full">
+                <thead style={{ backgroundColor: '#f8f9fa' }}>
+                  <tr>
+                    <th className="px-6 py-4 text-left text-sm font-semibold" style={{ color: '#102e4a' }}>Tax Payer ID</th>
+                    <th className="px-6 py-4 text-left text-sm font-semibold" style={{ color: '#102e4a' }}>TIN Number</th>
+                    <th className="px-6 py-4 text-left text-sm font-semibold" style={{ color: '#102e4a' }}>Full Name</th>
+                    <th className="px-6 py-4 text-left text-sm font-semibold" style={{ color: '#102e4a' }}>Email</th>
+                    <th className="px-6 py-4 text-left text-sm font-semibold" style={{ color: '#102e4a' }}>Phone Number</th>
+                    <th className="px-6 py-4 text-left text-sm font-semibold" style={{ color: '#102e4a' }}>ID Number</th>
+                    <th className="px-6 py-4 text-left text-sm font-semibold" style={{ color: '#102e4a' }}>ID Type</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {taxpayers.map((taxpayer, index) => (
+                    <tr key={taxpayer.id} className="border-t border-gray-200 hover:bg-gray-50">
+                      <td className="px-6 py-4">
+                        <span 
+                          className="text-blue-600 hover:underline cursor-pointer"
+                          onClick={() => handleTaxIdClick(taxpayer.id)}
+                        >
+                          {taxpayer.id}
+                        </span>
+                      </td>
+                      <td className="px-6 py-4" style={{ color: '#102e4a' }}>{taxpayer.tinNumber}</td>
+                      <td className="px-6 py-4" style={{ color: '#102e4a' }}>{taxpayer.fullName}</td>
+                      <td className="px-6 py-4" style={{ color: '#6c757d' }}>{taxpayer.email}</td>
+                      <td className="px-6 py-4" style={{ color: '#6c757d' }}>{taxpayer.phoneNumber}</td>
+                      <td className="px-6 py-4" style={{ color: '#6c757d' }}>{taxpayer.idNumber}</td>
+                      <td className="px-6 py-4" style={{ color: '#6c757d' }}>{taxpayer.idType}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
 
-//             {/* Pagination */}
-//             <div className="flex items-center justify-between px-6 py-4 border-t border-gray-200">
-//               <div className="text-sm" style={{ color: '#6c757d' }}>
-//                 Showing 1 to {taxpayers.length} of {taxpayers.length} entries
-//               </div>
-//               <div className="flex items-center space-x-2">
-//                 <button 
-//                   className="w-8 h-8 rounded-full text-white flex items-center justify-center text-sm font-medium"
-//                   style={{ backgroundColor: '#102e4a' }}
-//                 >
-//                   1
-//                 </button>
-//               </div>
-//             </div>
-//           </div>
-//         ) : (
-//           <div className="bg-white rounded-lg shadow-lg p-8 text-center">
-//             <p style={{ color: '#6c757d' }}>There are currently no entries to display at the moment.</p>
-//             <div className="mt-4 text-sm" style={{ color: '#6c757d' }}>
-//               Showing 1 to 0 of 0 entries
-//             </div>
-//           </div>
-//         )}
+            {/* Pagination */}
+            <div className="flex items-center justify-between px-6 py-4 border-t border-gray-200">
+              <div className="text-sm" style={{ color: '#6c757d' }}>
+                Showing 1 to {taxpayers.length} of {taxpayers.length} entries
+              </div>
+              <div className="flex items-center space-x-2">
+                <button 
+                  className="w-8 h-8 rounded-full text-white flex items-center justify-center text-sm font-medium"
+                  style={{ backgroundColor: '#102e4a' }}
+                >
+                  1
+                </button>
+              </div>
+            </div>
+          </div>
+        ) : (
+          <div className="bg-white rounded-lg shadow-lg p-8 text-center">
+            <p style={{ color: '#6c757d' }}>There are currently no entries to display at the moment.</p>
+            <div className="mt-4 text-sm" style={{ color: '#6c757d' }}>
+              Showing 1 to 0 of 0 entries
+            </div>
+          </div>
+        )}
 
-//         {/* Footer */}
-//         <div className="mt-8 text-center">
-//           <p className="text-sm" style={{ color: '#6c757d' }}>© 2025 e-Tax. All Rights Reserved.</p>
-//         </div>
-//       </div>
-//     );
-//   };
+        {/* Footer */}
+        <div className="mt-8 text-center">
+          <p className="text-sm" style={{ color: '#6c757d' }}>© 2025 e-Tax. All Rights Reserved.</p>
+        </div>
+      </div>
+    );
+  };
 
   // Tax Payer Verification Content
   const TaxPayerVerificationContent = () => {
@@ -2259,9 +2259,10 @@ const ETaxAdminDashboard = () => {
     });
     const [hasSearched, setHasSearched] = useState(false);
 
+    // Use showNotification from the parent scope
     const handleSearch = () => {
       if (!taxId.trim()) {
-        showNotification('Please enter a Tax ID to search');
+        Notification({ message: 'Please enter a Tax ID to search' });
         return;
       }
 
@@ -2291,14 +2292,14 @@ const ETaxAdminDashboard = () => {
 
       if (result) {
         setVerificationResult(result);
-        showNotification('Taxpayer found and verified');
+        Notification({ message: 'Taxpayer found and verified' });
       } else {
         setVerificationResult({
           taxId: taxId,
           name: 'N/A',
           lastPayment: 'No payment records found'
         });
-        showNotification('Taxpayer not found in records');
+         Notification({ message: 'Taxpayer not found in records' });
       }
 
       setHasSearched(true);
@@ -2446,7 +2447,9 @@ const ETaxAdminDashboard = () => {
         label: '',
         reference: ''
       });
-      showNotification('Filters cleared');
+        setRegistrationTasks([]);
+
+      Notification({ message: 'Filters cleared' });
     };
 
     const handleDownloadTemplate = (templateType: string) => {
@@ -2465,7 +2468,7 @@ const ETaxAdminDashboard = () => {
       document.body.removeChild(a);
       window.URL.revokeObjectURL(url);
       
-      showNotification(`${templateType} template downloaded successfully`);
+       Notification({ message: `${templateType} template downloaded successfully` });
     };
 
     const handleUploadCSV = () => {
@@ -2475,7 +2478,8 @@ const ETaxAdminDashboard = () => {
       input.onchange = (e) => {
         const file = (e.target as HTMLInputElement).files?.[0];
         if (file) {
-          showNotification(`CSV file "${file.name}" uploaded successfully`);
+
+          Notification({ message: `CSV file "${file.name}" uploaded successfully`});
           // Here you would typically process the file
         }
       };
@@ -2486,12 +2490,12 @@ const ETaxAdminDashboard = () => {
       const hasFilters = Object.values(filters).some(value => value.trim() !== '');
       
       if (!hasFilters) {
-        showNotification('Please enter at least one filter criteria');
+         Notification({ message: 'Please enter at least one filter criteria'});
         return;
       }
 
       // Simulate filtering results
-      showNotification('Filtering registration tasks...');
+      Notification({message: 'Filtering registration tasks...'});
     };
 
     return (
@@ -2801,7 +2805,8 @@ const ETaxAdminDashboard = () => {
 
     const handleSubmit = (e: React.FormEvent) => {
       e.preventDefault();
-      showNotification(`${type.replace('-', ' ')} action completed successfully`);
+      Notification({message: `${type.replace('-', ' ')} action completed successfully`});
+
       onClose();
     };
 
