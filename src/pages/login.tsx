@@ -65,41 +65,37 @@ export default function LoginPage() {
   };
 
   const handleSubmit = async () => {
-    const isValid = validateForm();
-    if (!isValid) {
-      alert('Please fill in all required fields');
-      return;
-    }
+  const isValid = validateForm();
+  if (!isValid) {
+    alert('Please fill in all required fields');
+    return;
+  }
 
-    setIsLoading(true);
-    try {
-      // TODO: replace with real authentication call
-      await new Promise(resolve => setTimeout(resolve, 800));
+  setIsLoading(true);
+  try {
+    // Simulate API call — replace with real auth call
+    await new Promise(resolve => setTimeout(resolve, 800));
 
-      // On success navigate to the correct route (update URL)
-      switch (selectedRole) {
-        case 'taxpayer':
-          navigate('/taxpayer-dashboard', { replace: true });
-          break;
-        case 'corporate':
-          navigate('/corporate-dashboard', { replace: true });
-          break;
-        case 'consultant':
-          navigate('/consultant-dashboard', { replace: true });
-          break;
-        case 'staff':
-          navigate('/staff-dashboard', { replace: true });
-          break;
-        default:
-          alert('Unknown role selected');
-      }
-    } catch (error) {
-      console.error('Login failed:', error);
-      alert('Login failed. Please try again.');
-    } finally {
-      setIsLoading(false);
-    }
-  };
+    // *** IMPORTANT: store an auth token/status BEFORE navigating ***
+    // Replace this with real token you receive from your backend:
+    localStorage.setItem('token', 'fake-jwt-token-for-dev');
+
+    // Now navigate to the appropriate dashboard
+    const target =
+      selectedRole === 'taxpayer' ? '/taxpayer-dashboard' :
+      selectedRole === 'corporate' ? '/corporate-dashboard' :
+      selectedRole === 'consultant' ? '/consultant-dashboard' :
+      selectedRole === 'staff' ? '/staff-dashboard' : '/';
+
+    navigate(target, { replace: true });
+
+  } catch (error) {
+    console.error('Login failed:', error);
+    alert('Login failed. Please try again.');
+  } finally {
+    setIsLoading(false);
+  }
+};
 
   const validateForm = (): boolean => {
     if (!selectedRole) return false;
