@@ -3474,15 +3474,15 @@ const DirectorsReport: React.FC = () => {
 
 
   // Modal Component
-type NotifyFn = (message: string) => void;
+// type NotifyFn = (message: string) => void;
 
-interface ModalProps {
-  isOpen: boolean;
-  onClose: () => void;
-  type: string;
-  showNotification?: NotifyFn;
-  onSave?: (payload: Record<string, any>) => void;
-}
+// interface ModalProps {
+//   isOpen: boolean;
+//   onClose: () => void;
+//   type: string;
+//   showNotification?: NotifyFn;
+//   onSave?: (payload: Record<string, any>) => void;
+// }
 
 /* Modal component (keeps your original form markup, simplified) */
 // const Modal: React.FC<ModalProps> = ({ isOpen, onClose, type, showNotification, onSave }) => {
