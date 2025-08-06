@@ -47,173 +47,7 @@ import {
   Navigate,
 } from 'react-router-dom';
 
-type SubMenuItem = {
-  key: string;
-  label: string;
-  path: string;
-};
 
-type MenuItemType = {
-  key: string;
-  label: string;
-  icon: React.ElementType;
-  path?: string;
-  hasSubmenu?: boolean;
-  submenu?: SubMenuItem[];
-};
-
-const menuItems: MenuItemType[] = [
-  { key: 'dashboard', label: 'Dashboard', icon: Home, path: '/dashboard' },
-  { key: 'etax-statistics', label: 'eTax Statistics', icon: BarChart3, path: '/statistics' },
-  {
-    key: 'tax-payers',
-    label: 'Tax Payers',
-    icon: Users,
-    hasSubmenu: true,
-    submenu: [
-      { key: 'individual-payers', label: 'Individual Payers', path: '/taxpayers/individual' },
-      { key: 'individual-inactive', label: 'Individual Payers (Inactive)', path: '/taxpayers/individual-inactive' },
-      { key: 'bulk-registration', label: 'Bulk Individual Registration', path: '/taxpayers/bulk-registration' },
-      { key: 'corporate-payers', label: 'Corporate Payers', path: '/taxpayers/corporate' },
-    ],
-  },
-  { key: 'tax-verification', label: 'Tax Payer Verification', icon: UserCheck, path: '/verification' },
-  { key: 'tax-services', label: 'Tax Services', icon: FileText, path: '/services' },
-  { key: 'tax-offices', label: 'Tax Offices', icon: Building2, path: '/offices' },
-  { key: 'merge-requests', label: 'Merge Requests', icon: GitMerge, path: '/merge-requests' },
-  { key: 'tama-registration', label: 'Tama Registration', icon: Shield, path: '/tama-registration' },
-  { key: 'rmu', label: 'RMU', icon: TrendingUp, hasSubmenu: true, submenu: [{ key: 'rmu-revenue', label: 'RMU Revenue', path: '/rmu/revenue' }] },
-  { key: 'payments', label: 'Payments', icon: CreditCard, path: '/payments' },
-  { key: 'laspppa', label: 'LASPPPA', icon: Shield, path: '/laspppa' },
-  { key: 'reports', label: 'Reports', icon: BarChart3, hasSubmenu: true, submenu: [{ key: 'directors', label: 'Directors', path: '/reports/directors' }] },
-  { key: 'debts', label: 'Debts', icon: DollarSign, path: '/debts' },
-  {
-    key: 'returns',
-    label: 'Returns',
-    icon: FileText,
-    hasSubmenu: true,
-    submenu: [
-      { key: 'individual-returns', label: 'Individual', path: '/returns/individual' },
-      { key: 'corporate-returns', label: 'Corporate', path: '/returns/corporate' },
-      { key: 'adequacy-checks', label: 'Adequacy Checks', path: '/returns/adequacy-checks' },
-    ],
-  },
-  {
-    key: 'assessments',
-    label: 'Assessments',
-    icon: ClipboardList,
-    hasSubmenu: true,
-    submenu: [
-      { key: 'individual-assessments', label: 'Individual', path: '/assessments/individual' },
-      { key: 'corporate-assessments', label: 'Corporate', path: '/assessments/corporate' },
-    ],
-  },
-  { key: 'tax-audit', label: 'Tax Audit', icon: Calculator, path: '/tax-audit' },
-  { key: 'revenue', label: 'Revenue', icon: Banknote, path: '/revenue' },
-  { key: 'bills', label: 'Bills', icon: Receipt, path: '/bills' },
-  {
-    key: 'ebs-reports',
-    label: 'EBS Reports',
-    icon: BarChart3,
-    hasSubmenu: true,
-    submenu: [
-      { key: 'transactions', label: 'Transactions', path: '/ebs-reports/transactions' },
-      { key: 'expatriates', label: 'Expatriates', path: '/ebs-reports/expatriates' },
-      { key: 'trend-collection', label: 'Trend Collection', path: '/ebs-reports/trend-collection' },
-    ],
-  },
-  { key: 'transactions', label: 'Transactions', icon: ArrowRightLeft, path: '/transactions' },
-  { key: 'expatriates', label: 'Expatriates', icon: UserX, path: '/expatriates' },
-  { key: 'trend-collection', label: 'Trend Collection', icon: TrendingDown, path: '/trend-collection' },
-  { key: 'assessment-requests', label: 'Assessment Requests', icon: FileQuestion, path: '/assessment-requests' },
-  { key: 'egis', label: 'EGIS', icon: Globe, path: '/egis' },
-  { key: 'messages', label: 'Messages', icon: MessageSquare, hasSubmenu: true, submenu: [{ key: 'direct-messages', label: 'Direct Messages', path: '/messages/direct' }] },
-  { key: 'download-manual', label: 'Download Manual', icon: Download, path: '/download-manual' },
-];
-
-// -------------- MenuItem Component --------------
-interface MenuItemProps {
-  item: MenuItemType;
-  level?: number;
-  activeItem: string;
-  expandedItems: Record<string, boolean>;
-  toggleExpanded: (key: string) => void;
-  setActiveItem: (key: string) => void;
-  sidebarCollapsed: boolean;
-}
-
-const MenuItem: React.FC<MenuItemProps> = ({
-  item,
-  level = 0,
-  activeItem,
-  expandedItems,
-  toggleExpanded,
-  setActiveItem,
-  sidebarCollapsed,
-}) => {
-  const Icon = item.icon;
-  const isExpanded = expandedItems[item.key];
-  const isActive = activeItem === item.key;
-
-  const handleClick = () => {
-    if (item.hasSubmenu) {
-      toggleExpanded(item.key);
-    } else {
-      setActiveItem(item.key);
-    }
-  };
-
-  return (
-    <div>
-      <div
-        onClick={handleClick}
-        className={`flex items-center justify-between px-4 py-3 cursor-pointer hover:bg-gray-50 ${
-          isActive ? 'bg-blue-50 border-r-4 border-blue-500' : ''
-        }`}
-        style={{ paddingLeft: `${level * 16}px` }}
-      >
-        <div className="flex items-center space-x-3">
-          <Icon size={18} />
-          {!sidebarCollapsed && <span className="font-medium">{item.label}</span>}
-        </div>
-        {!sidebarCollapsed && item.hasSubmenu && (
-          <div>{isExpanded ? <ChevronDown size={14} /> : <ChevronRight size={14} />}</div>
-        )}
-      </div>
-
-      {isExpanded && !sidebarCollapsed && item.submenu && (
-        <div className="ml-6 mt-1 space-y-1">
-          {item.submenu.map(sub => (
-            <NavLink
-              key={sub.key}
-              to={`/staff-dashboard${sub.path}`}
-              className={({ isActive }) =>
-                `block px-3 py-2 rounded text-sm ${
-                  isActive ? 'bg-blue-600 text-white' : 'text-gray-600 hover:bg-gray-100'
-                }`
-              }
-              onClick={() => setActiveItem(sub.key)}
-            >
-              {sub.label}
-            </NavLink>
-          ))}
-        </div>
-      )}
-    </div>
-  );
-};
-
-// -------------- Placeholder Page --------------
-const PlaceholderPage: React.FC<{ title?: string }> = ({ title }) => (
-  <div className="p-8">
-    <h2 className="text-2xl font-semibold" style={{ color: '#102e4a' }}>
-      {title ?? 'Page'}
-    </h2>
-    <p className="mt-2 text-sm" style={{ color: '#6c757d' }}>
-      This is a placeholder. Replace with a real component.
-    </p>
-  </div>
-);
 
 
 
@@ -3983,6 +3817,174 @@ const DirectorsReport: React.FC = () => {
   // | 'add-taxpayer'
   // | 'edit-taxpayer'
   // | 'delete-taxpayer';
+
+type SubMenuItem = {
+  key: string;
+  label: string;
+  path: string;
+};
+
+type MenuItemType = {
+  key: string;
+  label: string;
+  icon: React.ElementType;
+  path?: string;
+  hasSubmenu?: boolean;
+  submenu?: SubMenuItem[];
+};
+
+const menuItems: MenuItemType[] = [
+  { key: 'dashboard', label: 'Dashboard', icon: Home, path: '/dashboard' },
+  { key: 'etax-statistics', label: 'eTax Statistics', icon: BarChart3, path: '/statistics' },
+  {
+    key: 'tax-payers',
+    label: 'Tax Payers',
+    icon: Users,
+    hasSubmenu: true,
+    submenu: [
+      { key: 'individual-payers', label: 'Individual Payers', path: '/taxpayers/individual' },
+      { key: 'individual-inactive', label: 'Individual Payers (Inactive)', path: '/taxpayers/individual-inactive' },
+      { key: 'bulk-registration', label: 'Bulk Individual Registration', path: '/taxpayers/bulk-registration' },
+      { key: 'corporate-payers', label: 'Corporate Payers', path: '/taxpayers/corporate' },
+    ],
+  },
+  { key: 'tax-verification', label: 'Tax Payer Verification', icon: UserCheck, path: '/verification' },
+  { key: 'tax-services', label: 'Tax Services', icon: FileText, path: '/services' },
+  { key: 'tax-offices', label: 'Tax Offices', icon: Building2, path: '/offices' },
+  { key: 'merge-requests', label: 'Merge Requests', icon: GitMerge, path: '/merge-requests' },
+  { key: 'tama-registration', label: 'Tama Registration', icon: Shield, path: '/tama-registration' },
+  { key: 'rmu', label: 'RMU', icon: TrendingUp, hasSubmenu: true, submenu: [{ key: 'rmu-revenue', label: 'RMU Revenue', path: '/rmu/revenue' }] },
+  { key: 'payments', label: 'Payments', icon: CreditCard, path: '/payments' },
+  { key: 'laspppa', label: 'LASPPPA', icon: Shield, path: '/laspppa' },
+  { key: 'reports', label: 'Reports', icon: BarChart3, hasSubmenu: true, submenu: [{ key: 'directors', label: 'Directors', path: '/reports/directors' }] },
+  { key: 'debts', label: 'Debts', icon: DollarSign, path: '/debts' },
+  {
+    key: 'returns',
+    label: 'Returns',
+    icon: FileText,
+    hasSubmenu: true,
+    submenu: [
+      { key: 'individual-returns', label: 'Individual', path: '/returns/individual' },
+      { key: 'corporate-returns', label: 'Corporate', path: '/returns/corporate' },
+      { key: 'adequacy-checks', label: 'Adequacy Checks', path: '/returns/adequacy-checks' },
+    ],
+  },
+  {
+    key: 'assessments',
+    label: 'Assessments',
+    icon: ClipboardList,
+    hasSubmenu: true,
+    submenu: [
+      { key: 'individual-assessments', label: 'Individual', path: '/assessments/individual' },
+      { key: 'corporate-assessments', label: 'Corporate', path: '/assessments/corporate' },
+    ],
+  },
+  { key: 'tax-audit', label: 'Tax Audit', icon: Calculator, path: '/tax-audit' },
+  { key: 'revenue', label: 'Revenue', icon: Banknote, path: '/revenue' },
+  { key: 'bills', label: 'Bills', icon: Receipt, path: '/bills' },
+  {
+    key: 'ebs-reports',
+    label: 'EBS Reports',
+    icon: BarChart3,
+    hasSubmenu: true,
+    submenu: [
+      { key: 'transactions', label: 'Transactions', path: '/ebs-reports/transactions' },
+      { key: 'expatriates', label: 'Expatriates', path: '/ebs-reports/expatriates' },
+      { key: 'trend-collection', label: 'Trend Collection', path: '/ebs-reports/trend-collection' },
+    ],
+  },
+  { key: 'transactions', label: 'Transactions', icon: ArrowRightLeft, path: '/transactions' },
+  { key: 'expatriates', label: 'Expatriates', icon: UserX, path: '/expatriates' },
+  { key: 'trend-collection', label: 'Trend Collection', icon: TrendingDown, path: '/trend-collection' },
+  { key: 'assessment-requests', label: 'Assessment Requests', icon: FileQuestion, path: '/assessment-requests' },
+  { key: 'egis', label: 'EGIS', icon: Globe, path: '/egis' },
+  { key: 'messages', label: 'Messages', icon: MessageSquare, hasSubmenu: true, submenu: [{ key: 'direct-messages', label: 'Direct Messages', path: '/messages/direct' }] },
+  { key: 'download-manual', label: 'Download Manual', icon: Download, path: '/download-manual' },
+];
+
+// -------------- MenuItem Component --------------
+interface MenuItemProps {
+  item: MenuItemType;
+  level?: number;
+  activeItem: string;
+  expandedItems: Record<string, boolean>;
+  toggleExpanded: (key: string) => void;
+  setActiveItem: (key: string) => void;
+  sidebarCollapsed: boolean;
+}
+
+const MenuItem: React.FC<MenuItemProps> = ({
+  item,
+  level = 0,
+  activeItem,
+  expandedItems,
+  toggleExpanded,
+  setActiveItem,
+  sidebarCollapsed,
+}) => {
+  const Icon = item.icon;
+  const isExpanded = expandedItems[item.key];
+  const isActive = activeItem === item.key;
+
+  const handleClick = () => {
+    if (item.hasSubmenu) {
+      toggleExpanded(item.key);
+    } else {
+      setActiveItem(item.key);
+    }
+  };
+
+  return (
+    <div>
+      <div
+        onClick={handleClick}
+        className={`flex items-center justify-between px-4 py-3 cursor-pointer hover:bg-gray-50 ${
+          isActive ? 'bg-blue-50 border-r-4 border-blue-500' : ''
+        }`}
+        style={{ paddingLeft: `${level * 16}px` }}
+      >
+        <div className="flex items-center space-x-3">
+          <Icon size={18} />
+          {!sidebarCollapsed && <span className="font-medium">{item.label}</span>}
+        </div>
+        {!sidebarCollapsed && item.hasSubmenu && (
+          <div>{isExpanded ? <ChevronDown size={14} /> : <ChevronRight size={14} />}</div>
+        )}
+      </div>
+
+      {isExpanded && !sidebarCollapsed && item.submenu && (
+        <div className="ml-6 mt-1 space-y-1">
+          {item.submenu.map(sub => (
+            <NavLink
+              key={sub.key}
+              to={`/staff-dashboard${sub.path}`}
+              className={({ isActive }) =>
+                `block px-3 py-2 rounded text-sm ${
+                  isActive ? 'bg-blue-600 text-white' : 'text-gray-600 hover:bg-gray-100'
+                }`
+              }
+              onClick={() => setActiveItem(sub.key)}
+            >
+              {sub.label}
+            </NavLink>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+};
+
+// -------------- Placeholder Page --------------
+const PlaceholderPage: React.FC<{ title?: string }> = ({ title }) => (
+  <div className="p-8">
+    <h2 className="text-2xl font-semibold" style={{ color: '#102e4a' }}>
+      {title ?? 'Page'}
+    </h2>
+    <p className="mt-2 text-sm" style={{ color: '#6c757d' }}>
+      This is a placeholder. Replace with a real component.
+    </p>
+  </div>
+);
   
 const ETaxAdminDashboard: React.FC = () => {
   const [activeItem, setActiveItem] = useState<string>('dashboard');

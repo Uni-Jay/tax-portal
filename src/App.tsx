@@ -66,7 +66,7 @@ const App: React.FC = () => {
           }
         />
         <Route
-          path="/staff-dashboard"
+          path="/staff-dashboard/*"
           element={
             <RequireAuth>
               <ETaxAdminDashboard />
