@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { 
   Home, 
   RotateCcw,
@@ -55,394 +55,7 @@ const ETaxAdminDashboard = () => {
     }));
   };
 
-  // Individual Tax Payers Content
-//   const IndividualTaxPayersContent = () => {
-//     const [searchType, setSearchType] = useState('Taxpayer ID');
-//     const [searchValue, setSearchValue] = useState('');
-//     const [showProfileDetail, setShowProfileDetail] = useState(false);
-//     const [selectedTaxpayerId, setSelectedTaxpayerId] = useState('');
-//     const [filters, setFilters] = useState({
-//       taxId: '',
-//       tinNumber: '',
-//       firstName: '',
-//       middleName: '',
-//       lastName: '',
-//       email: '',
-//       phoneNumber: '',
-//       idNumber: ''
-//     });
-//     const [allTaxpayers] = useState([
-//       {
-//         id: 'N-4401681',
-//         tinNumber: '1061131973',
-//         fullName: 'Mr. Moshood Olalekan Bello',
-//         email: 'belloalalekan@gmail.com',
-//         phoneNumber: '08023129633',
-//         idNumber: '222*******9',
-//         idType: 'BVN'
-//       },
-//       {
-//         id: 'N-4401682',
-//         tinNumber: '1061131974',
-//         fullName: 'Mrs. Sarah Ahmed Johnson',
-//         email: 'sarah.johnson@gmail.com',
-//         phoneNumber: '08033445566',
-//         idNumber: '333*******1',
-//         idType: 'NIN'
-//       },
-//       {
-//         id: 'N-4401683',
-//         tinNumber: '1061131975',
-//         fullName: 'Mr. David Emmanuel Okafor',
-//         email: 'david.okafor@yahoo.com',
-//         phoneNumber: '08044556677',
-//         idNumber: '444*******2',
-//         idType: 'BVN'
-//       }
-//     ]);
-//     const [filteredTaxpayers, setFilteredTaxpayers] = useState<typeof allTaxpayers>([]);
-//     const [showResults, setShowResults] = useState(false);
 
-//     const handleFilterChange = (field: string, value: string) => {
-//       setFilters(prev => ({ ...prev, [field]: value }));
-//     };
-
-//     const handleAdvancedSearch = () => {
-//       if (!searchValue.trim()) {
-//         showNotification('Please enter a search value');
-//         return;
-//       }
-      
-//       const results = allTaxpayers.filter(taxpayer => {
-//         switch (searchType) {
-//           case 'Taxpayer ID':
-//             return taxpayer.id.toLowerCase().includes(searchValue.toLowerCase());
-//           case 'TIN Number':
-//             return taxpayer.tinNumber.includes(searchValue);
-//           case 'Full Name':
-//             return taxpayer.fullName.toLowerCase().includes(searchValue.toLowerCase());
-//           case 'Email':
-//             return taxpayer.email.toLowerCase().includes(searchValue.toLowerCase());
-//           default:
-//             return true;
-//         }
-//       });
-      
-//       setFilteredTaxpayers(results);
-//       setShowResults(true);
-//       showNotification(`Found ${results.length} taxpayer(s)`);
-//     };
-
-//     const handleFilter = () => {
-//       const hasFilters = Object.values(filters).some(value => value.trim() !== '');
-      
-//       if (!hasFilters) {
-//         showNotification('Please enter at least one filter criteria');
-//         return;
-//       }
-
-//       const results = allTaxpayers.filter(taxpayer => {
-//         return (
-//           (!filters.taxId || taxpayer.id.toLowerCase().includes(filters.taxId.toLowerCase())) &&
-//           (!filters.tinNumber || taxpayer.tinNumber.includes(filters.tinNumber)) &&
-//           (!filters.firstName || taxpayer.fullName.toLowerCase().includes(filters.firstName.toLowerCase())) &&
-//           (!filters.middleName || taxpayer.fullName.toLowerCase().includes(filters.middleName.toLowerCase())) &&
-//           (!filters.lastName || taxpayer.fullName.toLowerCase().includes(filters.lastName.toLowerCase())) &&
-//           (!filters.email || taxpayer.email.toLowerCase().includes(filters.email.toLowerCase())) &&
-//           (!filters.phoneNumber || taxpayer.phoneNumber.includes(filters.phoneNumber)) &&
-//           (!filters.idNumber || taxpayer.idNumber.includes(filters.idNumber))
-//         );
-//       });
-
-//       setFilteredTaxpayers(results);
-//       setShowResults(true);
-//       showNotification(`Filtered results: ${results.length} taxpayer(s)`);
-//     };
-
-//     const handleReset = () => {
-//       setFilters({
-//         taxId: '',
-//         tinNumber: '',
-//         firstName: '',
-//         middleName: '',
-//         lastName: '',
-//         email: '',
-//         phoneNumber: '',
-//         idNumber: ''
-//       });
-//       setSearchValue('');
-//       setShowResults(false);
-//       setFilteredTaxpayers([]);
-//       showNotification('Filters cleared');
-//     };
-
-//     const handleAddTaxpayer = () => {
-//       setModalType('add-taxpayer');
-//       setShowModal(true);
-//     };
-
-//     const handleTaxIdClick = (taxpayerId: string) => {
-//       setSelectedTaxpayerId(taxpayerId);
-//       setShowProfileDetail(true);
-//     };
-
-//     const handleBackFromProfile = () => {
-//       setShowProfileDetail(false);
-//       setSelectedTaxpayerId('');
-//     };
-
-//     const handleAddCompany = () => {
-//       setModalType('add-company');
-//       setShowModal(true);
-//     };
-
-//     // If showing profile detail, render that component
-//     if (showProfileDetail) {
-//       return (
-//         <TaxPayerProfileDetailContent 
-//           taxpayerId={selectedTaxpayerId} 
-//           onBack={handleBackFromProfile} 
-//         />
-//       );
-//     }
-
-//     return (
-//       <div className="p-8">
-//         {/* Header */}
-//         <div className="flex items-center justify-between mb-8">
-//           <h1 className="text-3xl font-bold" style={{ color: '#102e4a' }}>Individual Tax Payers</h1>
-//           <div className="w-10 h-10 rounded-full flex items-center justify-center" style={{ backgroundColor: '#f8f9fa' }}>
-//             <Users style={{ color: '#102e4a' }} size={20} />
-//           </div>
-//         </div>
-
-//         {/* Advanced Search Section */}
-//         <div className="bg-white rounded-lg shadow-lg p-6 mb-6">
-//           <div className="flex items-center mb-4">
-//             <div className="w-8 h-8 rounded flex items-center justify-center mr-3" style={{ backgroundColor: '#102e4a' }}>
-//               <Users style={{ color: 'white' }} size={16} />
-//             </div>
-//             <div>
-//               <h2 className="text-xl font-semibold" style={{ color: '#102e4a' }}>Individual Tax Payers</h2>
-//               <p className="text-sm" style={{ color: '#6c757d' }}>Advanced Search Type</p>
-//             </div>
-//           </div>
-
-//           <div className="flex gap-4 items-end">
-//             <div className="flex-1">
-//               <select 
-//                 value={searchType} 
-//                 onChange={(e) => setSearchType(e.target.value)}
-//                 className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-//                 style={{ color: '#102e4a' }}
-//               >
-//                 <option>Taxpayer ID</option>
-//                 <option>TIN Number</option>
-//                 <option>Full Name</option>
-//                 <option>Email</option>
-//               </select>
-//             </div>
-//             <div className="flex-1">
-//               <input
-//                 type="text"
-//                 placeholder="Taxpayer ID"
-//                 value={searchValue}
-//                 onChange={(e) => setSearchValue(e.target.value)}
-//                 className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-//                 style={{ color: '#102e4a' }}
-//               />
-//             </div>
-//             <button 
-//               onClick={handleAdvancedSearch}
-//               className="px-6 py-3 text-white rounded-lg hover:shadow-lg transition-all font-medium"
-//               style={{ backgroundColor: '#102e4a' }}
-//               onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#a682ff'}
-//               onMouseLeave={(e) => e.currentTarget.style.backgroundColor = '#102e4a'}
-//             >
-//               ADVANCED SEARCH
-//             </button>
-//             <button 
-//               onClick={handleAddTaxpayer}
-//               className="w-12 h-12 text-white rounded-lg hover:shadow-lg transition-all flex items-center justify-center"
-//               style={{ backgroundColor: '#102e4a' }}
-//               onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#a682ff'}
-//               onMouseLeave={(e) => e.currentTarget.style.backgroundColor = '#102e4a'}
-//               title="Add New Taxpayer"
-//             >
-//               +
-//             </button>
-//           </div>
-//         </div>
-
-//         {/* Search Results Header */}
-//         <div className="mb-4">
-//           <h3 className="text-lg font-semibold" style={{ color: '#102e4a' }}>Search Results (EBSRCM)</h3>
-//         </div>
-
-//         {/* Search Existing Users */}
-//         <div className="bg-white rounded-lg shadow-lg p-6 mb-6">
-//           <h3 className="text-lg font-semibold mb-4" style={{ color: '#102e4a' }}>Search Existing users</h3>
-          
-//           <div className="mb-4">
-//             <span className="text-sm font-medium" style={{ color: '#6c757d' }}>Filters:</span>
-//           </div>
-
-//           <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
-//             <input
-//               type="text"
-//               placeholder="Tax ID"
-//               value={filters.taxId}
-//               onChange={(e) => handleFilterChange('taxId', e.target.value)}
-//               className="p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-//               style={{ color: '#102e4a' }}
-//             />
-//             <input
-//               type="text"
-//               placeholder="TIN Number"
-//               value={filters.tinNumber}
-//               onChange={(e) => handleFilterChange('tinNumber', e.target.value)}
-//               className="p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-//               style={{ color: '#102e4a' }}
-//             />
-//             <input
-//               type="text"
-//               placeholder="First Name"
-//               value={filters.firstName}
-//               onChange={(e) => handleFilterChange('firstName', e.target.value)}
-//               className="p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-//               style={{ color: '#102e4a' }}
-//             />
-//             <input
-//               type="text"
-//               placeholder="Middle Name"
-//               value={filters.middleName}
-//               onChange={(e) => handleFilterChange('middleName', e.target.value)}
-//               className="p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-//               style={{ color: '#102e4a' }}
-//             />
-//             <input
-//               type="text"
-//               placeholder="Last Name"
-//               value={filters.lastName}
-//               onChange={(e) => handleFilterChange('lastName', e.target.value)}
-//               className="p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-//               style={{ color: '#102e4a' }}
-//             />
-//             <input
-//               type="email"
-//               placeholder="Email"
-//               value={filters.email}
-//               onChange={(e) => handleFilterChange('email', e.target.value)}
-//               className="p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-//               style={{ color: '#102e4a' }}
-//             />
-//             <input
-//               type="text"
-//               placeholder="Phone Number"
-//               value={filters.phoneNumber}
-//               onChange={(e) => handleFilterChange('phoneNumber', e.target.value)}
-//               className="p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-//               style={{ color: '#102e4a' }}
-//             />
-//             <input
-//               type="text"
-//               placeholder="ID Number"
-//               value={filters.idNumber}
-//               onChange={(e) => handleFilterChange('idNumber', e.target.value)}
-//               className="p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-//               style={{ color: '#102e4a' }}
-//             />
-//           </div>
-
-//           <div className="flex justify-end gap-4">
-//             <button 
-//               onClick={handleReset}
-//               className="px-6 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition-all font-medium"
-//             >
-//               RESET
-//             </button>
-//             <button 
-//               onClick={handleFilter}
-//               className="px-6 py-2 text-white rounded-lg hover:shadow-lg transition-all font-medium"
-//               style={{ backgroundColor: '#102e4a' }}
-//               onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#a682ff'}
-//               onMouseLeave={(e) => e.currentTarget.style.backgroundColor = '#102e4a'}
-//             >
-//               FILTER
-//             </button>
-//           </div>
-//         </div>
-
-//         {/* Results Table */}
-//         {showResults ? (
-//           <div className="bg-white rounded-lg shadow-lg overflow-hidden">
-//             <div className="overflow-x-auto">
-//               <table className="w-full">
-//                 <thead style={{ backgroundColor: '#f8f9fa' }}>
-//                   <tr>
-//                     <th className="px-6 py-4 text-left text-sm font-semibold" style={{ color: '#102e4a' }}>Tax Payer ID</th>
-//                     <th className="px-6 py-4 text-left text-sm font-semibold" style={{ color: '#102e4a' }}>TIN Number</th>
-//                     <th className="px-6 py-4 text-left text-sm font-semibold" style={{ color: '#102e4a' }}>Full Name</th>
-//                     <th className="px-6 py-4 text-left text-sm font-semibold" style={{ color: '#102e4a' }}>Email</th>
-//                     <th className="px-6 py-4 text-left text-sm font-semibold" style={{ color: '#102e4a' }}>Phone Number</th>
-//                     <th className="px-6 py-4 text-left text-sm font-semibold" style={{ color: '#102e4a' }}>ID Number</th>
-//                     <th className="px-6 py-4 text-left text-sm font-semibold" style={{ color: '#102e4a' }}>ID Type</th>
-//                   </tr>
-//                 </thead>
-//                 <tbody>
-//                   {(showResults ? filteredTaxpayers : []).map((taxpayer, index) => (
-//                     <tr key={taxpayer.id} className="border-t border-gray-200 hover:bg-gray-50">
-//                       <td className="px-6 py-4">
-//                         <span 
-//                           className="text-blue-600 hover:underline cursor-pointer"
-//                           onClick={() => handleTaxIdClick(taxpayer.id)}
-//                         >
-//                           {taxpayer.id}
-//                         </span>
-//                       </td>
-//                       <td className="px-6 py-4" style={{ color: '#102e4a' }}>{taxpayer.tinNumber}</td>
-//                       <td className="px-6 py-4" style={{ color: '#102e4a' }}>{taxpayer.fullName}</td>
-//                       <td className="px-6 py-4" style={{ color: '#6c757d' }}>{taxpayer.email}</td>
-//                       <td className="px-6 py-4" style={{ color: '#6c757d' }}>{taxpayer.phoneNumber}</td>
-//                       <td className="px-6 py-4" style={{ color: '#6c757d' }}>{taxpayer.idNumber}</td>
-//                       <td className="px-6 py-4" style={{ color: '#6c757d' }}>{taxpayer.idType}</td>
-//                     </tr>
-//                   ))}
-//                 </tbody>
-//               </table>
-//             </div>
-
-//             {/* Pagination */}
-//             <div className="flex items-center justify-between px-6 py-4 border-t border-gray-200">
-//               <div className="text-sm" style={{ color: '#6c757d' }}>
-//                 Showing 1 to {filteredTaxpayers.length} of {filteredTaxpayers.length} entries
-//               </div>
-//               <div className="flex items-center space-x-2">
-//                 <button 
-//                   className="w-8 h-8 rounded-full text-white flex items-center justify-center text-sm font-medium"
-//                   style={{ backgroundColor: '#102e4a' }}
-//                 >
-//                   1
-//                 </button>
-//               </div>
-//             </div>
-//           </div>
-//         ) : (
-//           <div className="bg-white rounded-lg shadow-lg p-8 text-center">
-//             <p style={{ color: '#6c757d' }}>There are currently no entries to display at the moment.</p>
-//             <div className="mt-4 text-sm" style={{ color: '#6c757d' }}>
-//               Showing 1 to 0 of 0 entries
-//             </div>
-//           </div>
-//         )}
-
-//         {/* Footer */}
-//         <div className="mt-8 text-center">
-//           <p className="text-sm" style={{ color: '#6c757d' }}>© 2025 e-Tax. All Rights Reserved.</p>
-//         </div>
-//       </div>
-//     );
-//   };
 
   const menuItems = [
     {
@@ -901,296 +514,689 @@ const ETaxAdminDashboard = () => {
   };
 
   // Tax Payer Profile Detail Content
-  const TaxPayerProfileDetailContent = ({ taxpayerId, onBack }: { taxpayerId: string; onBack: () => void }) => {
-    const [activeTab, setActiveTab] = useState('family-relations');
+type TaxpayerData = {
+  id: string;
+  tin?: string;
+  fullName?: string;
+  age?: string;
+  email?: string;
+  address?: string;
+  stateLgaLcda?: string;
+  phoneNumber?: string;
+  gender?: string;
+  maritalStatus?: string;
+  nationality?: string;
+  dateOfBirth?: string;
+  lassraNo?: string;
+  taxStation?: string;
+  identificationType?: string;
+  identificationNumber?: string;
+};
 
-    // Sample taxpayer data - in real app this would be fetched based on taxpayerId
-    const taxpayerData = {
-      id: 'N-4401681',
-      tin: '1061131973',
-      fullName: 'Mr. Moshood Olalekan Bello',
-      age: '56',
-      email: 'belloalalekan@gmail.com',
-      address: 'HABEEB AKINLADE AVENUE OWUTU,AGRIC,IKORODU',
-      stateLgaLcda: '- / - /',
-      phoneNumber: '08023129633',
-      gender: 'Male',
-      maritalStatus: 'Married',
-      nationality: 'Nigeria',
-      dateOfBirth: '31st Jul, 1968',
-      lassraNo: '',
-      taxStation: 'IKORODU TAX OFFICE',
-      identificationType: 'BVN',
-      identificationNumber: '222*******9'
+type AuditEntry = {
+  id?: string | number;
+  date: string;
+  action: string;
+  user?: string;
+  details?: string;
+  [key: string]: any;
+};
+
+type Props = {
+  taxpayerId: string;
+  onBack: () => void;
+  showNotification?: (msg: string, level?: "info" | "success" | "error") => void;
+};
+
+const TaxPayerProfileDetailContent: React.FC<Props> = ({ taxpayerId, onBack, showNotification }) => {
+  const [activeTab, setActiveTab] = useState<string>("family-relations");
+  const [taxpayerData, setTaxpayerData] = useState<TaxpayerData | null>(null);
+  const [loading, setLoading] = useState<boolean>(true);
+  const [error, setError] = useState<string | null>(null);
+
+  // Modal state for family add actions
+  const [showModal, setShowModal] = useState<boolean>(false);
+  const [modalType, setModalType] = useState<"add-child" | "add-spouse" | null>(null);
+
+  // Audit trail state
+  const [auditData, setAuditData] = useState<AuditEntry[]>([]);
+  const [showAuditModal, setShowAuditModal] = useState<boolean>(false);
+  const [auditLoading, setAuditLoading] = useState<boolean>(false);
+  const [auditError, setAuditError] = useState<string | null>(null);
+
+  useEffect(() => {
+    let isMounted = true;
+    setLoading(true);
+    setError(null);
+
+    fetch(`/api/taxpayers/${encodeURIComponent(taxpayerId)}`)
+      .then((res) => {
+        if (!res.ok) throw new Error(`Server responded with ${res.status}`);
+        return res.json();
+      })
+      .then((data: TaxpayerData) => {
+        if (!isMounted) return;
+        setTaxpayerData(data);
+      })
+      .catch((err) => {
+        if (!isMounted) return;
+        console.error("Fetch taxpayer data error:", err);
+        setError("Failed to load taxpayer data.");
+        showNotification?.("Failed to load taxpayer data.", "error");
+      })
+      .finally(() => {
+        if (!isMounted) return;
+        setLoading(false);
+      });
+
+    return () => {
+      isMounted = false;
     };
+  }, [taxpayerId, showNotification]);
 
-    const tabs = [
-      { key: 'family-relations', label: 'FAMILY RELATIONS', icon: '👥', color: 'bg-green-500' },
-      { key: 'support-staff', label: 'SUPPORT STAFF', icon: '🛠️', color: 'bg-orange-500' },
-      { key: 'employer', label: 'EMPLOYER', icon: '🏢', color: 'bg-teal-500' },
-      { key: 'companies', label: 'COMPANIES', icon: '🏭', color: 'bg-blue-500' },
-      { key: 'returns', label: 'RETURNS', icon: '📋', color: 'bg-green-600' },
-      { key: 'over-filed', label: 'OVER-FILED RETURNS', icon: '📄', color: 'bg-purple-500' },
-      { key: 'assets', label: 'ASSETS', icon: '🏠', color: 'bg-indigo-500' },
-      { key: 'cases', label: 'CASES', icon: '⚖️', color: 'bg-red-500' },
-      { key: 'bills', label: 'BILLS', icon: '💰', color: 'bg-yellow-500' },
-      { key: 'assessment', label: 'ASSESSMENT', icon: '📊', color: 'bg-teal-600' },
-      { key: 'payments', label: 'PAYMENTS', icon: '💳', color: 'bg-blue-600' }
+  const tabs = [
+    { key: "family-relations", label: "FAMILY RELATIONS", icon: "👥", color: "bg-green-500" },
+    { key: "support-staff", label: "SUPPORT STAFF", icon: "🛠️", color: "bg-orange-500" },
+    { key: "employer", label: "EMPLOYER", icon: "🏢", color: "bg-teal-500" },
+    { key: "companies", label: "COMPANIES", icon: "🏭", color: "bg-blue-500" },
+    { key: "returns", label: "RETURNS", icon: "📋", color: "bg-green-600" },
+    { key: "over-filed", label: "OVER-FILED RETURNS", icon: "📄", color: "bg-purple-500" },
+    { key: "assets", label: "ASSETS", icon: "🏠", color: "bg-indigo-500" },
+    { key: "cases", label: "CASES", icon: "⚖️", color: "bg-red-500" },
+    { key: "bills", label: "BILLS", icon: "💰", color: "bg-yellow-500" },
+    { key: "assessment", label: "ASSESSMENT", icon: "📊", color: "bg-teal-600" },
+    { key: "payments", label: "PAYMENTS", icon: "💳", color: "bg-blue-600" },
+  ];
+
+  // Fallback data while loading or if backend doesn't include fields
+  const fallback: TaxpayerData = {
+    id: taxpayerId,
+    tin: "—",
+    fullName: "—",
+    age: "—",
+    email: "—",
+    address: "—",
+    stateLgaLcda: "—",
+    phoneNumber: "—",
+    gender: "—",
+    maritalStatus: "—",
+    nationality: "—",
+    dateOfBirth: "—",
+    lassraNo: "—",
+    taxStation: "—",
+    identificationType: "—",
+    identificationNumber: "—",
+  };
+
+  const dataToShow = taxpayerData ?? fallback;
+
+  // ===== Audit trail functions =====
+  const fetchAuditTrail = async () => {
+    setAuditLoading(true);
+    setAuditError(null);
+    try {
+      const res = await fetch(`/api/taxpayers/${encodeURIComponent(taxpayerId)}/audit`);
+      if (!res.ok) throw new Error(`Server responded ${res.status}`);
+      const data = await res.json();
+      // Expecting array of audit entries; adapt if your API returns different shape
+      setAuditData(Array.isArray(data) ? data : []);
+      setShowAuditModal(true);
+    } catch (err) {
+      console.error("fetchAuditTrail error:", err);
+      setAuditError("Failed to load audit trail.");
+      showNotification?.("Failed to load audit trail.", "error");
+    } finally {
+      setAuditLoading(false);
+    }
+  };
+
+  // Convert audit data to CSV and trigger download
+  const downloadAuditCsv = () => {
+    if (!auditData || auditData.length === 0) {
+      showNotification?.("No audit entries to download.", "info");
+      return;
+    }
+
+    const keys = Array.from(
+      auditData.reduce((acc, row) => {
+        Object.keys(row).forEach(k => acc.add(k));
+        return acc;
+      }, new Set<string>())
+    );
+
+    const csvRows = [
+      keys.join(","),
+      ...auditData.map(entry =>
+        keys
+          .map(k => {
+            const raw = entry[k] ?? "";
+            const safe = String(raw).replace(/"/g, '""'); // escape quotes
+            // Wrap in quotes if contains comma/newline/quote
+            return /[",\n]/.test(safe) ? `"${safe}"` : safe;
+          })
+          .join(",")
+      ),
     ];
 
-    return (
-      <div className="p-8">
-        {/* Header */}
-        <div className="flex items-center justify-between mb-8">
-          <div className="flex items-center">
-            <button 
-              onClick={onBack}
-              className="mr-4 px-3 py-2 hover:bg-gray-100 rounded-lg transition-all flex items-center space-x-2 border border-gray-300"
-              style={{ color: '#102e4a' }}
-            >
-              <ArrowLeft size={20} />
-              <span className="font-medium">Back</span>
-            </button>
-            <h1 className="text-2xl font-semibold" style={{ color: '#102e4a' }}>
-              Tax Payer Profile Detail
-            </h1>
-          </div>
-          <div className="w-10 h-10 rounded-full flex items-center justify-center" style={{ backgroundColor: '#f8f9fa' }}>
-            <Users style={{ color: '#102e4a' }} size={20} />
-          </div>
+    const csv = csvRows.join("\n");
+    const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
+    const url = URL.createObjectURL(blob);
+
+    const link = document.createElement("a");
+    link.href = url;
+    const filename = `audit_${taxpayerId}_${new Date().toISOString().slice(0,19).replace(/[:T]/g, "-")}.csv`;
+    link.setAttribute("download", filename);
+    document.body.appendChild(link);
+    link.click();
+    link.remove();
+    URL.revokeObjectURL(url);
+
+    showNotification?.("Audit CSV downloaded.", "success");
+  };
+
+  return (
+    <div className="p-8">
+      {/* Header */}
+      <div className="flex items-center justify-between mb-8">
+        <div className="flex items-center">
+          <button
+            onClick={onBack}
+            className="mr-4 px-3 py-2 hover:bg-gray-100 rounded-lg transition-all flex items-center space-x-2 border border-gray-300"
+            style={{ color: "#102e4a" }}
+          >
+            <ArrowLeft size={20} />
+            <span className="font-medium">Back</span>
+          </button>
+          <h1 className="text-2xl font-semibold" style={{ color: "#102e4a" }}>
+            Tax Payer Profile Detail
+          </h1>
         </div>
 
-        {/* Profile Card */}
+        <div className="w-10 h-10 rounded-full flex items-center justify-center" style={{ backgroundColor: "#f8f9fa" }}>
+          <Users style={{ color: "#102e4a" }} size={20} />
+        </div>
+      </div>
+
+      {/* Loading / Error */}
+      {loading ? (
+        <div className="bg-white rounded-lg shadow-lg p-8 mb-8 text-center">Loading taxpayer data...</div>
+      ) : error ? (
+        <div className="bg-white rounded-lg shadow-lg p-8 mb-8 text-center text-red-600">{error}</div>
+      ) : null}
+
+      {/* Profile Card */}
+      {!loading && (
         <div className="bg-white rounded-lg shadow-lg p-8 mb-8">
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
             {/* Profile Picture and Audit Trail */}
             <div className="flex flex-col items-center">
               <div className="w-40 h-40 rounded-full bg-gray-300 flex items-center justify-center mb-4">
-                <Users size={60} style={{ color: '#6c757d' }} />
+                <Users size={60} style={{ color: "#6c757d" }} />
               </div>
-              <button 
-                onClick={() => showNotification('Audit trail report generated successfully')}
+
+              {/* AUDIT TRAIL button now fetches the audit */}
+              <button
+                onClick={fetchAuditTrail}
                 className="px-6 py-2 text-white rounded-lg hover:shadow-lg transition-all font-medium"
-                style={{ backgroundColor: '#28a745' }}
+                style={{ backgroundColor: "#28a745" }}
+                disabled={auditLoading}
+                aria-disabled={auditLoading}
               >
-                AUDIT TRAIL
+                {auditLoading ? "Loading..." : "AUDIT TRAIL"}
               </button>
             </div>
 
             {/* Personal Information - Left Column */}
             <div className="space-y-4">
               <div>
-                <label className="text-sm font-medium" style={{ color: '#6c757d' }}>Payer Id:</label>
-                <p className="text-lg" style={{ color: '#102e4a' }}>{taxpayerData.id}</p>
+                <label className="text-sm font-medium" style={{ color: "#6c757d" }}>
+                  Payer Id:
+                </label>
+                <p className="text-lg" style={{ color: "#102e4a" }}>
+                  {dataToShow.id}
+                </p>
               </div>
+
               <div>
-                <label className="text-sm font-medium" style={{ color: '#6c757d' }}>TIN:</label>
-                <p className="text-lg" style={{ color: '#102e4a' }}>{taxpayerData.tin}</p>
+                <label className="text-sm font-medium" style={{ color: "#6c757d" }}>
+                  TIN:
+                </label>
+                <p className="text-lg" style={{ color: "#102e4a" }}>
+                  {dataToShow.tin}
+                </p>
               </div>
+
               <div>
-                <label className="text-sm font-medium" style={{ color: '#6c757d' }}>Full Name:</label>
-                <p className="text-lg" style={{ color: '#102e4a' }}>{taxpayerData.fullName}</p>
+                <label className="text-sm font-medium" style={{ color: "#6c757d" }}>
+                  Full Name:
+                </label>
+                <p className="text-lg" style={{ color: "#102e4a" }}>
+                  {dataToShow.fullName}
+                </p>
               </div>
+
               <div>
-                <label className="text-sm font-medium" style={{ color: '#6c757d' }}>Age:</label>
-                <p className="text-lg" style={{ color: '#102e4a' }}>{taxpayerData.age}</p>
+                <label className="text-sm font-medium" style={{ color: "#6c757d" }}>
+                  Age:
+                </label>
+                <p className="text-lg" style={{ color: "#102e4a" }}>
+                  {dataToShow.age}
+                </p>
               </div>
+
               <div>
-                <label className="text-sm font-medium" style={{ color: '#6c757d' }}>Email Address:</label>
-                <p className="text-lg" style={{ color: '#102e4a' }}>{taxpayerData.email}</p>
+                <label className="text-sm font-medium" style={{ color: "#6c757d" }}>
+                  Email Address:
+                </label>
+                <p className="text-lg" style={{ color: "#102e4a" }}>
+                  {dataToShow.email}
+                </p>
               </div>
+
               <div>
-                <label className="text-sm font-medium" style={{ color: '#6c757d' }}>Address:</label>
-                <p className="text-lg" style={{ color: '#102e4a' }}>{taxpayerData.address}</p>
+                <label className="text-sm font-medium" style={{ color: "#6c757d" }}>
+                  Address:
+                </label>
+                <p className="text-lg" style={{ color: "#102e4a" }}>
+                  {dataToShow.address}
+                </p>
               </div>
+
               <div>
-                <label className="text-sm font-medium" style={{ color: '#6c757d' }}>State / LGA / LCDA:</label>
-                <p className="text-lg" style={{ color: '#102e4a' }}>{taxpayerData.stateLgaLcda}</p>
+                <label className="text-sm font-medium" style={{ color: "#6c757d" }}>
+                  State / LGA / LCDA:
+                </label>
+                <p className="text-lg" style={{ color: "#102e4a" }}>
+                  {dataToShow.stateLgaLcda}
+                </p>
               </div>
             </div>
 
             {/* Personal Information - Right Column */}
             <div className="space-y-4">
               <div>
-                <label className="text-sm font-medium" style={{ color: '#6c757d' }}>Phone Number:</label>
-                <p className="text-lg" style={{ color: '#102e4a' }}>{taxpayerData.phoneNumber}</p>
+                <label className="text-sm font-medium" style={{ color: "#6c757d" }}>
+                  Phone Number:
+                </label>
+                <p className="text-lg" style={{ color: "#102e4a" }}>
+                  {dataToShow.phoneNumber}
+                </p>
               </div>
+
               <div>
-                <label className="text-sm font-medium" style={{ color: '#6c757d' }}>Gender:</label>
-                <p className="text-lg" style={{ color: '#102e4a' }}>{taxpayerData.gender}</p>
+                <label className="text-sm font-medium" style={{ color: "#6c757d" }}>
+                  Gender:
+                </label>
+                <p className="text-lg" style={{ color: "#102e4a" }}>
+                  {dataToShow.gender}
+                </p>
               </div>
+
               <div>
-                <label className="text-sm font-medium" style={{ color: '#6c757d' }}>Marital Status:</label>
-                <p className="text-lg" style={{ color: '#102e4a' }}>{taxpayerData.maritalStatus}</p>
+                <label className="text-sm font-medium" style={{ color: "#6c757d" }}>
+                  Marital Status:
+                </label>
+                <p className="text-lg" style={{ color: "#102e4a" }}>
+                  {dataToShow.maritalStatus}
+                </p>
               </div>
+
               <div>
-                <label className="text-sm font-medium" style={{ color: '#6c757d' }}>Nationality:</label>
-                <p className="text-lg" style={{ color: '#102e4a' }}>{taxpayerData.nationality}</p>
+                <label className="text-sm font-medium" style={{ color: "#6c757d" }}>
+                  Nationality:
+                </label>
+                <p className="text-lg" style={{ color: "#102e4a" }}>
+                  {dataToShow.nationality}
+                </p>
               </div>
+
               <div>
-                <label className="text-sm font-medium" style={{ color: '#6c757d' }}>Date of Birth:</label>
-                <p className="text-lg" style={{ color: '#102e4a' }}>{taxpayerData.dateOfBirth}</p>
+                <label className="text-sm font-medium" style={{ color: "#6c757d" }}>
+                  Date of Birth:
+                </label>
+                <p className="text-lg" style={{ color: "#102e4a" }}>
+                  {dataToShow.dateOfBirth}
+                </p>
               </div>
+
               <div>
-                <label className="text-sm font-medium" style={{ color: '#6c757d' }}>LASSRA No:</label>
-                <p className="text-lg" style={{ color: '#102e4a' }}>{taxpayerData.lassraNo || '-'}</p>
+                <label className="text-sm font-medium" style={{ color: "#6c757d" }}>
+                  LASSRA No:
+                </label>
+                <p className="text-lg" style={{ color: "#102e4a" }}>
+                  {dataToShow.lassraNo || "-"}
+                </p>
               </div>
+
               <div>
-                <label className="text-sm font-medium" style={{ color: '#6c757d' }}>Tax Station:</label>
-                <p className="text-lg" style={{ color: '#102e4a' }}>{taxpayerData.taxStation}</p>
+                <label className="text-sm font-medium" style={{ color: "#6c757d" }}>
+                  Tax Station:
+                </label>
+                <p className="text-lg" style={{ color: "#102e4a" }}>
+                  {dataToShow.taxStation}
+                </p>
               </div>
+
               <div>
-                <label className="text-sm font-medium" style={{ color: '#6c757d' }}>Identification Type:</label>
-                <p className="text-lg" style={{ color: '#102e4a' }}>{taxpayerData.identificationType}</p>
+                <label className="text-sm font-medium" style={{ color: "#6c757d" }}>
+                  Identification Type:
+                </label>
+                <p className="text-lg" style={{ color: "#102e4a" }}>
+                  {dataToShow.identificationType}
+                </p>
               </div>
+
               <div>
-                <label className="text-sm font-medium" style={{ color: '#6c757d' }}>Identification Number:</label>
-                <p className="text-lg" style={{ color: '#102e4a' }}>{taxpayerData.identificationNumber}</p>
+                <label className="text-sm font-medium" style={{ color: "#6c757d" }}>
+                  Identification Number:
+                </label>
+                <p className="text-lg" style={{ color: "#102e4a" }}>
+                  {dataToShow.identificationNumber}
+                </p>
               </div>
             </div>
           </div>
         </div>
+      )}
 
-        {/* Tab Navigation */}
-        <div className="bg-white rounded-lg shadow-lg overflow-hidden mb-8">
-          <div className="flex overflow-x-auto">
-            {tabs.map((tab, index) => (
-              <button
-                key={tab.key}
-                onClick={() => setActiveTab(tab.key)}
-                className={`flex-shrink-0 px-4 py-4 text-white font-medium text-sm hover:opacity-90 transition-all ${tab.color} ${
-                  activeTab === tab.key ? 'opacity-100' : 'opacity-75'
-                }`}
-                style={{ minWidth: '120px' }}
-              >
-                <div className="flex flex-col items-center space-y-1">
-                  <span className="text-lg">{tab.icon}</span>
-                  <span className="text-xs">{tab.label}</span>
-                </div>
-              </button>
-            ))}
-          </div>
-        </div>
-
-        {/* Tab Content */}
-        <div className="bg-white rounded-lg shadow-lg p-8">
-          {activeTab === 'family-relations' && (
-            <div>
-              <div className="flex justify-end space-x-4 mb-6">
-                <button 
-                  onClick={() => {
-                    setModalType('add-child');
-                    setShowModal(true);
-                  }}
-                  className="px-6 py-2 bg-cyan-500 text-white rounded-lg hover:bg-cyan-600 transition-all font-medium"
-                >
-                  ADD CHILD
-                </button>
-                <button 
-                  onClick={() => {
-                    setModalType('add-spouse');
-                    setShowModal(true);
-                  }}
-                  className="px-6 py-2 bg-cyan-500 text-white rounded-lg hover:bg-cyan-600 transition-all font-medium"
-                >
-                  ADD SPOUSE
-                </button>
+      {/* Tab Navigation */}
+      <div className="bg-white rounded-lg shadow-lg overflow-hidden mb-8">
+        <div className="flex overflow-x-auto">
+          {tabs.map((tab) => (
+            <button
+              key={tab.key}
+              onClick={() => setActiveTab(tab.key)}
+              className={`flex-shrink-0 px-4 py-4 text-white font-medium text-sm hover:opacity-90 transition-all ${tab.color} ${
+                activeTab === tab.key ? "opacity-100" : "opacity-75"
+              }`}
+              style={{ minWidth: "120px" }}
+            >
+              <div className="flex flex-col items-center space-y-1">
+                <span className="text-lg">{tab.icon}</span>
+                <span className="text-xs">{tab.label}</span>
               </div>
-              <div className="text-center py-8">
-                <p style={{ color: '#6c757d' }}>There are currently no known family relations.</p>
-              </div>
-            </div>
-          )}
-
-          {activeTab !== 'family-relations' && (
-            <div className="text-center py-8">
-              <p style={{ color: '#6c757d' }}>
-                {tabs.find(t => t.key === activeTab)?.label} section is under development.
-              </p>
-            </div>
-          )}
-        </div>
-
-        {/* Footer */}
-        <div className="mt-8 text-center">
-          <p className="text-sm" style={{ color: '#6c757d' }}>© 2025 e-Tax. All Rights Reserved.</p>
+            </button>
+          ))}
         </div>
       </div>
-    );
-  };
 
-  // Corporate Tax Payer Profile Detail Content
-  const CorporateTaxPayerProfileDetailContent = ({ taxpayerId, onBack }: { taxpayerId: string; onBack: () => void }) => {
-    const [activeTab, setActiveTab] = useState('family-relations');
-
-    // Sample corporate taxpayer data - in real app this would be fetched based on taxpayerId
-    const corporateData = {
-      id: 'C-7789123',
-      tin: '2098765432',
-      companyName: 'NEXUS TECHNOLOGY SOLUTIONS LIMITED',
-      registrationNumber: 'RC-1234567',
-      businessType: 'Information Technology',
-      email: 'info@nexustech.ng',
-      address: 'PLOT 45 ADEMOLA ADETOKUNBO STREET, VICTORIA ISLAND, LAGOS',
-      stateLgaLcda: 'LAGOS / LAGOS ISLAND / -',
-      phoneNumber: '08033445566',
-      dateOfIncorporation: '15th Mar, 2018',
-      cacNumber: 'RC-1234567',
-      taxStation: 'VICTORIA ISLAND TAX OFFICE',
-      businessNature: 'Software Development and IT Services',
-      directorsCounts: '4',
-      authorizedCapital: '₦50,000,000',
-      paidUpCapital: '₦25,000,000'
-    };
-
-    const tabs = [
-      { key: 'family-relations', label: 'COMPANY INFO', icon: '🏢', color: 'bg-green-500' },
-      { key: 'support-staff', label: 'DIRECTORS', icon: '👥', color: 'bg-orange-500' },
-      { key: 'employer', label: 'SHAREHOLDERS', icon: '📊', color: 'bg-teal-500' },
-      { key: 'companies', label: 'SUBSIDIARIES', icon: '🏭', color: 'bg-blue-500' },
-      { key: 'returns', label: 'RETURNS', icon: '📋', color: 'bg-green-600' },
-      { key: 'over-filed', label: 'OVER-FILED RETURNS', icon: '📄', color: 'bg-purple-500' },
-      { key: 'assets', label: 'ASSETS', icon: '🏠', color: 'bg-indigo-500' },
-      { key: 'cases', label: 'CASES', icon: '⚖️', color: 'bg-red-500' },
-      { key: 'bills', label: 'BILLS', icon: '💰', color: 'bg-yellow-500' },
-      { key: 'assessment', label: 'ASSESSMENT', icon: '📊', color: 'bg-teal-600' },
-      { key: 'payments', label: 'PAYMENTS', icon: '💳', color: 'bg-blue-600' }
-    ];
-
-    return (
-      <div className="p-8">
-        {/* Header */}
-        <div className="flex items-center justify-between mb-8">
-          <div className="flex items-center">
-            <button 
-              onClick={onBack}
-              className="mr-4 px-3 py-2 hover:bg-gray-100 rounded-lg transition-all flex items-center space-x-2 border border-gray-300"
-              style={{ color: '#102e4a' }}
-            >
-              <ArrowLeft size={20} />
-              <span className="font-medium">Back</span>
-            </button>
-            <h1 className="text-2xl font-semibold" style={{ color: '#102e4a' }}>
-              Corporate Tax Payer Profile Detail
-            </h1>
+      {/* Tab Content */}
+      <div className="bg-white rounded-lg shadow-lg p-8">
+        {activeTab === "family-relations" && (
+          <div>
+            <div className="flex justify-end space-x-4 mb-6">
+              <button
+                onClick={() => {
+                  setModalType("add-child");
+                  setShowModal(true);
+                }}
+                className="px-6 py-2 bg-cyan-500 text-white rounded-lg hover:bg-cyan-600 transition-all font-medium"
+              >
+                ADD CHILD
+              </button>
+              <button
+                onClick={() => {
+                  setModalType("add-spouse");
+                  setShowModal(true);
+                }}
+                className="px-6 py-2 bg-cyan-500 text-white rounded-lg hover:bg-cyan-600 transition-all font-medium"
+              >
+                ADD SPOUSE
+              </button>
+            </div>
+            <div className="text-center py-8">
+              <p style={{ color: "#6c757d" }}>There are currently no known family relations.</p>
+            </div>
           </div>
-          <div className="w-10 h-10 rounded-full flex items-center justify-center" style={{ backgroundColor: '#f8f9fa' }}>
-            <Building2 style={{ color: '#102e4a' }} size={20} />
+        )}
+
+        {activeTab !== "family-relations" && (
+          <div className="text-center py-8">
+            <p style={{ color: "#6c757d" }}>{tabs.find((t) => t.key === activeTab)?.label} section is under development.</p>
+          </div>
+        )}
+      </div>
+
+      {/* Audit Modal */}
+      {showAuditModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black bg-opacity-40">
+          <div className="bg-white rounded-lg shadow-lg w-full max-w-3xl p-6">
+            <div className="flex items-center justify-between mb-4">
+              <h2 className="text-xl font-semibold">Audit Trail</h2>
+              <div className="flex items-center space-x-2">
+                <button
+                  onClick={downloadAuditCsv}
+                  className="px-3 py-1 border rounded hover:bg-gray-100"
+                >
+                  Download CSV
+                </button>
+                <button
+                  onClick={() => {
+                    setShowAuditModal(false);
+                    setAuditData([]);
+                  }}
+                  className="px-3 py-1 border rounded hover:bg-gray-100"
+                >
+                  Close
+                </button>
+              </div>
+            </div>
+
+            {auditLoading ? (
+              <div>Loading audit...</div>
+            ) : auditError ? (
+              <div className="text-red-600">{auditError}</div>
+            ) : auditData.length === 0 ? (
+              <div>No audit trail found for this taxpayer.</div>
+            ) : (
+              <div className="max-h-72 overflow-auto">
+                <table className="w-full text-sm table-fixed border-collapse">
+                  <thead>
+                    <tr className="text-left border-b">
+                      <th className="p-2">Date</th>
+                      <th className="p-2">Action</th>
+                      <th className="p-2">User</th>
+                      <th className="p-2">Details</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {auditData.map((entry, idx) => (
+                      <tr key={entry.id ?? idx} className="border-b odd:bg-white even:bg-gray-50">
+                        <td className="p-2 align-top">{entry.date}</td>
+                        <td className="p-2 align-top">{entry.action}</td>
+                        <td className="p-2 align-top">{entry.user ?? "-"}</td>
+                        <td className="p-2 align-top">{entry.details ?? JSON.stringify(entry, null, 0)}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            )}
           </div>
         </div>
+      )}
 
-        {/* Profile Card */}
+      {/* Example modal placeholder (add child/spouse) */}
+      {showModal && (
+        <div className="fixed inset-0 flex items-center justify-center z-40 bg-black bg-opacity-40">
+          <div className="bg-white p-6 rounded shadow-lg w-11/12 max-w-md">
+            <h3 className="text-lg font-semibold mb-4">{modalType === "add-child" ? "Add Child" : "Add Spouse"}</h3>
+            <p className="text-sm text-gray-600 mb-6">Modal content goes here. Implement your form or component.</p>
+            <div className="flex justify-end space-x-2">
+              <button onClick={() => setShowModal(false)} className="px-4 py-2 border rounded">
+                Close
+              </button>
+              <button
+                onClick={() => {
+                  // perform save action...
+                  showNotification?.(`${modalType === "add-child" ? "Child" : "Spouse"} added (mock).`, "success");
+                  setShowModal(false);
+                }}
+                className="px-4 py-2 bg-blue-600 text-white rounded"
+              >
+                Save
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Footer */}
+      <div className="mt-8 text-center">
+        <p className="text-sm" style={{ color: "#6c757d" }}>
+          © 2025 e-Tax. All Rights Reserved.
+        </p>
+      </div>
+    </div>
+  );
+};
+
+  // Corporate Tax Payer Profile Detail Content
+ type CorporateData = {
+  id: string;
+  tin?: string;
+  companyName?: string;
+  registrationNumber?: string;
+  businessType?: string;
+  email?: string;
+  address?: string;
+  stateLgaLcda?: string;
+  phoneNumber?: string;
+  dateOfIncorporation?: string;
+  cacNumber?: string;
+  taxStation?: string;
+  businessNature?: string;
+  directorsCounts?: string;
+  authorizedCapital?: string;
+  paidUpCapital?: string;
+};
+
+type Profileprops = {
+  taxpayerId: string;
+  onBack: () => void;
+  showNotification?: (msg: string) => void;
+};
+
+const CorporateTaxPayerProfileDetailContent: React.FC<Profileprops> = ({
+  taxpayerId,
+  onBack,
+  showNotification,
+}) => {
+  const [activeTab, setActiveTab] = useState<string>("family-relations");
+  const [corporateData, setCorporateData] = useState<CorporateData | null>(null);
+  const [loading, setLoading] = useState<boolean>(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    let isMounted = true;
+    setLoading(true);
+    setError(null);
+
+    // Replace this URL with your real API endpoint.
+    fetch(`/api/corporate-taxpayers/${encodeURIComponent(taxpayerId)}`)
+      .then((res) => {
+        if (!res.ok) throw new Error(`Server responded with ${res.status}`);
+        return res.json();
+      })
+      .then((data: CorporateData) => {
+        if (!isMounted) return;
+        setCorporateData(data);
+      })
+      .catch((err) => {
+        if (!isMounted) return;
+        console.error("Fetch corporate data error:", err);
+        setError("Failed to load corporate data.");
+        // optionally show a notification if provided
+        showNotification?.("Failed to load corporate data.");
+      })
+      .finally(() => {
+        if (!isMounted) return;
+        setLoading(false);
+      });
+
+    return () => {
+      isMounted = false;
+    };
+  }, [taxpayerId, showNotification]);
+
+  const tabs = [
+    { key: "family-relations", label: "COMPANY INFO", icon: "🏢", color: "bg-green-500" },
+    { key: "support-staff", label: "DIRECTORS", icon: "👥", color: "bg-orange-500" },
+    { key: "employer", label: "SHAREHOLDERS", icon: "📊", color: "bg-teal-500" },
+    { key: "companies", label: "SUBSIDIARIES", icon: "🏭", color: "bg-blue-500" },
+    { key: "returns", label: "RETURNS", icon: "📋", color: "bg-green-600" },
+    { key: "over-filed", label: "OVER-FILED RETURNS", icon: "📄", color: "bg-purple-500" },
+    { key: "assets", label: "ASSETS", icon: "🏠", color: "bg-indigo-500" },
+    { key: "cases", label: "CASES", icon: "⚖️", color: "bg-red-500" },
+    { key: "bills", label: "BILLS", icon: "💰", color: "bg-yellow-500" },
+    { key: "assessment", label: "ASSESSMENT", icon: "📊", color: "bg-teal-600" },
+    { key: "payments", label: "PAYMENTS", icon: "💳", color: "bg-blue-600" },
+  ];
+
+  // Temporary fallback while fetching / if missing fields
+  const fallback: CorporateData = {
+    id: taxpayerId,
+    tin: "—",
+    companyName: "—",
+    registrationNumber: "—",
+    businessType: "—",
+    email: "—",
+    address: "—",
+    stateLgaLcda: "—",
+    phoneNumber: "—",
+    dateOfIncorporation: "—",
+    cacNumber: "—",
+    taxStation: "—",
+    businessNature: "—",
+    directorsCounts: "—",
+    authorizedCapital: "—",
+    paidUpCapital: "—",
+  };
+
+  const dataToShow = corporateData ?? fallback;
+
+  return (
+    <div className="p-8">
+      {/* Header */}
+      <div className="flex items-center justify-between mb-8">
+        <div className="flex items-center">
+          <button
+            onClick={onBack}
+            className="mr-4 px-3 py-2 hover:bg-gray-100 rounded-lg transition-all flex items-center space-x-2 border border-gray-300"
+            style={{ color: "#102e4a" }}
+          >
+            <ArrowLeft size={20} />
+            <span className="font-medium">Back</span>
+          </button>
+          <h1 className="text-2xl font-semibold" style={{ color: "#102e4a" }}>
+            Corporate Tax Payer Profile Detail
+          </h1>
+        </div>
+        <div className="w-10 h-10 rounded-full flex items-center justify-center" style={{ backgroundColor: "#f8f9fa" }}>
+          <Building2 style={{ color: "#102e4a" }} size={20} />
+        </div>
+      </div>
+
+      {/* Loading / Error */}
+      {loading ? (
+        <div className="bg-white rounded-lg shadow-lg p-8 mb-8 text-center">Loading corporate data...</div>
+      ) : error ? (
+        <div className="bg-white rounded-lg shadow-lg p-8 mb-8 text-center text-red-600">{error}</div>
+      ) : null}
+
+      {/* Profile Card */}
+      {!loading && (
         <div className="bg-white rounded-lg shadow-lg p-8 mb-8">
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
             {/* Company Logo and Audit Trail */}
             <div className="flex flex-col items-center">
               <div className="w-40 h-40 rounded-lg bg-gray-300 flex items-center justify-center mb-4">
-                <Building2 size={60} style={{ color: '#6c757d' }} />
+                <Building2 size={60} style={{ color: "#6c757d" }} />
               </div>
-              <button 
-                onClick={() => showNotification('Corporate audit trail report generated successfully')}
+              <button
+                onClick={() => showNotification?.("Corporate audit trail report generated successfully")}
                 className="px-6 py-2 text-white rounded-lg hover:shadow-lg transition-all font-medium"
-                style={{ backgroundColor: '#28a745' }}
+                style={{ backgroundColor: "#28a745" }}
               >
                 AUDIT TRAIL
               </button>
@@ -1199,138 +1205,139 @@ const ETaxAdminDashboard = () => {
             {/* Company Information - Left Column */}
             <div className="space-y-4">
               <div>
-                <label className="text-sm font-medium" style={{ color: '#6c757d' }}>Company Id:</label>
-                <p className="text-lg" style={{ color: '#102e4a' }}>{corporateData.id}</p>
+                <label className="text-sm font-medium" style={{ color: "#6c757d" }}>Company Id:</label>
+                <p className="text-lg" style={{ color: "#102e4a" }}>{dataToShow.id}</p>
               </div>
               <div>
-                <label className="text-sm font-medium" style={{ color: '#6c757d' }}>TIN:</label>
-                <p className="text-lg" style={{ color: '#102e4a' }}>{corporateData.tin}</p>
+                <label className="text-sm font-medium" style={{ color: "#6c757d" }}>TIN:</label>
+                <p className="text-lg" style={{ color: "#102e4a" }}>{dataToShow.tin}</p>
               </div>
               <div>
-                <label className="text-sm font-medium" style={{ color: '#6c757d' }}>Company Name:</label>
-                <p className="text-lg" style={{ color: '#102e4a' }}>{corporateData.companyName}</p>
+                <label className="text-sm font-medium" style={{ color: "#6c757d" }}>Company Name:</label>
+                <p className="text-lg" style={{ color: "#102e4a" }}>{dataToShow.companyName}</p>
               </div>
               <div>
-                <label className="text-sm font-medium" style={{ color: '#6c757d' }}>Registration Number:</label>
-                <p className="text-lg" style={{ color: '#102e4a' }}>{corporateData.registrationNumber}</p>
+                <label className="text-sm font-medium" style={{ color: "#6c757d" }}>Registration Number:</label>
+                <p className="text-lg" style={{ color: "#102e4a" }}>{dataToShow.registrationNumber}</p>
               </div>
               <div>
-                <label className="text-sm font-medium" style={{ color: '#6c757d' }}>Business Type:</label>
-                <p className="text-lg" style={{ color: '#102e4a' }}>{corporateData.businessType}</p>
+                <label className="text-sm font-medium" style={{ color: "#6c757d" }}>Business Type:</label>
+                <p className="text-lg" style={{ color: "#102e4a" }}>{dataToShow.businessType}</p>
               </div>
               <div>
-                <label className="text-sm font-medium" style={{ color: '#6c757d' }}>Email Address:</label>
-                <p className="text-lg" style={{ color: '#102e4a' }}>{corporateData.email}</p>
+                <label className="text-sm font-medium" style={{ color: "#6c757d" }}>Email Address:</label>
+                <p className="text-lg" style={{ color: "#102e4a" }}>{dataToShow.email}</p>
               </div>
               <div>
-                <label className="text-sm font-medium" style={{ color: '#6c757d' }}>Address:</label>
-                <p className="text-lg" style={{ color: '#102e4a' }}>{corporateData.address}</p>
+                <label className="text-sm font-medium" style={{ color: "#6c757d" }}>Address:</label>
+                <p className="text-lg" style={{ color: "#102e4a" }}>{dataToShow.address}</p>
               </div>
               <div>
-                <label className="text-sm font-medium" style={{ color: '#6c757d' }}>State / LGA / LCDA:</label>
-                <p className="text-lg" style={{ color: '#102e4a' }}>{corporateData.stateLgaLcda}</p>
+                <label className="text-sm font-medium" style={{ color: "#6c757d" }}>State / LGA / LCDA:</label>
+                <p className="text-lg" style={{ color: "#102e4a" }}>{dataToShow.stateLgaLcda}</p>
               </div>
             </div>
 
             {/* Company Information - Right Column */}
             <div className="space-y-4">
               <div>
-                <label className="text-sm font-medium" style={{ color: '#6c757d' }}>Phone Number:</label>
-                <p className="text-lg" style={{ color: '#102e4a' }}>{corporateData.phoneNumber}</p>
+                <label className="text-sm font-medium" style={{ color: "#6c757d" }}>Phone Number:</label>
+                <p className="text-lg" style={{ color: "#102e4a" }}>{dataToShow.phoneNumber}</p>
               </div>
               <div>
-                <label className="text-sm font-medium" style={{ color: '#6c757d' }}>Date of Incorporation:</label>
-                <p className="text-lg" style={{ color: '#102e4a' }}>{corporateData.dateOfIncorporation}</p>
+                <label className="text-sm font-medium" style={{ color: "#6c757d" }}>Date of Incorporation:</label>
+                <p className="text-lg" style={{ color: "#102e4a" }}>{dataToShow.dateOfIncorporation}</p>
               </div>
               <div>
-                <label className="text-sm font-medium" style={{ color: '#6c757d' }}>CAC Number:</label>
-                <p className="text-lg" style={{ color: '#102e4a' }}>{corporateData.cacNumber}</p>
+                <label className="text-sm font-medium" style={{ color: "#6c757d" }}>CAC Number:</label>
+                <p className="text-lg" style={{ color: "#102e4a" }}>{dataToShow.cacNumber}</p>
               </div>
               <div>
-                <label className="text-sm font-medium" style={{ color: '#6c757d' }}>Business Nature:</label>
-                <p className="text-lg" style={{ color: '#102e4a' }}>{corporateData.businessNature}</p>
+                <label className="text-sm font-medium" style={{ color: "#6c757d" }}>Business Nature:</label>
+                <p className="text-lg" style={{ color: "#102e4a" }}>{dataToShow.businessNature}</p>
               </div>
               <div>
-                <label className="text-sm font-medium" style={{ color: '#6c757d' }}>Tax Station:</label>
-                <p className="text-lg" style={{ color: '#102e4a' }}>{corporateData.taxStation}</p>
+                <label className="text-sm font-medium" style={{ color: "#6c757d" }}>Tax Station:</label>
+                <p className="text-lg" style={{ color: "#102e4a" }}>{dataToShow.taxStation}</p>
               </div>
               <div>
-                <label className="text-sm font-medium" style={{ color: '#6c757d' }}>Number of Directors:</label>
-                <p className="text-lg" style={{ color: '#102e4a' }}>{corporateData.directorsCounts}</p>
+                <label className="text-sm font-medium" style={{ color: "#6c757d" }}>Number of Directors:</label>
+                <p className="text-lg" style={{ color: "#102e4a" }}>{dataToShow.directorsCounts}</p>
               </div>
               <div>
-                <label className="text-sm font-medium" style={{ color: '#6c757d' }}>Authorized Capital:</label>
-                <p className="text-lg" style={{ color: '#102e4a' }}>{corporateData.authorizedCapital}</p>
+                <label className="text-sm font-medium" style={{ color: "#6c757d" }}>Authorized Capital:</label>
+                <p className="text-lg" style={{ color: "#102e4a" }}>{dataToShow.authorizedCapital}</p>
               </div>
               <div>
-                <label className="text-sm font-medium" style={{ color: '#6c757d' }}>Paid-Up Capital:</label>
-                <p className="text-lg" style={{ color: '#102e4a' }}>{corporateData.paidUpCapital}</p>
+                <label className="text-sm font-medium" style={{ color: "#6c757d" }}>Paid-Up Capital:</label>
+                <p className="text-lg" style={{ color: "#102e4a" }}>{dataToShow.paidUpCapital}</p>
               </div>
             </div>
           </div>
         </div>
+      )}
 
-        {/* Tab Navigation */}
-        <div className="bg-white rounded-lg shadow-lg overflow-hidden mb-8">
-          <div className="flex overflow-x-auto">
-            {tabs.map((tab, index) => (
-              <button
-                key={tab.key}
-                onClick={() => setActiveTab(tab.key)}
-                className={`flex-shrink-0 px-4 py-4 text-white font-medium text-sm hover:opacity-90 transition-all ${tab.color} ${
-                  activeTab === tab.key ? 'opacity-100' : 'opacity-75'
-                }`}
-                style={{ minWidth: '120px' }}
-              >
-                <div className="flex flex-col items-center space-y-1">
-                  <span className="text-lg">{tab.icon}</span>
-                  <span className="text-xs">{tab.label}</span>
-                </div>
-              </button>
-            ))}
-          </div>
-        </div>
-
-        {/* Tab Content */}
-        <div className="bg-white rounded-lg shadow-lg p-8">
-          {activeTab === 'family-relations' && (
-            <div>
-              <div className="flex justify-end space-x-4 mb-6">
-                <button 
-                  onClick={() => showNotification('Branch office functionality coming soon')}
-                  className="px-6 py-2 bg-cyan-500 text-white rounded-lg hover:bg-cyan-600 transition-all font-medium"
-                >
-                  ADD BRANCH
-                </button>
-                <button 
-                  onClick={() => showNotification('Company information updated successfully')}
-                  className="px-6 py-2 bg-cyan-500 text-white rounded-lg hover:bg-cyan-600 transition-all font-medium"
-                >
-                  UPDATE INFO
-                </button>
+      {/* Tab Navigation */}
+      <div className="bg-white rounded-lg shadow-lg overflow-hidden mb-8">
+        <div className="flex overflow-x-auto">
+          {tabs.map((tab) => (
+            <button
+              key={tab.key}
+              onClick={() => setActiveTab(tab.key)}
+              className={`flex-shrink-0 px-4 py-4 text-white font-medium text-sm hover:opacity-90 transition-all ${tab.color} ${
+                activeTab === tab.key ? "opacity-100" : "opacity-75"
+              }`}
+              style={{ minWidth: "120px" }}
+            >
+              <div className="flex flex-col items-center space-y-1">
+                <span className="text-lg">{tab.icon}</span>
+                <span className="text-xs">{tab.label}</span>
               </div>
-              <div className="text-center py-8">
-                <p style={{ color: '#6c757d' }}>Company information is up to date.</p>
-              </div>
-            </div>
-          )}
-
-          {activeTab !== 'family-relations' && (
-            <div className="text-center py-8">
-              <p style={{ color: '#6c757d' }}>
-                {tabs.find(t => t.key === activeTab)?.label} section is under development.
-              </p>
-            </div>
-          )}
-        </div>
-
-        {/* Footer */}
-        <div className="mt-8 text-center">
-          <p className="text-sm" style={{ color: '#6c757d' }}>© 2025 e-Tax. All Rights Reserved.</p>
+            </button>
+          ))}
         </div>
       </div>
-    );
-  };
+
+      {/* Tab Content */}
+      <div className="bg-white rounded-lg shadow-lg p-8">
+        {activeTab === "family-relations" && (
+          <div>
+            <div className="flex justify-end space-x-4 mb-6">
+              <button
+                onClick={() => showNotification?.("Branch office functionality coming soon")}
+                className="px-6 py-2 bg-cyan-500 text-white rounded-lg hover:bg-cyan-600 transition-all font-medium"
+              >
+                ADD BRANCH
+              </button>
+              <button
+                onClick={() => showNotification?.("Company information updated successfully")}
+                className="px-6 py-2 bg-cyan-500 text-white rounded-lg hover:bg-cyan-600 transition-all font-medium"
+              >
+                UPDATE INFO
+              </button>
+            </div>
+            <div className="text-center py-8">
+              <p style={{ color: "#6c757d" }}>Company information is up to date.</p>
+            </div>
+          </div>
+        )}
+
+        {activeTab !== "family-relations" && (
+          <div className="text-center py-8">
+            <p style={{ color: "#6c757d" }}>{tabs.find((t) => t.key === activeTab)?.label} section is under development.</p>
+          </div>
+        )}
+      </div>
+
+      {/* Footer */}
+      <div className="mt-8 text-center">
+        <p className="text-sm" style={{ color: "#6c757d" }}>© 2025 e-Tax. All Rights Reserved.</p>
+      </div>
+    </div>
+  );
+};
+
+
 
   const TaxServicesInterface = () => {
   const [taxPayerNumber, setTaxPayerNumber] = useState('');
@@ -1495,7 +1502,54 @@ const ETaxAdminDashboard = () => {
 
   // Individual Tax Payers (Inactive) Content
   const IndividualTaxPayersInactiveContent = () => {
-    const [filters, setFilters] = useState({
+  const [filters, setFilters] = useState({
+    taxId: '',
+    firstName: '',
+    middleName: '',
+    lastName: '',
+    email: '',
+    phoneNumber: ''
+  });
+
+  const [inactiveTaxpayers, setInactiveTaxpayers] = useState([
+    {
+      id: 'TEMP-VUU2T7QX7Q',
+      fullName: 'Mrs. Abigail Davou Emmanuel',
+      email: 'davouabigailb@gmail.com',
+      phoneNumber: '08137626502',
+      bvn: 'N/A',
+      sector: '',
+      address: '1 PINEWOOD COURT, LEKKI PH 1\nState: Lagos\nLGA: Eti Osa\nLCDA: Iru Victoria Island',
+      isActivated: false
+    },
+    {
+      id: 'TEMP-FHSMQCSSH1',
+      fullName: 'Mr. Femi Muideen Balogun',
+      email: 'muideen@outlook.com',
+      phoneNumber: '02045678412',
+      bvn: 'N/A',
+      sector: '',
+      address: 'AVIATION TANK FARM DEPOT ALONG MURITALA INTERNATIONAL AIRPORT WAY, NACHO BUSSTOP\nState: Lagos\nLGA: Ikeja\nLCDA: Ikeja',
+      isActivated: false
+    },
+    {
+      id: 'TEMP-X6BTILSUMD',
+      fullName: 'Miss. Anerobi Ogochukwu',
+      email: 'finance@finceptive.co',
+      phoneNumber: '07032418150',
+      bvn: 'N/A',
+      sector: '',
+      address: '4 VICTOR OKWODU STREET, BADORE\nState: Lagos\nLGA: Ibeju/Lekki\nLCDA: Ibeju',
+      isActivated: false
+    }
+  ]);
+
+  const handleFilterChange = (field: string, value: string) => {
+    setFilters(prev => ({ ...prev, [field]: value }));
+  };
+
+  const handleReset = () => {
+    setFilters({
       taxId: '',
       firstName: '',
       middleName: '',
@@ -1503,281 +1557,239 @@ const ETaxAdminDashboard = () => {
       email: '',
       phoneNumber: ''
     });
+    showNotification('Filters cleared');
+  };
 
-    const [inactiveTaxpayers, setInactiveTaxpayers] = useState([
-      {
-        id: 'TEMP-VUU2T7QX7Q',
-        fullName: 'Mrs. Abigail Davou Emmanuel',
-        email: 'davouabigailb@gmail.com',
-        phoneNumber: '08137626502',
-        bvn: 'N/A',
-        sector: '',
-        address: '1 PINEWOOD COURT, LEKKI PH 1\nState: Lagos\nLGA: Eti Osa\nLCDA: Iru Victoria Island',
-        isActivated: false
-      },
-      {
-        id: 'TEMP-FHSMQCSSH1',
-        fullName: 'Mr. Femi Muideen Balogun',
-        email: 'muideen@outlook.com',
-        phoneNumber: '02045678412',
-        bvn: 'N/A',
-        sector: '',
-        address: 'AVIATION TANK FARM DEPOT ALONG MURITALA INTERNATIONAL AIRPORT WAY, NACHO BUSSTOP\nState: Lagos\nLGA: Ikeja\nLCDA: Ikeja',
-        isActivated: false
-      },
-      {
-        id: 'TEMP-X6BTILSUMD',
-        fullName: 'Miss. Anerobi Ogochukwu',
-        email: 'finance@finceptive.co',
-        phoneNumber: '07032418150',
-        bvn: 'N/A',
-        sector: '',
-        address: '4 VICTOR OKWODU STREET, BADORE\nState: Lagos\nLGA: Ibeju/Lekki\nLCDA: Ibeju',
-        isActivated: false
-      }
-    ]);
+  const handleFilter = () => {
+    const hasFilters = Object.values(filters).some(value => value.trim() !== '');
+    if (!hasFilters) {
+      showNotification('Please enter at least one filter criteria');
+      return;
+    }
+    showNotification('Filtering inactive taxpayers...');
+  };
 
-    const handleFilterChange = (field: string, value: string) => {
-      setFilters(prev => ({ ...prev, [field]: value }));
-    };
+  const handleActivate = (taxpayerId: string) => {
+    setInactiveTaxpayers(prev => 
+      prev.map(taxpayer => 
+        taxpayer.id === taxpayerId 
+          ? { ...taxpayer, isActivated: true }
+          : taxpayer
+      )
+    );
+    showNotification(`Taxpayer ${taxpayerId} activated successfully`);
+  };
 
-    const handleReset = () => {
-      setFilters({
-        taxId: '',
-        firstName: '',
-        middleName: '',
-        lastName: '',
-        email: '',
-        phoneNumber: ''
-      });
-      showNotification('Filters cleared');
-    };
+  const handleAddInactiveTaxpayer = () => {
+    setModalType('add-taxpayer');
+    setShowModal(true);
+  };
 
-    const handleFilter = () => {
-      const hasFilters = Object.values(filters).some(value => value.trim() !== '');
-      
-      if (!hasFilters) {
-        showNotification('Please enter at least one filter criteria');
-        return;
-      }
-
-      showNotification('Filtering inactive taxpayers...');
-    };
-
-    const handleActivate = (taxpayerId: string) => {
-      setInactiveTaxpayers(prev => 
-        prev.map(taxpayer => 
-          taxpayer.id === taxpayerId 
-            ? { ...taxpayer, isActivated: true }
-            : taxpayer
-        )
-      );
-      showNotification(`Taxpayer ${taxpayerId} activated successfully`);
-    };
-
-    const handleAddInactiveTaxpayer = () => {
-      setModalType('add-taxpayer');
-      setShowModal(true);
-    };
-
-    return (
-      <div className="p-8">
-        {/* Header */}
-        <div className="flex items-center justify-between mb-8">
-          <h1 className="text-3xl font-bold" style={{ color: '#102e4a' }}>Individual Tax Payers(Unactivated)</h1>
-          <div className="w-10 h-10 rounded-full flex items-center justify-center" style={{ backgroundColor: '#f8f9fa' }}>
-            <Users style={{ color: '#102e4a' }} size={20} />
-          </div>
-        </div>
-
-        {/* Main Content Card */}
-        <div className="bg-white rounded-lg shadow-lg p-6 mb-6">
-          <div className="flex items-center justify-between mb-6">
-            <div className="flex items-center">
-              <div className="w-12 h-12 rounded bg-green-500 flex items-center justify-center mr-4">
-                <Users style={{ color: 'white' }} size={24} />
-              </div>
-              <h2 className="text-xl font-semibold" style={{ color: '#102e4a' }}>
-                Individual Tax Payers (Unactivated)
-              </h2>
-            </div>
-            <button 
-              onClick={handleAddInactiveTaxpayer}
-              className="w-12 h-12 bg-green-500 text-white rounded hover:bg-green-600 transition-all flex items-center justify-center text-xl font-bold"
-              title="Add Inactive Taxpayer"
-            >
-              +
-            </button>
-          </div>
-
-          {/* Filters */}
-          <div className="mb-6">
-            <div className="mb-4">
-              <span className="text-sm font-medium" style={{ color: '#6c757d' }}>Filters:</span>
-            </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
-              <input
-                type="text"
-                placeholder="Tax ID"
-                value={filters.taxId}
-                onChange={(e) => handleFilterChange('taxId', e.target.value)}
-                className="p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                style={{ color: '#102e4a' }}
-              />
-              <input
-                type="text"
-                placeholder="First Name"
-                value={filters.firstName}
-                onChange={(e) => handleFilterChange('firstName', e.target.value)}
-                className="p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                style={{ color: '#102e4a' }}
-              />
-              <input
-                type="text"
-                placeholder="Middle Name"
-                value={filters.middleName}
-                onChange={(e) => handleFilterChange('middleName', e.target.value)}
-                className="p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                style={{ color: '#102e4a' }}
-              />
-              <input
-                type="text"
-                placeholder="Last Name"
-                value={filters.lastName}
-                onChange={(e) => handleFilterChange('lastName', e.target.value)}
-                className="p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                style={{ color: '#102e4a' }}
-              />
-              <input
-                type="email"
-                placeholder="Email"
-                value={filters.email}
-                onChange={(e) => handleFilterChange('email', e.target.value)}
-                className="p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                style={{ color: '#102e4a' }}
-              />
-              <input
-                type="text"
-                placeholder="Phone Number"
-                value={filters.phoneNumber}
-                onChange={(e) => handleFilterChange('phoneNumber', e.target.value)}
-                className="p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                style={{ color: '#102e4a' }}
-              />
-            </div>
-
-            <div className="flex justify-end gap-4">
-              <button 
-                onClick={handleReset}
-                className="px-6 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition-all font-medium"
-              >
-                RESET
-              </button>
-              <button 
-                onClick={handleFilter}
-                className="px-6 py-2 text-white rounded-lg hover:shadow-lg transition-all font-medium"
-                style={{ backgroundColor: '#102e4a' }}
-                onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#a682ff'}
-                onMouseLeave={(e) => e.currentTarget.style.backgroundColor = '#102e4a'}
-              >
-                FILTER
-              </button>
-            </div>
-          </div>
-
-          {/* Results Table */}
-          <div className="overflow-x-auto">
-            <table className="w-full">
-              <thead style={{ backgroundColor: '#f8f9fa' }}>
-                <tr>
-                  <th className="px-6 py-4 text-left text-sm font-semibold" style={{ color: '#102e4a' }}>Tax Payer ID</th>
-                  <th className="px-6 py-4 text-left text-sm font-semibold" style={{ color: '#102e4a' }}>Full Name</th>
-                  <th className="px-6 py-4 text-left text-sm font-semibold" style={{ color: '#102e4a' }}>Email</th>
-                  <th className="px-6 py-4 text-left text-sm font-semibold" style={{ color: '#102e4a' }}>Phone Number</th>
-                  <th className="px-6 py-4 text-left text-sm font-semibold" style={{ color: '#102e4a' }}>BVN</th>
-                  <th className="px-6 py-4 text-left text-sm font-semibold" style={{ color: '#102e4a' }}>Sector</th>
-                  <th className="px-6 py-4 text-left text-sm font-semibold" style={{ color: '#102e4a' }}>Address</th>
-                  <th className="px-6 py-4 text-left text-sm font-semibold" style={{ color: '#102e4a' }}>Action</th>
-                </tr>
-              </thead>
-              <tbody>
-                {inactiveTaxpayers.map((taxpayer, index) => (
-                  <tr key={taxpayer.id} className="border-t border-gray-200 hover:bg-gray-50">
-                    <td className="px-6 py-4">
-                      <span className="text-blue-600 hover:underline cursor-pointer">{taxpayer.id}</span>
-                    </td>
-                    <td className="px-6 py-4" style={{ color: '#102e4a' }}>{taxpayer.fullName}</td>
-                    <td className="px-6 py-4" style={{ color: '#6c757d' }}>{taxpayer.email}</td>
-                    <td className="px-6 py-4" style={{ color: '#6c757d' }}>{taxpayer.phoneNumber}</td>
-                    <td className="px-6 py-4" style={{ color: '#6c757d' }}>{taxpayer.bvn}</td>
-                    <td className="px-6 py-4" style={{ color: '#6c757d' }}>{taxpayer.sector}</td>
-                    <td className="px-6 py-4" style={{ color: '#6c757d' }}>
-                      <div className="text-sm whitespace-pre-line max-w-xs">
-                        {taxpayer.address}
-                      </div>
-                    </td>
-                    <td className="px-6 py-4">
-                      {taxpayer.isActivated ? (
-                        <span className="px-4 py-2 bg-gray-400 text-white rounded font-medium cursor-not-allowed">
-                          ACTIVATED
-                        </span>
-                      ) : (
-                        <button 
-                          onClick={() => handleActivate(taxpayer.id)}
-                          className="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600 transition-all font-medium"
-                        >
-                          ACTIVATE
-                        </button>
-                      )}
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-
-          {/* Pagination */}
-          <div className="flex items-center justify-between mt-6">
-            <div className="text-sm" style={{ color: '#6c757d' }}>
-              Showing 1 to 20 of 3411 entries
-            </div>
-            <div className="flex items-center space-x-2">
-              <button className="w-8 h-8 rounded-full bg-green-500 text-white flex items-center justify-center text-sm font-medium">
-                1
-              </button>
-              <button className="w-8 h-8 rounded-full hover:bg-gray-100 flex items-center justify-center text-sm font-medium" style={{ color: '#6c757d' }}>
-                2
-              </button>
-              <button className="w-8 h-8 rounded-full hover:bg-gray-100 flex items-center justify-center text-sm font-medium" style={{ color: '#6c757d' }}>
-                3
-              </button>
-              <button className="w-8 h-8 rounded-full hover:bg-gray-100 flex items-center justify-center text-sm font-medium" style={{ color: '#6c757d' }}>
-                4
-              </button>
-              <button className="w-8 h-8 rounded-full hover:bg-gray-100 flex items-center justify-center text-sm font-medium" style={{ color: '#6c757d' }}>
-                5
-              </button>
-              <button className="px-2 py-1 hover:bg-gray-100 rounded text-sm font-medium" style={{ color: '#6c757d' }}>
-                &gt;&gt;
-              </button>
-            </div>
-          </div>
-        </div>
-
-        {/* Footer */}
-        <div className="mt-8 text-center">
-          <p className="text-sm" style={{ color: '#6c757d' }}>© 2025 e-Tax. All Rights Reserved.</p>
+  return (
+    <div className="p-8">
+      {/* Header */}
+      <div className="flex items-center justify-between mb-8">
+        <h1 className="text-3xl font-bold" style={{ color: '#102e4a' }}>
+          Individual Tax Payers(Unactivated)
+        </h1>
+        <div className="w-10 h-10 rounded-full flex items-center justify-center" style={{ backgroundColor: '#f8f9fa' }}>
+          <Users style={{ color: '#102e4a' }} size={20} />
         </div>
       </div>
-    );
-  };
+
+      {/* Main Content Card */}
+      <div className="bg-white rounded-lg shadow-lg p-6 mb-6">
+        <div className="flex items-center justify-between mb-6">
+          <div className="flex items-center">
+            <div className="w-12 h-12 rounded bg-green-500 flex items-center justify-center mr-4">
+              <Users style={{ color: 'white' }} size={24} />
+            </div>
+            <h2 className="text-xl font-semibold" style={{ color: '#102e4a' }}>
+              Individual Tax Payers (Unactivated)
+            </h2>
+          </div>
+          <button 
+            onClick={handleAddInactiveTaxpayer}
+            className="w-12 h-12 bg-green-500 text-white rounded hover:bg-green-600 transition-all flex items-center justify-center text-xl font-bold"
+            title="Add Inactive Taxpayer"
+          >
+            +
+          </button>
+        </div>
+
+        {/* Filters */}
+        <div className="mb-6">
+          <div className="mb-4">
+            <span className="text-sm font-medium" style={{ color: '#6c757d' }}>Filters:</span>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+            <input type="text" placeholder="Tax ID" value={filters.taxId} onChange={(e) => handleFilterChange('taxId', e.target.value)} className="p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" style={{ color: '#102e4a' }} />
+            <input type="text" placeholder="First Name" value={filters.firstName} onChange={(e) => handleFilterChange('firstName', e.target.value)} className="p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" style={{ color: '#102e4a' }} />
+            <input type="text" placeholder="Middle Name" value={filters.middleName} onChange={(e) => handleFilterChange('middleName', e.target.value)} className="p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" style={{ color: '#102e4a' }} />
+            <input type="text" placeholder="Last Name" value={filters.lastName} onChange={(e) => handleFilterChange('lastName', e.target.value)} className="p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" style={{ color: '#102e4a' }} />
+            <input type="email" placeholder="Email" value={filters.email} onChange={(e) => handleFilterChange('email', e.target.value)} className="p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" style={{ color: '#102e4a' }} />
+            <input type="text" placeholder="Phone Number" value={filters.phoneNumber} onChange={(e) => handleFilterChange('phoneNumber', e.target.value)} className="p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" style={{ color: '#102e4a' }} />
+          </div>
+
+          <div className="flex justify-end gap-4">
+            <button onClick={handleReset} className="px-6 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition-all font-medium">
+              RESET
+            </button>
+            <button 
+              onClick={handleFilter}
+              className="px-6 py-2 text-white rounded-lg hover:shadow-lg transition-all font-medium"
+              style={{ backgroundColor: '#102e4a' }}
+              onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#a682ff'}
+              onMouseLeave={(e) => e.currentTarget.style.backgroundColor = '#102e4a'}
+            >
+              FILTER
+            </button>
+          </div>
+        </div>
+
+        {/* Results Table */}
+        <div className="overflow-x-auto">
+          <table className="w-full">
+            <thead style={{ backgroundColor: '#f8f9fa' }}>
+              <tr>
+                <th className="px-6 py-4 text-left text-sm font-semibold" style={{ color: '#102e4a' }}>Tax Payer ID</th>
+                <th className="px-6 py-4 text-left text-sm font-semibold" style={{ color: '#102e4a' }}>Full Name</th>
+                <th className="px-6 py-4 text-left text-sm font-semibold" style={{ color: '#102e4a' }}>Email</th>
+                <th className="px-6 py-4 text-left text-sm font-semibold" style={{ color: '#102e4a' }}>Phone Number</th>
+                <th className="px-6 py-4 text-left text-sm font-semibold" style={{ color: '#102e4a' }}>BVN</th>
+                <th className="px-6 py-4 text-left text-sm font-semibold" style={{ color: '#102e4a' }}>Sector</th>
+                <th className="px-6 py-4 text-left text-sm font-semibold" style={{ color: '#102e4a' }}>Address</th>
+                <th className="px-6 py-4 text-left text-sm font-semibold" style={{ color: '#102e4a' }}>Action</th>
+              </tr>
+            </thead>
+            <tbody>
+              {inactiveTaxpayers.map((taxpayer) => (
+                <tr key={taxpayer.id} className="border-t border-gray-200 hover:bg-gray-50">
+                  <td className="px-6 py-4">
+                    <span className="text-blue-600 hover:underline cursor-pointer">{taxpayer.id}</span>
+                  </td>
+                  <td className="px-6 py-4" style={{ color: '#102e4a' }}>{taxpayer.fullName}</td>
+                  <td className="px-6 py-4" style={{ color: '#6c757d' }}>{taxpayer.email}</td>
+                  <td className="px-6 py-4" style={{ color: '#6c757d' }}>{taxpayer.phoneNumber}</td>
+                  <td className="px-6 py-4" style={{ color: '#6c757d' }}>{taxpayer.bvn}</td>
+                  <td className="px-6 py-4" style={{ color: '#6c757d' }}>{taxpayer.sector}</td>
+                  <td className="px-6 py-4" style={{ color: '#6c757d' }}>
+                    <div className="text-sm whitespace-pre-line max-w-xs">
+                      {taxpayer.address}
+                    </div>
+                  </td>
+                  <td className="px-6 py-4">
+                    {taxpayer.isActivated ? (
+                      <span className="px-4 py-2 bg-gray-400 text-white rounded font-medium cursor-not-allowed">
+                        ACTIVATED
+                      </span>
+                    ) : (
+                      <button 
+                        onClick={() => handleActivate(taxpayer.id)}
+                        className="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600 transition-all font-medium"
+                      >
+                        ACTIVATE
+                      </button>
+                    )}
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+
+        {/* Pagination */}
+        <div className="flex items-center justify-between mt-6">
+          <div className="text-sm" style={{ color: '#6c757d' }}>
+            Showing 1 to 20 of 3411 entries
+          </div>
+          <div className="flex items-center space-x-2">
+            <button className="w-8 h-8 rounded-full bg-green-500 text-white flex items-center justify-center text-sm font-medium">
+              1
+            </button>
+            <button className="w-8 h-8 rounded-full hover:bg-gray-100 flex items-center justify-center text-sm font-medium" style={{ color: '#6c757d' }}>
+              2
+            </button>
+            <button className="w-8 h-8 rounded-full hover:bg-gray-100 flex items-center justify-center text-sm font-medium" style={{ color: '#6c757d' }}>
+              3
+            </button>
+            <button className="w-8 h-8 rounded-full hover:bg-gray-100 flex items-center justify-center text-sm font-medium" style={{ color: '#6c757d' }}>
+              4
+            </button>
+            <button className="w-8 h-8 rounded-full hover:bg-gray-100 flex items-center justify-center text-sm font-medium" style={{ color: '#6c757d' }}>
+              5
+            </button>
+            <button className="px-2 py-1 hover:bg-gray-100 rounded text-sm font-medium" style={{ color: '#6c757d' }}>
+              &gt;&gt;
+            </button>
+          </div>
+        </div>
+      </div>
+
+      {/* Footer */}
+      <div className="mt-8 text-center">
+        <p className="text-sm" style={{ color: '#6c757d' }}>© 2025 e-Tax. All Rights Reserved.</p>
+      </div>
+    </div>
+  );
+};
+
   const CorporateTaxPayersContent = () => {
-    const [searchType, setSearchType] = useState('Company ID');
-    const [searchValue, setSearchValue] = useState('');
-    const [showProfileDetail, setShowProfileDetail] = useState(false);
-    const [selectedTaxpayerId, setSelectedTaxpayerId] = useState('');
-    const [filters, setFilters] = useState({
+  const [searchType, setSearchType] = useState('Company ID');
+  const [searchValue, setSearchValue] = useState('');
+  const [showProfileDetail, setShowProfileDetail] = useState(false);
+  const [selectedTaxpayerId, setSelectedTaxpayerId] = useState('');
+  const [filters, setFilters] = useState({
+    companyId: '',
+    tinNumber: '',
+    companyName: '',
+    registrationNumber: '',
+    businessType: '',
+    email: '',
+    phoneNumber: '',
+    cacNumber: ''
+  });
+
+  // <-- removed the unused setter (setCorporateTaxpayers) to avoid ts(6133)
+  const [corporateTaxpayers] = useState([
+    {
+      id: 'C-7789123',
+      tinNumber: '2098765432',
+      companyName: 'NEXUS TECHNOLOGY SOLUTIONS LIMITED',
+      email: 'info@nexustech.ng',
+      phoneNumber: '08033445566',
+      registrationNumber: 'RC-1234567',
+      businessType: 'Information Technology'
+    },
+    {
+      id: 'C-8890234',
+      tinNumber: '2109876543',
+      companyName: 'LAGOS MANUFACTURING COMPANY LTD',
+      email: 'contact@lagosmanufacturing.com',
+      phoneNumber: '08044556677',
+      registrationNumber: 'RC-2345678',
+      businessType: 'Manufacturing'
+    }
+  ]);
+
+  const [showResults, setShowResults] = useState(false);
+
+  const handleFilterChange = (field: string, value: string) => {
+    setFilters(prev => ({ ...prev, [field]: value }));
+  };
+
+  const handleAdvancedSearch = () => {
+    setShowResults(true);
+  };
+
+  const handleFilter = () => {
+    // Filter logic would go here (if you plan to mutate corporateTaxpayers you would use setCorporateTaxpayers)
+    setShowResults(true);
+  };
+
+  const handleReset = () => {
+    setFilters({
       companyId: '',
       tinNumber: '',
       companyName: '',
@@ -1787,325 +1799,374 @@ const ETaxAdminDashboard = () => {
       phoneNumber: '',
       cacNumber: ''
     });
-    const [corporateTaxpayers, setCorporateTaxpayers] = useState([
-      {
-        id: 'C-7789123',
-        tinNumber: '2098765432',
-        companyName: 'NEXUS TECHNOLOGY SOLUTIONS LIMITED',
-        email: 'info@nexustech.ng',
-        phoneNumber: '08033445566',
-        registrationNumber: 'RC-1234567',
-        businessType: 'Information Technology'
-      },
-      {
-        id: 'C-8890234',
-        tinNumber: '2109876543',
-        companyName: 'LAGOS MANUFACTURING COMPANY LTD',
-        email: 'contact@lagosmanufacturing.com',
-        phoneNumber: '08044556677',
-        registrationNumber: 'RC-2345678',
-        businessType: 'Manufacturing'
-      }
-    ]);
-    const [showResults, setShowResults] = useState(false);
+    setSearchValue('');
+    setShowResults(false);
+  };
 
-    const handleFilterChange = (field: string, value: string) => {
-      setFilters(prev => ({ ...prev, [field]: value }));
-    };
+  const handleTaxIdClick = (taxpayerId: string) => {
+    setSelectedTaxpayerId(taxpayerId);
+    setShowProfileDetail(true);
+  };
 
-    const handleAdvancedSearch = () => {
-      setShowResults(true);
-    };
+  const handleBackFromProfile = () => {
+    setShowProfileDetail(false);
+    setSelectedTaxpayerId('');
+  };
 
-    const handleFilter = () => {
-      // Filter logic would go here
-      setShowResults(true);
-    };
+  const handleAddCompany = () => {
+    // setModalType('add-company'); setShowModal(true);
+    // ensure setModalType and setShowModal are available in your scope
+  };
 
-    const handleReset = () => {
-      setFilters({
-        companyId: '',
-        tinNumber: '',
-        companyName: '',
-        registrationNumber: '',
-        businessType: '',
-        email: '',
-        phoneNumber: '',
-        cacNumber: ''
-      });
-      setSearchValue('');
-      setShowResults(false);
-    };
-
-    const handleTaxIdClick = (taxpayerId: string) => {
-      setSelectedTaxpayerId(taxpayerId);
-      setShowProfileDetail(true);
-    };
-
-    const handleBackFromProfile = () => {
-      setShowProfileDetail(false);
-      setSelectedTaxpayerId('');
-    };
-
-    const handleAddCompany = () => {
-      setModalType('add-company');
-      setShowModal(true);
-    };
-
-    // If showing profile detail, render that component
-    if (showProfileDetail) {
-      return (
-        <CorporateTaxPayerProfileDetailContent 
-          taxpayerId={selectedTaxpayerId} 
-          onBack={handleBackFromProfile} 
-        />
-      );
-    }
-
+  // If showing profile detail, render that component
+  if (showProfileDetail) {
     return (
-      <div className="p-8">
-        {/* Header */}
-        <div className="flex items-center justify-between mb-8">
-          <h1 className="text-3xl font-bold" style={{ color: '#102e4a' }}>Corporate Tax Payers</h1>
-          <div className="w-10 h-10 rounded-full flex items-center justify-center" style={{ backgroundColor: '#f8f9fa' }}>
-            <Building2 style={{ color: '#102e4a' }} size={20} />
+      <CorporateTaxPayerProfileDetailContent 
+        taxpayerId={selectedTaxpayerId} 
+        onBack={handleBackFromProfile} 
+      />
+    );
+  }
+
+  return (
+    <div className="p-8">
+      {/* Header */}
+      <div className="flex items-center justify-between mb-8">
+        <h1 className="text-3xl font-bold" style={{ color: '#102e4a' }}>Corporate Tax Payers</h1>
+        <div className="w-10 h-10 rounded-full flex items-center justify-center" style={{ backgroundColor: '#f8f9fa' }}>
+          <Building2 style={{ color: '#102e4a' }} size={20} />
+        </div>
+      </div>
+
+      {/* Advanced Search Section */}
+      <div className="bg-white rounded-lg shadow-lg p-6 mb-6">
+        <div className="flex items-center mb-4">
+          <div className="w-8 h-8 rounded flex items-center justify-center mr-3" style={{ backgroundColor: '#102e4a' }}>
+            <Building2 style={{ color: 'white' }} size={16} />
+          </div>
+          <div>
+            <h2 className="text-xl font-semibold" style={{ color: '#102e4a' }}>Corporate Tax Payers</h2>
+            <p className="text-sm" style={{ color: '#6c757d' }}>Advanced Search Type</p>
           </div>
         </div>
 
-        {/* Advanced Search Section */}
-        <div className="bg-white rounded-lg shadow-lg p-6 mb-6">
-          <div className="flex items-center mb-4">
-            <div className="w-8 h-8 rounded flex items-center justify-center mr-3" style={{ backgroundColor: '#102e4a' }}>
-              <Building2 style={{ color: 'white' }} size={16} />
-            </div>
-            <div>
-              <h2 className="text-xl font-semibold" style={{ color: '#102e4a' }}>Corporate Tax Payers</h2>
-              <p className="text-sm" style={{ color: '#6c757d' }}>Advanced Search Type</p>
-            </div>
-          </div>
-
-          <div className="flex gap-4 items-end">
-            <div className="flex-1">
-              <select 
-                value={searchType} 
-                onChange={(e) => setSearchType(e.target.value)}
-                className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                style={{ color: '#102e4a' }}
-              >
-                <option>Company ID</option>
-                <option>TIN Number</option>
-                <option>Company Name</option>
-                <option>Registration Number</option>
-                <option>Email</option>
-              </select>
-            </div>
-            <div className="flex-1">
-              <input
-                type="text"
-                placeholder="Company ID"
-                value={searchValue}
-                onChange={(e) => setSearchValue(e.target.value)}
-                className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                style={{ color: '#102e4a' }}
-              />
-            </div>
-            <button 
-              onClick={handleAdvancedSearch}
-              className="px-6 py-3 text-white rounded-lg hover:shadow-lg transition-all font-medium"
-              style={{ backgroundColor: '#102e4a' }}
-              onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#a682ff'}
-              onMouseLeave={(e) => e.currentTarget.style.backgroundColor = '#102e4a'}
+        <div className="flex gap-4 items-end">
+          <div className="flex-1">
+            <select 
+              value={searchType} 
+              onChange={(e) => setSearchType(e.target.value)}
+              className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+              style={{ color: '#102e4a' }}
             >
-              ADVANCED SEARCH
-            </button>
-            <button 
-              onClick={handleAddCompany}
-              className="w-12 h-12 text-white rounded-lg hover:shadow-lg transition-all flex items-center justify-center"
-              style={{ backgroundColor: '#102e4a' }}
-              onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#a682ff'}
-              onMouseLeave={(e) => e.currentTarget.style.backgroundColor = '#102e4a'}
-              title="Add New Company"
-            >
-              +
-            </button>
+              <option>Company ID</option>
+              <option>TIN Number</option>
+              <option>Company Name</option>
+              <option>Registration Number</option>
+              <option>Email</option>
+            </select>
           </div>
-        </div>
-
-        {/* Search Results Header */}
-        <div className="mb-4">
-          <h3 className="text-lg font-semibold" style={{ color: '#102e4a' }}>Search Results (CBSRCM)</h3>
-        </div>
-
-        {/* Search Existing Companies */}
-        <div className="bg-white rounded-lg shadow-lg p-6 mb-6">
-          <h3 className="text-lg font-semibold mb-4" style={{ color: '#102e4a' }}>Search Existing Companies</h3>
-          
-          <div className="mb-4">
-            <span className="text-sm font-medium" style={{ color: '#6c757d' }}>Filters:</span>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+          <div className="flex-1">
             <input
               type="text"
               placeholder="Company ID"
-              value={filters.companyId}
-              onChange={(e) => handleFilterChange('companyId', e.target.value)}
-              className="p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-              style={{ color: '#102e4a' }}
-            />
-            <input
-              type="text"
-              placeholder="TIN Number"
-              value={filters.tinNumber}
-              onChange={(e) => handleFilterChange('tinNumber', e.target.value)}
-              className="p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-              style={{ color: '#102e4a' }}
-            />
-            <input
-              type="text"
-              placeholder="Company Name"
-              value={filters.companyName}
-              onChange={(e) => handleFilterChange('companyName', e.target.value)}
-              className="p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-              style={{ color: '#102e4a' }}
-            />
-            <input
-              type="text"
-              placeholder="Registration Number"
-              value={filters.registrationNumber}
-              onChange={(e) => handleFilterChange('registrationNumber', e.target.value)}
-              className="p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-              style={{ color: '#102e4a' }}
-            />
-            <input
-              type="text"
-              placeholder="Business Type"
-              value={filters.businessType}
-              onChange={(e) => handleFilterChange('businessType', e.target.value)}
-              className="p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-              style={{ color: '#102e4a' }}
-            />
-            <input
-              type="email"
-              placeholder="Email"
-              value={filters.email}
-              onChange={(e) => handleFilterChange('email', e.target.value)}
-              className="p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-              style={{ color: '#102e4a' }}
-            />
-            <input
-              type="text"
-              placeholder="Phone Number"
-              value={filters.phoneNumber}
-              onChange={(e) => handleFilterChange('phoneNumber', e.target.value)}
-              className="p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-              style={{ color: '#102e4a' }}
-            />
-            <input
-              type="text"
-              placeholder="CAC Number"
-              value={filters.cacNumber}
-              onChange={(e) => handleFilterChange('cacNumber', e.target.value)}
-              className="p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+              value={searchValue}
+              onChange={(e) => setSearchValue(e.target.value)}
+              className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
               style={{ color: '#102e4a' }}
             />
           </div>
-
-          <div className="flex justify-end gap-4">
-            <button 
-              onClick={handleReset}
-              className="px-6 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition-all font-medium"
-            >
-              RESET
-            </button>
-            <button 
-              onClick={handleFilter}
-              className="px-6 py-2 text-white rounded-lg hover:shadow-lg transition-all font-medium"
-              style={{ backgroundColor: '#102e4a' }}
-              onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#a682ff'}
-              onMouseLeave={(e) => e.currentTarget.style.backgroundColor = '#102e4a'}
-            >
-              FILTER
-            </button>
-          </div>
-        </div>
-
-        {/* Results Table */}
-        {showResults ? (
-          <div className="bg-white rounded-lg shadow-lg overflow-hidden">
-            <div className="overflow-x-auto">
-              <table className="w-full">
-                <thead style={{ backgroundColor: '#f8f9fa' }}>
-                  <tr>
-                    <th className="px-6 py-4 text-left text-sm font-semibold" style={{ color: '#102e4a' }}>Company ID</th>
-                    <th className="px-6 py-4 text-left text-sm font-semibold" style={{ color: '#102e4a' }}>TIN Number</th>
-                    <th className="px-6 py-4 text-left text-sm font-semibold" style={{ color: '#102e4a' }}>Company Name</th>
-                    <th className="px-6 py-4 text-left text-sm font-semibold" style={{ color: '#102e4a' }}>Email</th>
-                    <th className="px-6 py-4 text-left text-sm font-semibold" style={{ color: '#102e4a' }}>Phone Number</th>
-                    <th className="px-6 py-4 text-left text-sm font-semibold" style={{ color: '#102e4a' }}>Registration No</th>
-                    <th className="px-6 py-4 text-left text-sm font-semibold" style={{ color: '#102e4a' }}>Business Type</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {(showResults ? corporateTaxpayers : []).map((company, index) => (
-                    <tr key={company.id} className="border-t border-gray-200 hover:bg-gray-50">
-                      <td className="px-6 py-4">
-                        <span 
-                          className="text-blue-600 hover:underline cursor-pointer"
-                          onClick={() => handleTaxIdClick(company.id)}
-                        >
-                          {company.id}
-                        </span>
-                      </td>
-                      <td className="px-6 py-4" style={{ color: '#102e4a' }}>{company.tinNumber}</td>
-                      <td className="px-6 py-4" style={{ color: '#102e4a' }}>{company.companyName}</td>
-                      <td className="px-6 py-4" style={{ color: '#6c757d' }}>{company.email}</td>
-                      <td className="px-6 py-4" style={{ color: '#6c757d' }}>{company.phoneNumber}</td>
-                      <td className="px-6 py-4" style={{ color: '#6c757d' }}>{company.registrationNumber}</td>
-                      <td className="px-6 py-4" style={{ color: '#6c757d' }}>{company.businessType}</td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-
-            {/* Pagination */}
-            <div className="flex items-center justify-between px-6 py-4 border-t border-gray-200">
-              <div className="text-sm" style={{ color: '#6c757d' }}>
-                Showing 1 to {corporateTaxpayers.length} of {corporateTaxpayers.length} entries
-              </div>
-              <div className="flex items-center space-x-2">
-                <button 
-                  className="w-8 h-8 rounded-full text-white flex items-center justify-center text-sm font-medium"
-                  style={{ backgroundColor: '#102e4a' }}
-                >
-                  1
-                </button>
-              </div>
-            </div>
-          </div>
-        ) : (
-          <div className="bg-white rounded-lg shadow-lg p-8 text-center">
-            <p style={{ color: '#6c757d' }}>There are currently no entries to display at the moment.</p>
-            <div className="mt-4 text-sm" style={{ color: '#6c757d' }}>
-              Showing 1 to 0 of 0 entries
-            </div>
-          </div>
-        )}
-
-        {/* Footer */}
-        <div className="mt-8 text-center">
-          <p className="text-sm" style={{ color: '#6c757d' }}>© 2025 e-Tax. All Rights Reserved.</p>
+          <button 
+            onClick={handleAdvancedSearch}
+            className="px-6 py-3 text-white rounded-lg hover:shadow-lg transition-all font-medium"
+            style={{ backgroundColor: '#102e4a' }}
+            onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = '#a682ff')}
+            onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = '#102e4a')}
+          >
+            ADVANCED SEARCH
+          </button>
+          <button 
+            onClick={handleAddCompany}
+            className="w-12 h-12 text-white rounded-lg hover:shadow-lg transition-all flex items-center justify-center"
+            style={{ backgroundColor: '#102e4a' }}
+            onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = '#a682ff')}
+            onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = '#102e4a')}
+            title="Add New Company"
+          >
+            +
+          </button>
         </div>
       </div>
-    );
+
+      {/* Search Results Header */}
+      <div className="mb-4">
+        <h3 className="text-lg font-semibold" style={{ color: '#102e4a' }}>Search Results (CBSRCM)</h3>
+      </div>
+
+      {/* Search Existing Companies */}
+      <div className="bg-white rounded-lg shadow-lg p-6 mb-6">
+        <h3 className="text-lg font-semibold mb-4" style={{ color: '#102e4a' }}>Search Existing Companies</h3>
+        
+        <div className="mb-4">
+          <span className="text-sm font-medium" style={{ color: '#6c757d' }}>Filters:</span>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+          <input
+            type="text"
+            placeholder="Company ID"
+            value={filters.companyId}
+            onChange={(e) => handleFilterChange('companyId', e.target.value)}
+            className="p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+            style={{ color: '#102e4a' }}
+          />
+          <input
+            type="text"
+            placeholder="TIN Number"
+            value={filters.tinNumber}
+            onChange={(e) => handleFilterChange('tinNumber', e.target.value)}
+            className="p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+            style={{ color: '#102e4a' }}
+          />
+          <input
+            type="text"
+            placeholder="Company Name"
+            value={filters.companyName}
+            onChange={(e) => handleFilterChange('companyName', e.target.value)}
+            className="p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+            style={{ color: '#102e4a' }}
+          />
+          <input
+            type="text"
+            placeholder="Registration Number"
+            value={filters.registrationNumber}
+            onChange={(e) => handleFilterChange('registrationNumber', e.target.value)}
+            className="p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+            style={{ color: '#102e4a' }}
+          />
+          <input
+            type="text"
+            placeholder="Business Type"
+            value={filters.businessType}
+            onChange={(e) => handleFilterChange('businessType', e.target.value)}
+            className="p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+            style={{ color: '#102e4a' }}
+          />
+          <input
+            type="email"
+            placeholder="Email"
+            value={filters.email}
+            onChange={(e) => handleFilterChange('email', e.target.value)}
+            className="p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+            style={{ color: '#102e4a' }}
+          />
+          <input
+            type="text"
+            placeholder="Phone Number"
+            value={filters.phoneNumber}
+            onChange={(e) => handleFilterChange('phoneNumber', e.target.value)}
+            className="p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+            style={{ color: '#102e4a' }}
+          />
+          <input
+            type="text"
+            placeholder="CAC Number"
+            value={filters.cacNumber}
+            onChange={(e) => handleFilterChange('cacNumber', e.target.value)}
+            className="p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+            style={{ color: '#102e4a' }}
+          />
+        </div>
+
+        <div className="flex justify-end gap-4">
+          <button 
+            onClick={handleReset}
+            className="px-6 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition-all font-medium"
+          >
+            RESET
+          </button>
+          <button 
+            onClick={handleFilter}
+            className="px-6 py-2 text-white rounded-lg hover:shadow-lg transition-all font-medium"
+            style={{ backgroundColor: '#102e4a' }}
+            onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = '#a682ff')}
+            onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = '#102e4a')}
+          >
+            FILTER
+          </button>
+        </div>
+      </div>
+
+      {/* Results Table */}
+      {showResults ? (
+        <div className="bg-white rounded-lg shadow-lg overflow-hidden">
+          <div className="overflow-x-auto">
+            <table className="w-full">
+              <thead style={{ backgroundColor: '#f8f9fa' }}>
+                <tr>
+                  <th className="px-6 py-4 text-left text-sm font-semibold" style={{ color: '#102e4a' }}>Company ID</th>
+                  <th className="px-6 py-4 text-left text-sm font-semibold" style={{ color: '#102e4a' }}>TIN Number</th>
+                  <th className="px-6 py-4 text-left text-sm font-semibold" style={{ color: '#102e4a' }}>Company Name</th>
+                  <th className="px-6 py-4 text-left text-sm font-semibold" style={{ color: '#102e4a' }}>Email</th>
+                  <th className="px-6 py-4 text-left text-sm font-semibold" style={{ color: '#102e4a' }}>Phone Number</th>
+                  <th className="px-6 py-4 text-left text-sm font-semibold" style={{ color: '#102e4a' }}>Registration No</th>
+                  <th className="px-6 py-4 text-left text-sm font-semibold" style={{ color: '#102e4a' }}>Business Type</th>
+                </tr>
+              </thead>
+              <tbody>
+                {(showResults ? corporateTaxpayers : []).map((company) => (
+                  <tr key={company.id} className="border-t border-gray-200 hover:bg-gray-50">
+                    <td className="px-6 py-4">
+                      <span 
+                        className="text-blue-600 hover:underline cursor-pointer"
+                        onClick={() => handleTaxIdClick(company.id)}
+                      >
+                        {company.id}
+                      </span>
+                    </td>
+                    <td className="px-6 py-4" style={{ color: '#102e4a' }}>{company.tinNumber}</td>
+                    <td className="px-6 py-4" style={{ color: '#102e4a' }}>{company.companyName}</td>
+                    <td className="px-6 py-4" style={{ color: '#6c757d' }}>{company.email}</td>
+                    <td className="px-6 py-4" style={{ color: '#6c757d' }}>{company.phoneNumber}</td>
+                    <td className="px-6 py-4" style={{ color: '#6c757d' }}>{company.registrationNumber}</td>
+                    <td className="px-6 py-4" style={{ color: '#6c757d' }}>{company.businessType}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+
+          {/* Pagination */}
+          <div className="flex items-center justify-between px-6 py-4 border-t border-gray-200">
+            <div className="text-sm" style={{ color: '#6c757d' }}>
+              Showing 1 to {corporateTaxpayers.length} of {corporateTaxpayers.length} entries
+            </div>
+            <div className="flex items-center space-x-2">
+              <button 
+                className="w-8 h-8 rounded-full text-white flex items-center justify-center text-sm font-medium"
+                style={{ backgroundColor: '#102e4a' }}
+              >
+                1
+              </button>
+            </div>
+          </div>
+        </div>
+      ) : (
+        <div className="bg-white rounded-lg shadow-lg p-8 text-center">
+          <p style={{ color: '#6c757d' }}>There are currently no entries to display at the moment.</p>
+          <div className="mt-4 text-sm" style={{ color: '#6c757d' }}>
+            Showing 1 to 0 of 0 entries
+          </div>
+        </div>
+      )}
+
+      {/* Footer */}
+      <div className="mt-8 text-center">
+        <p className="text-sm" style={{ color: '#6c757d' }}>© 2025 e-Tax. All Rights Reserved.</p>
+      </div>
+    </div>
+  );
+};
+
+
+
+
+  type Taxpayer = {
+  id: string;
+  tinNumber?: string;
+  fullName: string;
+  email?: string;
+  phoneNumber?: string;
+  idNumber?: string;
+  idType?: string;
   };
-   const IndividualTaxPayersContent = () => {
-    const [searchType, setSearchType] = useState('Taxpayer ID');
-    const [searchValue, setSearchValue] = useState('');
-    const [showProfileDetail, setShowProfileDetail] = useState(false);
-    const [selectedTaxpayerId, setSelectedTaxpayerId] = useState('');
-    const [filters, setFilters] = useState({
+
+// ORIGINAL / UNFILTERED DATA (used as source-of-truth for filtering & reset)
+const initialTaxpayersData: Taxpayer[] = [
+  {
+    id: 'N-4401681',
+    tinNumber: '1061131973',
+    fullName: 'Mr. Moshood Olalekan Bello',
+    email: 'belloalalekan@gmail.com',
+    phoneNumber: '08023129633',
+    idNumber: '222*******9',
+    idType: 'BVN'
+  }
+  // add more seed data here if needed
+];
+
+const IndividualTaxPayersContent: React.FC = () => {
+  const [searchType, setSearchType] = useState('Taxpayer ID');
+  const [searchValue, setSearchValue] = useState('');
+  const [showProfileDetail, setShowProfileDetail] = useState(false);
+  const [selectedTaxpayerId, setSelectedTaxpayerId] = useState('');
+  const [filters, setFilters] = useState({
+    taxId: '',
+    tinNumber: '',
+    firstName: '',
+    middleName: '',
+    lastName: '',
+    email: '',
+    phoneNumber: '',
+    idNumber: ''
+  });
+
+  // This state will hold the currently displayed (possibly filtered) list
+  const [taxpayers, setTaxpayers] = useState<Taxpayer[]>(initialTaxpayersData);
+  const [showResults, setShowResults] = useState(false);
+
+  const handleFilterChange = (field: string, value: string) => {
+    setFilters(prev => ({ ...prev, [field]: value }));
+  };
+
+  const handleAdvancedSearch = () => {
+    handleFilter(); // reuse the same filter logic
+  };
+
+  const handleFilter = () => {
+    const search = searchValue.trim().toLowerCase();
+
+    const filtered = initialTaxpayersData.filter(tp => {
+      // 1) If searchValue exists, it must match searchType
+      if (search) {
+        let matchesSearchType = false;
+        switch (searchType) {
+          case 'Taxpayer ID':
+            matchesSearchType = tp.id.toLowerCase().includes(search);
+            break;
+          case 'TIN Number':
+            matchesSearchType = (tp.tinNumber ?? '').toLowerCase().includes(search);
+            break;
+          case 'Full Name':
+            matchesSearchType = tp.fullName.toLowerCase().includes(search);
+            break;
+          case 'Email':
+            matchesSearchType = (tp.email ?? '').toLowerCase().includes(search);
+            break;
+          default:
+            matchesSearchType = false;
+        }
+        if (!matchesSearchType) return false;
+      }
+
+      // 2) Apply each non-empty filter field (AND behavior)
+      if (filters.taxId && !tp.id.toLowerCase().includes(filters.taxId.trim().toLowerCase())) return false;
+      if (filters.tinNumber && !((tp.tinNumber ?? '').toLowerCase().includes(filters.tinNumber.trim().toLowerCase()))) return false;
+      if (filters.firstName && !tp.fullName.toLowerCase().includes(filters.firstName.trim().toLowerCase())) return false;
+      if (filters.middleName && !tp.fullName.toLowerCase().includes(filters.middleName.trim().toLowerCase())) return false;
+      if (filters.lastName && !tp.fullName.toLowerCase().includes(filters.lastName.trim().toLowerCase())) return false;
+      if (filters.email && !((tp.email ?? '').toLowerCase().includes(filters.email.trim().toLowerCase()))) return false;
+      if (filters.phoneNumber && !((tp.phoneNumber ?? '').toLowerCase().includes(filters.phoneNumber.trim().toLowerCase()))) return false;
+      if (filters.idNumber && !((tp.idNumber ?? '').toLowerCase().includes(filters.idNumber.trim().toLowerCase()))) return false;
+
+      return true;
+    });
+
+    setTaxpayers(filtered); // now setTaxpayers is used (no ts(6133) warning)
+    setShowResults(true);
+  };
+
+  const handleReset = () => {
+    setFilters({
       taxId: '',
       tinNumber: '',
       firstName: '',
@@ -2115,302 +2176,185 @@ const ETaxAdminDashboard = () => {
       phoneNumber: '',
       idNumber: ''
     });
-    const [taxpayers, setTaxpayers] = useState([
-      {
-        id: 'N-4401681',
-        tinNumber: '1061131973',
-        fullName: 'Mr. Moshood Olalekan Bello',
-        email: 'belloalalekan@gmail.com',
-        phoneNumber: '08023129633',
-        idNumber: '222*******9',
-        idType: 'BVN'
-      }
-    ]);
-    const [showResults, setShowResults] = useState(false);
+    setSearchValue('');
+    setTaxpayers(initialTaxpayersData); // restore original list
+    setShowResults(false);
+  };
 
-    const handleFilterChange = (field: string, value: string) => {
-      setFilters(prev => ({ ...prev, [field]: value }));
-    };
+  const handleTaxIdClick = (taxpayerId: string) => {
+    setSelectedTaxpayerId(taxpayerId);
+    setShowProfileDetail(true);
+  };
 
-    const handleAdvancedSearch = () => {
-      setShowResults(true);
-    };
+  const handleBackFromProfile = () => {
+    setShowProfileDetail(false);
+    setSelectedTaxpayerId('');
+  };
 
-    const handleFilter = () => {
-      // Filter logic would go here
-      setShowResults(true);
-    };
-
-    const handleReset = () => {
-      setFilters({
-        taxId: '',
-        tinNumber: '',
-        firstName: '',
-        middleName: '',
-        lastName: '',
-        email: '',
-        phoneNumber: '',
-        idNumber: ''
-      });
-      setSearchValue('');
-      setShowResults(false);
-    };
-
-    const handleTaxIdClick = (taxpayerId: string) => {
-      setSelectedTaxpayerId(taxpayerId);
-      setShowProfileDetail(true);
-    };
-
-    const handleBackFromProfile = () => {
-      setShowProfileDetail(false);
-      setSelectedTaxpayerId('');
-    };
-
-    // If showing profile detail, render that component
-    if (showProfileDetail) {
-      return (
-        <TaxPayerProfileDetailContent 
-          taxpayerId={selectedTaxpayerId} 
-          onBack={handleBackFromProfile} 
-        />
-      );
-    }
-
+  if (showProfileDetail) {
     return (
-      <div className="p-8">
-        {/* Header */}
-        <div className="flex items-center justify-between mb-8">
-          <h1 className="text-3xl font-bold" style={{ color: '#102e4a' }}>Individual Tax Payers</h1>
-          <div className="w-10 h-10 rounded-full flex items-center justify-center" style={{ backgroundColor: '#f8f9fa' }}>
-            <Users style={{ color: '#102e4a' }} size={20} />
-          </div>
-        </div>
+      // Ensure TaxPayerProfileDetailContent is imported in your file
+      <TaxPayerProfileDetailContent taxpayerId={selectedTaxpayerId} onBack={handleBackFromProfile} />
+    );
+  }
 
-        {/* Advanced Search Section */}
-        <div className="bg-white rounded-lg shadow-lg p-6 mb-6">
-          <div className="flex items-center mb-4">
-            <div className="w-8 h-8 rounded flex items-center justify-center mr-3" style={{ backgroundColor: '#102e4a' }}>
-              <Users style={{ color: 'white' }} size={16} />
-            </div>
-            <div>
-              <h2 className="text-xl font-semibold" style={{ color: '#102e4a' }}>Individual Tax Payers</h2>
-              <p className="text-sm" style={{ color: '#6c757d' }}>Advanced Search Type</p>
-            </div>
-          </div>
-
-          <div className="flex gap-4 items-end">
-            <div className="flex-1">
-              <select 
-                value={searchType} 
-                onChange={(e) => setSearchType(e.target.value)}
-                className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                style={{ color: '#102e4a' }}
-              >
-                <option>Taxpayer ID</option>
-                <option>TIN Number</option>
-                <option>Full Name</option>
-                <option>Email</option>
-              </select>
-            </div>
-            <div className="flex-1">
-              <input
-                type="text"
-                placeholder="Taxpayer ID"
-                value={searchValue}
-                onChange={(e) => setSearchValue(e.target.value)}
-                className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                style={{ color: '#102e4a' }}
-              />
-            </div>
-            <button 
-              onClick={handleAdvancedSearch}
-              className="px-6 py-3 text-white rounded-lg hover:shadow-lg transition-all font-medium"
-              style={{ backgroundColor: '#102e4a' }}
-              onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#a682ff'}
-              onMouseLeave={(e) => e.currentTarget.style.backgroundColor = '#102e4a'}
-            >
-              ADVANCED SEARCH
-            </button>
-            <button 
-              className="w-12 h-12 text-white rounded-lg hover:shadow-lg transition-all flex items-center justify-center"
-              style={{ backgroundColor: '#102e4a' }}
-              onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#a682ff'}
-              onMouseLeave={(e) => e.currentTarget.style.backgroundColor = '#102e4a'}
-            >
-              +
-            </button>
-          </div>
-        </div>
-
-        {/* Search Results Header */}
-        <div className="mb-4">
-          <h3 className="text-lg font-semibold" style={{ color: '#102e4a' }}>Search Results (EBSRCM)</h3>
-        </div>
-
-        {/* Search Existing Users */}
-        <div className="bg-white rounded-lg shadow-lg p-6 mb-6">
-          <h3 className="text-lg font-semibold mb-4" style={{ color: '#102e4a' }}>Search Existing users</h3>
-          
-          <div className="mb-4">
-            <span className="text-sm font-medium" style={{ color: '#6c757d' }}>Filters:</span>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
-            <input
-              type="text"
-              placeholder="Tax ID"
-              value={filters.taxId}
-              onChange={(e) => handleFilterChange('taxId', e.target.value)}
-              className="p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-              style={{ color: '#102e4a' }}
-            />
-            <input
-              type="text"
-              placeholder="TIN Number"
-              value={filters.tinNumber}
-              onChange={(e) => handleFilterChange('tinNumber', e.target.value)}
-              className="p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-              style={{ color: '#102e4a' }}
-            />
-            <input
-              type="text"
-              placeholder="First Name"
-              value={filters.firstName}
-              onChange={(e) => handleFilterChange('firstName', e.target.value)}
-              className="p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-              style={{ color: '#102e4a' }}
-            />
-            <input
-              type="text"
-              placeholder="Middle Name"
-              value={filters.middleName}
-              onChange={(e) => handleFilterChange('middleName', e.target.value)}
-              className="p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-              style={{ color: '#102e4a' }}
-            />
-            <input
-              type="text"
-              placeholder="Last Name"
-              value={filters.lastName}
-              onChange={(e) => handleFilterChange('lastName', e.target.value)}
-              className="p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-              style={{ color: '#102e4a' }}
-            />
-            <input
-              type="email"
-              placeholder="Email"
-              value={filters.email}
-              onChange={(e) => handleFilterChange('email', e.target.value)}
-              className="p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-              style={{ color: '#102e4a' }}
-            />
-            <input
-              type="text"
-              placeholder="Phone Number"
-              value={filters.phoneNumber}
-              onChange={(e) => handleFilterChange('phoneNumber', e.target.value)}
-              className="p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-              style={{ color: '#102e4a' }}
-            />
-            <input
-              type="text"
-              placeholder="ID Number"
-              value={filters.idNumber}
-              onChange={(e) => handleFilterChange('idNumber', e.target.value)}
-              className="p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-              style={{ color: '#102e4a' }}
-            />
-          </div>
-
-          <div className="flex justify-end gap-4">
-            <button 
-              onClick={handleReset}
-              className="px-6 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition-all font-medium"
-            >
-              RESET
-            </button>
-            <button 
-              onClick={handleFilter}
-              className="px-6 py-2 text-white rounded-lg hover:shadow-lg transition-all font-medium"
-              style={{ backgroundColor: '#102e4a' }}
-              onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#a682ff'}
-              onMouseLeave={(e) => e.currentTarget.style.backgroundColor = '#102e4a'}
-            >
-              FILTER
-            </button>
-          </div>
-        </div>
-
-        {/* Results Table */}
-        {showResults ? (
-          <div className="bg-white rounded-lg shadow-lg overflow-hidden">
-            <div className="overflow-x-auto">
-              <table className="w-full">
-                <thead style={{ backgroundColor: '#f8f9fa' }}>
-                  <tr>
-                    <th className="px-6 py-4 text-left text-sm font-semibold" style={{ color: '#102e4a' }}>Tax Payer ID</th>
-                    <th className="px-6 py-4 text-left text-sm font-semibold" style={{ color: '#102e4a' }}>TIN Number</th>
-                    <th className="px-6 py-4 text-left text-sm font-semibold" style={{ color: '#102e4a' }}>Full Name</th>
-                    <th className="px-6 py-4 text-left text-sm font-semibold" style={{ color: '#102e4a' }}>Email</th>
-                    <th className="px-6 py-4 text-left text-sm font-semibold" style={{ color: '#102e4a' }}>Phone Number</th>
-                    <th className="px-6 py-4 text-left text-sm font-semibold" style={{ color: '#102e4a' }}>ID Number</th>
-                    <th className="px-6 py-4 text-left text-sm font-semibold" style={{ color: '#102e4a' }}>ID Type</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {taxpayers.map((taxpayer, index) => (
-                    <tr key={taxpayer.id} className="border-t border-gray-200 hover:bg-gray-50">
-                      <td className="px-6 py-4">
-                        <span 
-                          className="text-blue-600 hover:underline cursor-pointer"
-                          onClick={() => handleTaxIdClick(taxpayer.id)}
-                        >
-                          {taxpayer.id}
-                        </span>
-                      </td>
-                      <td className="px-6 py-4" style={{ color: '#102e4a' }}>{taxpayer.tinNumber}</td>
-                      <td className="px-6 py-4" style={{ color: '#102e4a' }}>{taxpayer.fullName}</td>
-                      <td className="px-6 py-4" style={{ color: '#6c757d' }}>{taxpayer.email}</td>
-                      <td className="px-6 py-4" style={{ color: '#6c757d' }}>{taxpayer.phoneNumber}</td>
-                      <td className="px-6 py-4" style={{ color: '#6c757d' }}>{taxpayer.idNumber}</td>
-                      <td className="px-6 py-4" style={{ color: '#6c757d' }}>{taxpayer.idType}</td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-
-            {/* Pagination */}
-            <div className="flex items-center justify-between px-6 py-4 border-t border-gray-200">
-              <div className="text-sm" style={{ color: '#6c757d' }}>
-                Showing 1 to {taxpayers.length} of {taxpayers.length} entries
-              </div>
-              <div className="flex items-center space-x-2">
-                <button 
-                  className="w-8 h-8 rounded-full text-white flex items-center justify-center text-sm font-medium"
-                  style={{ backgroundColor: '#102e4a' }}
-                >
-                  1
-                </button>
-              </div>
-            </div>
-          </div>
-        ) : (
-          <div className="bg-white rounded-lg shadow-lg p-8 text-center">
-            <p style={{ color: '#6c757d' }}>There are currently no entries to display at the moment.</p>
-            <div className="mt-4 text-sm" style={{ color: '#6c757d' }}>
-              Showing 1 to 0 of 0 entries
-            </div>
-          </div>
-        )}
-
-        {/* Footer */}
-        <div className="mt-8 text-center">
-          <p className="text-sm" style={{ color: '#6c757d' }}>© 2025 e-Tax. All Rights Reserved.</p>
+  return (
+    <div className="p-8">
+      {/* Header */}
+      <div className="flex items-center justify-between mb-8">
+        <h1 className="text-3xl font-bold" style={{ color: '#102e4a' }}>Individual Tax Payers</h1>
+        <div className="w-10 h-10 rounded-full flex items-center justify-center" style={{ backgroundColor: '#f8f9fa' }}>
+          {/* <Users style={{ color: '#102e4a' }} size={20} /> */}
         </div>
       </div>
-    );
+
+      {/* Advanced Search Section */}
+      <div className="bg-white rounded-lg shadow-lg p-6 mb-6">
+        <div className="flex items-center mb-4">
+          <div className="w-8 h-8 rounded flex items-center justify-center mr-3" style={{ backgroundColor: '#102e4a' }}>
+            {/* <Users style={{ color: 'white' }} size={16} /> */}
+          </div>
+          <div>
+            <h2 className="text-xl font-semibold" style={{ color: '#102e4a' }}>Individual Tax Payers</h2>
+            <p className="text-sm" style={{ color: '#6c757d' }}>Advanced Search Type</p>
+          </div>
+        </div>
+
+        <div className="flex gap-4 items-end">
+          <div className="flex-1">
+            <select
+              value={searchType}
+              onChange={(e) => setSearchType(e.target.value)}
+              className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+              style={{ color: '#102e4a' }}
+            >
+              <option>Taxpayer ID</option>
+              <option>TIN Number</option>
+              <option>Full Name</option>
+              <option>Email</option>
+            </select>
+          </div>
+
+          <div className="flex-1">
+            <input
+              type="text"
+              placeholder="Taxpayer ID"
+              value={searchValue}
+              onChange={(e) => setSearchValue(e.target.value)}
+              className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+              style={{ color: '#102e4a' }}
+            />
+          </div>
+
+          <button
+            onClick={handleAdvancedSearch}
+            className="px-6 py-3 text-white rounded-lg hover:shadow-lg transition-all font-medium"
+            style={{ backgroundColor: '#102e4a' }}
+            onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = '#a682ff')}
+            onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = '#102e4a')}
+          >
+            ADVANCED SEARCH
+          </button>
+
+          <button
+            className="w-12 h-12 text-white rounded-lg hover:shadow-lg transition-all flex items-center justify-center"
+            style={{ backgroundColor: '#102e4a' }}
+            onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = '#a682ff')}
+            onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = '#102e4a')}
+          >
+            +
+          </button>
+        </div>
+      </div>
+
+      {/* Search Results Header */}
+      <div className="mb-4">
+        <h3 className="text-lg font-semibold" style={{ color: '#102e4a' }}>Search Results (EBSRCM)</h3>
+      </div>
+
+      {/* Filters card */}
+      <div className="bg-white rounded-lg shadow-lg p-6 mb-6">
+        <h3 className="text-lg font-semibold mb-4" style={{ color: '#102e4a' }}>Search Existing users</h3>
+
+        <div className="mb-4">
+          <span className="text-sm font-medium" style={{ color: '#6c757d' }}>Filters:</span>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+          <input type="text" placeholder="Tax ID" value={filters.taxId} onChange={(e) => handleFilterChange('taxId', e.target.value)} className="p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" style={{ color: '#102e4a' }} />
+          <input type="text" placeholder="TIN Number" value={filters.tinNumber} onChange={(e) => handleFilterChange('tinNumber', e.target.value)} className="p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" style={{ color: '#102e4a' }} />
+          <input type="text" placeholder="First Name" value={filters.firstName} onChange={(e) => handleFilterChange('firstName', e.target.value)} className="p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" style={{ color: '#102e4a' }} />
+          <input type="text" placeholder="Middle Name" value={filters.middleName} onChange={(e) => handleFilterChange('middleName', e.target.value)} className="p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" style={{ color: '#102e4a' }} />
+          <input type="text" placeholder="Last Name" value={filters.lastName} onChange={(e) => handleFilterChange('lastName', e.target.value)} className="p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" style={{ color: '#102e4a' }} />
+          <input type="email" placeholder="Email" value={filters.email} onChange={(e) => handleFilterChange('email', e.target.value)} className="p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" style={{ color: '#102e4a' }} />
+          <input type="text" placeholder="Phone Number" value={filters.phoneNumber} onChange={(e) => handleFilterChange('phoneNumber', e.target.value)} className="p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" style={{ color: '#102e4a' }} />
+          <input type="text" placeholder="ID Number" value={filters.idNumber} onChange={(e) => handleFilterChange('idNumber', e.target.value)} className="p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" style={{ color: '#102e4a' }} />
+        </div>
+
+        <div className="flex justify-end gap-4">
+          <button onClick={handleReset} className="px-6 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition-all font-medium">RESET</button>
+          <button onClick={handleFilter} className="px-6 py-2 text-white rounded-lg hover:shadow-lg transition-all font-medium" style={{ backgroundColor: '#102e4a' }} onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = '#a682ff')} onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = '#102e4a')}>FILTER</button>
+        </div>
+      </div>
+
+      {/* Results Table */}
+      {showResults ? (
+        <div className="bg-white rounded-lg shadow-lg overflow-hidden">
+          <div className="overflow-x-auto">
+            <table className="w-full">
+              <thead style={{ backgroundColor: '#f8f9fa' }}>
+                <tr>
+                  <th className="px-6 py-4 text-left text-sm font-semibold" style={{ color: '#102e4a' }}>Tax Payer ID</th>
+                  <th className="px-6 py-4 text-left text-sm font-semibold" style={{ color: '#102e4a' }}>TIN Number</th>
+                  <th className="px-6 py-4 text-left text-sm font-semibold" style={{ color: '#102e4a' }}>Full Name</th>
+                  <th className="px-6 py-4 text-left text-sm font-semibold" style={{ color: '#102e4a' }}>Email</th>
+                  <th className="px-6 py-4 text-left text-sm font-semibold" style={{ color: '#102e4a' }}>Phone Number</th>
+                  <th className="px-6 py-4 text-left text-sm font-semibold" style={{ color: '#102e4a' }}>ID Number</th>
+                  <th className="px-6 py-4 text-left text-sm font-semibold" style={{ color: '#102e4a' }}>ID Type</th>
+                </tr>
+              </thead>
+              <tbody>
+                {taxpayers.map((taxpayer) => (
+                  <tr key={taxpayer.id} className="border-t border-gray-200 hover:bg-gray-50">
+                    <td className="px-6 py-4">
+                      <span className="text-blue-600 hover:underline cursor-pointer" onClick={() => handleTaxIdClick(taxpayer.id)}>{taxpayer.id}</span>
+                    </td>
+                    <td className="px-6 py-4" style={{ color: '#102e4a' }}>{taxpayer.tinNumber}</td>
+                    <td className="px-6 py-4" style={{ color: '#102e4a' }}>{taxpayer.fullName}</td>
+                    <td className="px-6 py-4" style={{ color: '#6c757d' }}>{taxpayer.email}</td>
+                    <td className="px-6 py-4" style={{ color: '#6c757d' }}>{taxpayer.phoneNumber}</td>
+                    <td className="px-6 py-4" style={{ color: '#6c757d' }}>{taxpayer.idNumber}</td>
+                    <td className="px-6 py-4" style={{ color: '#6c757d' }}>{taxpayer.idType}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+
+          {/* Pagination */}
+          <div className="flex items-center justify-between px-6 py-4 border-t border-gray-200">
+            <div className="text-sm" style={{ color: '#6c757d' }}>Showing 1 to {taxpayers.length} of {taxpayers.length} entries</div>
+            <div className="flex items-center space-x-2">
+              <button className="w-8 h-8 rounded-full text-white flex items-center justify-center text-sm font-medium" style={{ backgroundColor: '#102e4a' }}>1</button>
+            </div>
+          </div>
+        </div>
+      ) : (
+        <div className="bg-white rounded-lg shadow-lg p-8 text-center">
+          <p style={{ color: '#6c757d' }}>There are currently no entries to display at the moment.</p>
+          <div className="mt-4 text-sm" style={{ color: '#6c757d' }}>Showing 1 to 0 of 0 entries</div>
+        </div>
+      )}
+
+      {/* Footer */}
+      <div className="mt-8 text-center">
+        <p className="text-sm" style={{ color: '#6c757d' }}>© 2025 e-Tax. All Rights Reserved.</p>
+      </div>
+    </div>
+  );
   };
+
+
 
   // Tax Payer Verification Content
   const TaxPayerVerificationContent = () => {
@@ -2595,190 +2539,197 @@ const ETaxAdminDashboard = () => {
       </div>
     );
   };
-  const BulkIndividualRegistrationContent = () => {
-    const [filters, setFilters] = useState({
+  
+const BulkIndividualRegistrationContent = () => {
+  const [filters, setFilters] = useState({
+    label: '',
+    reference: ''
+  });
+
+  const [registrationTasks, setRegistrationTasks] = useState<any[]>([]);
+
+  const handleFilterChange = (field: string, value: string) => {
+    setFilters(prev => ({ ...prev, [field]: value }));
+  };
+
+  const handleReset = () => {
+    setFilters({
       label: '',
       reference: ''
     });
-    const [registrationTasks, setRegistrationTasks] = useState<any[]>([]);
+    setRegistrationTasks([]);
 
-    const handleFilterChange = (field: string, value: string) => {
-      setFilters(prev => ({ ...prev, [field]: value }));
-    };
+    Notification({ message: 'Filters cleared' });
+  };
 
-    const handleReset = () => {
-      setFilters({
-        label: '',
-        reference: ''
-      });
-        setRegistrationTasks([]);
+  const handleDownloadTemplate = (templateType: string) => {
+    const csvContent = templateType === 'BVN'
+      ? 'First Name,Last Name,Email,Phone,BVN,Address\nJohn,Doe,john@email.com,08012345678,12345678901,Lagos'
+      : 'First Name,Last Name,Email,Phone,NIN,Address\nJane,Smith,jane@email.com,08087654321,12345678901,Abuja';
 
-      Notification({ message: 'Filters cleared' });
-    };
+    const blob = new Blob([csvContent], { type: 'text/csv' });
+    const url = window.URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `${templateType}_Registration_Template.csv`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    window.URL.revokeObjectURL(url);
 
-    const handleDownloadTemplate = (templateType: string) => {
-      // Create a sample CSV content
-      const csvContent = templateType === 'BVN' 
-        ? 'First Name,Last Name,Email,Phone,BVN,Address\nJohn,Doe,john@email.com,08012345678,12345678901,Lagos'
-        : 'First Name,Last Name,Email,Phone,NIN,Address\nJane,Smith,jane@email.com,08087654321,12345678901,Abuja';
-      
-      const blob = new Blob([csvContent], { type: 'text/csv' });
-      const url = window.URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = `${templateType}_Registration_Template.csv`;
-      document.body.appendChild(a);
-      a.click();
-      document.body.removeChild(a);
-      window.URL.revokeObjectURL(url);
-      
-       Notification({ message: `${templateType} template downloaded successfully` });
-    };
+    Notification({ message: `${templateType} template downloaded successfully` });
+  };
 
-    const handleUploadCSV = () => {
-      const input = document.createElement('input');
-      input.type = 'file';
-      input.accept = '.csv';
-      input.onchange = (e) => {
-        const file = (e.target as HTMLInputElement).files?.[0];
-        if (file) {
-
-          Notification({ message: `CSV file "${file.name}" uploaded successfully`});
-          // Here you would typically process the file
-        }
-      };
-      input.click();
-    };
-
-    const handleFilter = () => {
-      const hasFilters = Object.values(filters).some(value => value.trim() !== '');
-      
-      if (!hasFilters) {
-         Notification({ message: 'Please enter at least one filter criteria'});
-        return;
+  const handleUploadCSV = () => {
+    const input = document.createElement('input');
+    input.type = 'file';
+    input.accept = '.csv';
+    input.onchange = (e) => {
+      const file = (e.target as HTMLInputElement).files?.[0];
+      if (file) {
+        Notification({ message: `CSV file "${file.name}" uploaded successfully` });
+        // Here you would typically process the file
       }
-
-      // Simulate filtering results
-      Notification({message: 'Filtering registration tasks...'});
     };
+    input.click();
+  };
 
-    return (
-      <div className="p-8">
-        {/* Header */}
-        <div className="flex items-center justify-between mb-8">
-          <h1 className="text-3xl font-bold" style={{ color: '#102e4a' }}>Bulk Individual Registrations</h1>
-          <div className="w-10 h-10 rounded-full flex items-center justify-center" style={{ backgroundColor: '#f8f9fa' }}>
-            <Users style={{ color: '#102e4a' }} size={20} />
+  const handleFilter = () => {
+    const hasFilters = Object.values(filters).some(value => value.trim() !== '');
+
+    if (!hasFilters) {
+      Notification({ message: 'Please enter at least one filter criteria' });
+      return;
+    }
+
+    // Simulate filtering results
+    Notification({ message: 'Filtering registration tasks...' });
+  };
+
+  return (
+    <div className="p-8">
+      {/* Header */}
+      <div className="flex items-center justify-between mb-8">
+        <h1 className="text-3xl font-bold" style={{ color: '#102e4a' }}>Bulk Individual Registrations</h1>
+        <div className="w-10 h-10 rounded-full flex items-center justify-center" style={{ backgroundColor: '#f8f9fa' }}>
+          <Users style={{ color: '#102e4a' }} size={20} />
+        </div>
+      </div>
+
+      {/* Main Content Card */}
+      <div className="bg-white rounded-lg shadow-lg p-6 mb-6">
+        <div className="flex items-center mb-6">
+          <div className="w-16 h-16 rounded bg-green-500 flex items-center justify-center mr-4">
+            <Users style={{ color: 'white' }} size={32} />
+          </div>
+          <h2 className="text-xl font-semibold" style={{ color: '#102e4a' }}>
+            Bulk Individual Tasks Report
+          </h2>
+        </div>
+
+        {/* Template Download Buttons */}
+        <div className="flex flex-wrap gap-4 mb-6">
+          <button
+            onClick={() => handleDownloadTemplate('BVN')}
+            className="px-6 py-3 bg-orange-500 text-white rounded-lg hover:bg-orange-600 transition-all font-medium flex items-center space-x-2"
+          >
+            <span>BVN BULK REGISTRATION TEMPLATE</span>
+            <Download size={16} />
+          </button>
+          <button
+            onClick={() => handleDownloadTemplate('NIN')}
+            className="px-6 py-3 bg-orange-500 text-white rounded-lg hover:bg-orange-600 transition-all font-medium flex items-center space-x-2"
+          >
+            <span>NIN BULK REGISTRATION TEMPLATE</span>
+            <Download size={16} />
+          </button>
+          <button
+            onClick={handleUploadCSV}
+            className="px-6 py-3 bg-green-500 text-white rounded-lg hover:bg-green-600 transition-all font-medium flex items-center space-x-2"
+          >
+            <span>UPLOAD CSV</span>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M14,2H6A2,2 0 0,0 4,4V20A2,2 0 0,0 6,22H18A2,2 0 0,0 20,20V8L14,2M18,20H6V4H13V9H18V20Z" />
+            </svg>
+          </button>
+        </div>
+
+        {/* Note */}
+        <div className="mb-8 p-4 bg-blue-50 rounded-lg">
+          <p className="text-sm" style={{ color: '#102e4a' }}>
+            Kindly ensure to upload the updated template in CSV format
+          </p>
+        </div>
+      </div>
+
+      {/* Registrations Tasks Section */}
+      <div className="bg-white rounded-lg shadow-lg p-6">
+        <h3 className="text-xl font-semibold mb-6" style={{ color: '#102e4a' }}>Registrations Tasks</h3>
+
+        {/* Filters */}
+        <div className="mb-6">
+          <div className="mb-4">
+            <span className="text-sm font-medium" style={{ color: '#6c757d' }}>Filters:</span>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+            <input
+              type="text"
+              placeholder="Label"
+              value={filters.label}
+              onChange={(e) => handleFilterChange('label', e.target.value)}
+              className="p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+              style={{ color: '#102e4a' }}
+            />
+            <input
+              type="text"
+              placeholder="Reference"
+              value={filters.reference}
+              onChange={(e) => handleFilterChange('reference', e.target.value)}
+              className="p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+              style={{ color: '#102e4a' }}
+            />
+          </div>
+
+          <div className="flex justify-end gap-4">
+            <button
+              onClick={handleReset}
+              className="px-6 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition-all font-medium"
+            >
+              RESET
+            </button>
+            <button
+              onClick={handleFilter}
+              className="px-6 py-2 text-white rounded-lg hover:shadow-lg transition-all font-medium"
+              style={{ backgroundColor: '#102e4a' }}
+              onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#a682ff'}
+              onMouseLeave={(e) => e.currentTarget.style.backgroundColor = '#102e4a'}
+            >
+              FILTER
+            </button>
           </div>
         </div>
 
-        {/* Main Content Card */}
-        <div className="bg-white rounded-lg shadow-lg p-6 mb-6">
-          <div className="flex items-center mb-6">
-            <div className="w-16 h-16 rounded bg-green-500 flex items-center justify-center mr-4">
-              <Users style={{ color: 'white' }} size={32} />
-            </div>
-            <h2 className="text-xl font-semibold" style={{ color: '#102e4a' }}>
-              Bulk Individual Tasks Report
-            </h2>
-          </div>
-
-          {/* Template Download Buttons */}
-          <div className="flex flex-wrap gap-4 mb-6">
-            <button 
-              onClick={() => handleDownloadTemplate('BVN')}
-              className="px-6 py-3 bg-orange-500 text-white rounded-lg hover:bg-orange-600 transition-all font-medium flex items-center space-x-2"
-            >
-              <span>BVN BULK REGISTRATION TEMPLATE</span>
-              <Download size={16} />
-            </button>
-            <button 
-              onClick={() => handleDownloadTemplate('NIN')}
-              className="px-6 py-3 bg-orange-500 text-white rounded-lg hover:bg-orange-600 transition-all font-medium flex items-center space-x-2"
-            >
-              <span>NIN BULK REGISTRATION TEMPLATE</span>
-              <Download size={16} />
-            </button>
-            <button 
-              onClick={handleUploadCSV}
-              className="px-6 py-3 bg-green-500 text-white rounded-lg hover:bg-green-600 transition-all font-medium flex items-center space-x-2"
-            >
-              <span>UPLOAD CSV</span>
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
-                <path d="M14,2H6A2,2 0 0,0 4,4V20A2,2 0 0,0 6,22H18A2,2 0 0,0 20,20V8L14,2M18,20H6V4H13V9H18V20Z"/>
-              </svg>
-            </button>
-          </div>
-
-          {/* Note */}
-          <div className="mb-8 p-4 bg-blue-50 rounded-lg">
-            <p className="text-sm" style={{ color: '#102e4a' }}>
-              Kindly ensure to upload the updated template in CSV format
-            </p>
-          </div>
+        {/* Show tasks count */}
+        <div className="mb-6" style={{ color: '#102e4a' }}>
+          <p>{registrationTasks.length} registration task{registrationTasks.length !== 1 ? 's' : ''} loaded.</p>
         </div>
 
-        {/* Registrations Tasks Section */}
-        <div className="bg-white rounded-lg shadow-lg p-6">
-          <h3 className="text-xl font-semibold mb-6" style={{ color: '#102e4a' }}>Registrations Tasks</h3>
-          
-          {/* Filters */}
-          <div className="mb-6">
-            <div className="mb-4">
-              <span className="text-sm font-medium" style={{ color: '#6c757d' }}>Filters:</span>
-            </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
-              <input
-                type="text"
-                placeholder="Label"
-                value={filters.label}
-                onChange={(e) => handleFilterChange('label', e.target.value)}
-                className="p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                style={{ color: '#102e4a' }}
-              />
-              <input
-                type="text"
-                placeholder="Reference"
-                value={filters.reference}
-                onChange={(e) => handleFilterChange('reference', e.target.value)}
-                className="p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                style={{ color: '#102e4a' }}
-              />
-            </div>
-
-            <div className="flex justify-end gap-4">
-              <button 
-                onClick={handleReset}
-                className="px-6 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition-all font-medium"
-              >
-                RESET
-              </button>
-              <button 
-                onClick={handleFilter}
-                className="px-6 py-2 text-white rounded-lg hover:shadow-lg transition-all font-medium"
-                style={{ backgroundColor: '#102e4a' }}
-                onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#a682ff'}
-                onMouseLeave={(e) => e.currentTarget.style.backgroundColor = '#102e4a'}
-              >
-                FILTER
-              </button>
-            </div>
-          </div>
-
-          {/* No Data Message */}
+        {/* No Data Message */}
+        {registrationTasks.length === 0 && (
           <div className="text-center py-12">
             <p style={{ color: '#6c757d' }}>There are currently no entries to display at the moment.</p>
           </div>
-        </div>
-
-        {/* Footer */}
-        <div className="mt-8 text-center">
-          <p className="text-sm" style={{ color: '#6c757d' }}>© 2025 e-Tax. All Rights Reserved.</p>
-        </div>
+        )}
       </div>
-    );
-  };
+
+      {/* Footer */}
+      <div className="mt-8 text-center">
+        <p className="text-sm" style={{ color: '#6c757d' }}>© 2025 e-Tax. All Rights Reserved.</p>
+      </div>
+    </div>
+  );
+};
 
   const MergeRequestsInterface = () => {
   const [taxId, setTaxId] = useState('');
