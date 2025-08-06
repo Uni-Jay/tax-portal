@@ -36,6 +36,7 @@ import {
   Filter,
   Search,
   RefreshCw,
+  Building,
 } from 'lucide-react';
 import {
   NavLink,
@@ -3812,6 +3813,532 @@ const DirectorsReport: React.FC = () => {
   );
   };
 
+
+
+interface DebtData {
+  taxPayerId: string;
+  taxPayerType: string;
+  agency: string;
+  revenue: string;
+  outstanding: string;
+  appliedPeriod: string;
+  assessmentReference: string;
+  debtSource: string;
+  state: string;
+  lga: string;
+  lcda: string;
+}
+
+const DebtsReport: React.FC = () => {
+  const [debts, setDebts] = useState<DebtData[]>([]);
+  const [filteredDebts, setFilteredDebts] = useState<DebtData[]>([]);
+  const [filters, setFilters] = useState({
+    taxPayerId: '',
+    taxPayerType: '',
+    taxOffice: 'Ikorodu Tax Office',
+    revenue: '',
+    state: '',
+    lga: '',
+    lcda: '',
+    currency: 'NGN',
+    perPage: 20
+  });
+  const [showFilters, setShowFilters] = useState(false);  // <-- used now
+  const [currentPage, setCurrentPage] = useState(1);
+  const [isLoading, setIsLoading] = useState(false);
+
+  // Sample data for dropdowns
+  const taxPayerTypes = ['Individual', 'Corporate', 'Partnership', 'Trust'];
+  const taxOffices = ['Ikorodu Tax Office', 'Ikeja Tax Office', 'Lagos Island Tax Office', 'Victoria Island Tax Office'];
+  const revenues = ['Direct Assessment', 'Withholding Tax', 'Personal Income Tax', 'Capital Gains Tax'];
+  const states = ['Lagos', 'Abuja', 'Kano', 'Rivers', 'Ogun'];
+  const lgas = ['Ikorodu', 'Ikeja', 'Lagos Island', 'Lagos Mainland', 'Surulere'];
+  const lcdas = ['Ikorodu North', 'Ikorodu South', 'Ikorodu West', 'Ikorodu Central'];
+  const currencies = ['NGN', 'USD', 'EUR', 'GBP'];
+
+  // Mock debt data
+  const mockDebts: DebtData[] = [
+    {
+      taxPayerId: 'N-2046918',
+      taxPayerType: 'Individual',
+      agency: 'OGUNDEJI OGUNTONA STR, UJAIYE\nState: -\nLGA: -\nLCDA: -',
+      revenue: 'Ikeja Tax Office (13056)',
+      outstanding: 'NGN100,000.00',
+      appliedPeriod: '2024',
+      assessmentReference: 'QGCMUBDAPIUP2BPK8U',
+      debtSource: 'Direct Assessment (32102)',
+      state: 'Lagos',
+      lga: 'Ikeja',
+      lcda: 'Ikorodu North'
+    },
+    {
+      taxPayerId: 'N-7045374',
+      taxPayerType: 'Individual',
+      agency: '48 Raufu Williams Crescent,SURULERE,LAGOS\nState: -\nLGA: -\nLCDA: -',
+      revenue: 'Oko-Oba / Alakuko Tax Office (13067)',
+      outstanding: 'NGN1,700,000.00',
+      appliedPeriod: '2023',
+      assessmentReference: '5UUOCWDIOTVNRRXJJ',
+      debtSource: 'Direct Assessment (32102)',
+      state: 'Lagos',
+      lga: 'Surulere',
+      lcda: 'Ikorodu South'
+    },
+    {
+      taxPayerId: 'N-7045374',
+      taxPayerType: 'Individual',
+      agency: '48 Raufu Williams Crescent,SURULERE,LAGOS\nState: -\nLGA: -\nLCDA: -',
+      revenue: 'Oko-Oba / Alakuko Tax Office (13067)',
+      outstanding: 'NGN1,400,000.00',
+      appliedPeriod: '2022',
+      assessmentReference: '2TXZ5O9HAGPD7NEEN',
+      debtSource: 'Direct Assessment (32102)',
+      state: 'Lagos',
+      lga: 'Surulere',
+      lcda: 'Ikorodu West'
+    },
+    {
+      taxPayerId: 'N-1206842',
+      taxPayerType: 'Individual',
+      agency: 'Victoria Island (II) Tax Office (13077)',
+      revenue: 'Direct Assessment (32102)',
+      outstanding: 'NGN2,000,000.00',
+      appliedPeriod: '2024',
+      assessmentReference: 'SAKSYC6TOFXW2W0MCES7',
+      debtSource: 'Bill',
+      state: 'Lagos',
+      lga: 'Lagos Island',
+      lcda: 'Ikorodu Central'
+    },
+    {
+      taxPayerId: 'N-1206842',
+      taxPayerType: 'Individual',
+      agency: 'Victoria Island (II) Tax Office (13077)',
+      revenue: 'Direct Assessment (32102)',
+      outstanding: 'NGN1,700,000.00',
+      appliedPeriod: '2023',
+      assessmentReference: 'FAXZSAHSLJOGTELLWKY0',
+      debtSource: 'Bill',
+      state: 'Lagos',
+      lga: 'Lagos Island',
+      lcda: 'Ikorodu North'
+    }
+  ];
+
+  const handleFilterChange = (field: string, value: string | number) => {
+    setFilters(prev => ({ ...prev, [field]: value }));
+  };
+
+  const handleFilter = () => {
+    setIsLoading(true);
+
+    setTimeout(() => {
+      let filtered = [...mockDebts];
+
+      if (filters.taxPayerId) {
+        filtered = filtered.filter(debt => debt.taxPayerId.toLowerCase().includes(filters.taxPayerId.toLowerCase()));
+      }
+      if (filters.taxPayerType) {
+        filtered = filtered.filter(debt => debt.taxPayerType === filters.taxPayerType);
+      }
+      if (filters.revenue) {
+        filtered = filtered.filter(debt => debt.revenue.includes(filters.revenue));
+      }
+      if (filters.state) {
+        filtered = filtered.filter(debt => debt.state === filters.state);
+      }
+      if (filters.lga) {
+        filtered = filtered.filter(debt => debt.lga === filters.lga);
+      }
+      if (filters.lcda) {
+        filtered = filtered.filter(debt => debt.lcda === filters.lcda);
+      }
+
+      setDebts(filtered);
+      setFilteredDebts(filtered);
+      setCurrentPage(1);
+      setIsLoading(false);
+    }, 1000);
+  };
+
+  const handleReset = () => {
+    setFilters({
+      taxPayerId: '',
+      taxPayerType: '',
+      taxOffice: 'Ikorodu Tax Office',
+      revenue: '',
+      state: '',
+      lga: '',
+      lcda: '',
+      currency: 'NGN',
+      perPage: 20
+    });
+    setDebts([]);
+    setFilteredDebts([]);
+    setCurrentPage(1);
+  };
+
+  const handleLoadSampleData = () => {
+    setIsLoading(true);
+    setTimeout(() => {
+      setDebts(mockDebts);
+      setFilteredDebts(mockDebts);
+      setCurrentPage(1);
+      setIsLoading(false);
+    }, 800);
+  };
+
+  const handleDownload = () => {
+    if (debts.length === 0) {
+      alert('No data to download. Please load or filter data first.');
+      return;
+    }
+
+    const headers = [
+      'Tax Payer Id', 'Tax Payer Type', 'Agency', 'Revenue', 'Outstanding',
+      'Applied Period', 'Assessment Reference', 'Debt Source'
+    ];
+
+    const csvContent = [
+      headers.join(','),
+      ...debts.map(debt => [
+        debt.taxPayerId,
+        debt.taxPayerType,
+        debt.agency.replace(/\n/g, ' '),
+        debt.revenue,
+        debt.outstanding,
+        debt.appliedPeriod,
+        debt.assessmentReference,
+        debt.debtSource
+      ].join(','))
+    ].join('\n');
+
+    const blob = new Blob([csvContent], { type: 'text/csv' });
+    const url = window.URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `debts_report_${new Date().toISOString().split('T')[0]}.csv`;
+    a.click();
+    window.URL.revokeObjectURL(url);
+  };
+
+  // Calculate totals
+  const totalCount = debts.length;
+  const grossDebt = debts.reduce((sum, debt) => {
+    const amount = parseFloat(debt.outstanding.replace(/NGN|,/g, ''));
+    return sum + (isNaN(amount) ? 0 : amount);
+  }, 0);
+  const filteredGrossDebt = filteredDebts.reduce((sum, debt) => {
+    const amount = parseFloat(debt.outstanding.replace(/NGN|,/g, ''));
+    return sum + (isNaN(amount) ? 0 : amount);
+  }, 0);
+
+  // Pagination logic
+  const totalPages = Math.ceil(debts.length / filters.perPage);
+  const startIndex = (currentPage - 1) * filters.perPage;
+  const endIndex = startIndex + filters.perPage;
+  const currentDebts = debts.slice(startIndex, endIndex);
+
+  const handlePageChange = (page: number) => {
+    setCurrentPage(page);
+  };
+
+  const formatCurrency = (amount: number) => {
+    return new Intl.NumberFormat('en-NG', {
+      style: 'currency',
+      currency: 'NGN',
+      minimumFractionDigits: 2
+    }).format(amount).replace('₦', 'NGN ');
+  };
+
+  return (
+    <div className="min-h-screen bg-gray-100">
+      {/* Header */}
+      <div className="bg-white shadow-sm border-b" style={{ backgroundColor: 'rgb(16,46,74)' }}>
+        <div className="max-w-7xl mx-auto px-6 py-4 flex justify-between items-center">
+          <h1 className="text-2xl font-medium text-white">Debts Report</h1>
+          <div className="flex space-x-3">
+            <button
+              onClick={handleLoadSampleData}
+              disabled={isLoading}
+              className="px-4 py-2 bg-white text-gray-700 rounded-lg hover:bg-gray-100 transition-colors flex items-center space-x-2 disabled:opacity-50"
+            >
+              {isLoading ? <RefreshCw className="w-4 h-4 animate-spin" /> : <Search className="w-4 h-4" />}
+              <span>{isLoading ? 'Loading...' : 'Load Sample Data'}</span>
+            </button>
+            <button
+              onClick={handleDownload}
+              className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors flex items-center space-x-2"
+            >
+              <Download className="w-4 h-4" />
+              <span>DOWNLOAD</span>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <div className="max-w-7xl mx-auto px-6 py-8">
+        {/* Stats Cards */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+          <div className="bg-white rounded-lg shadow-sm p-6">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center space-x-4">
+                <div className="w-16 h-16 bg-orange-400 rounded-lg flex items-center justify-center">
+                  <FileText className="w-8 h-8 text-white" />
+                </div>
+                <div>
+                  <p className="text-sm text-gray-500 mb-1">Count</p>
+                  <p className="text-2xl font-bold text-gray-900">{totalCount.toLocaleString()}</p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div className="bg-white rounded-lg shadow-sm p-6">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center space-x-4">
+                <div className="w-16 h-16 bg-orange-400 rounded-lg flex items-center justify-center">
+                  <Building className="w-8 h-8 text-white" />
+                </div>
+                <div>
+                  <p className="text-sm text-gray-500 mb-1">Gross Debt</p>
+                  <p className="text-xl font-bold text-gray-900">{formatCurrency(grossDebt)}</p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div className="bg-white rounded-lg shadow-sm p-6">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center space-x-4">
+                <div className="w-16 h-16 bg-orange-400 rounded-lg flex items-center justify-center">
+                  <DollarSign className="w-8 h-8 text-white" />
+                </div>
+                <div>
+                  <p className="text-sm text-gray-500 mb-1">Filtered Gross Debt</p>
+                  <p className="text-xl font-bold text-gray-900">{formatCurrency(filteredGrossDebt)}</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Debts Report Section */}
+        <div className="bg-white rounded-lg shadow-sm">
+          <div className="p-6 border-b border-gray-200 flex justify-between items-center">
+            <div className="flex items-center space-x-3">
+              <div className="w-12 h-12 bg-green-500 rounded-lg flex items-center justify-center">
+                <span className="text-white font-bold text-lg">NGN</span>
+              </div>
+              <h2 className="text-xl font-medium text-gray-800">Debts Report</h2>
+            </div>
+
+            {/* Toggle Show Filters Button */}
+            <button
+              onClick={() => setShowFilters(prev => !prev)}
+              className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition-colors"
+            >
+              {showFilters ? 'Hide Filters' : 'Show Filters'}
+            </button>
+
+            <button
+              onClick={handleDownload}
+              className="px-6 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors flex items-center space-x-2"
+            >
+              <Download className="w-4 h-4" />
+              <span>DOWNLOAD</span>
+            </button>
+          </div>
+
+          <div className="p-6">
+            {/* Filter Controls - only show when toggled */}
+            {showFilters && (
+              <div className="mb-6">
+                <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-4">
+                  <input
+                    type="text"
+                    placeholder="Tax Payer ID"
+                    value={filters.taxPayerId}
+                    onChange={(e) => handleFilterChange('taxPayerId', e.target.value)}
+                    className="border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  />
+
+                  <select
+                    value={filters.taxPayerType}
+                    onChange={(e) => handleFilterChange('taxPayerType', e.target.value)}
+                    className="border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  >
+                    <option value="">Tax Payer Type</option>
+                    {taxPayerTypes.map(type => (
+                      <option key={type} value={type}>{type}</option>
+                    ))}
+                  </select>
+
+                  <select
+                    value={filters.taxOffice}
+                    onChange={(e) => handleFilterChange('taxOffice', e.target.value)}
+                    className="border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  >
+                    {taxOffices.map(office => (
+                      <option key={office} value={office}>{office}</option>
+                    ))}
+                  </select>
+
+                  <select
+                    value={filters.revenue}
+                    onChange={(e) => handleFilterChange('revenue', e.target.value)}
+                    className="border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  >
+                    <option value="">Select Revenue</option>
+                    {revenues.map(revenue => (
+                      <option key={revenue} value={revenue}>{revenue}</option>
+                    ))}
+                  </select>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
+                  <select
+                    value={filters.state}
+                    onChange={(e) => handleFilterChange('state', e.target.value)}
+                    className="border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  >
+                    <option value="">Select State</option>
+                    {states.map(state => (
+                      <option key={state} value={state}>{state}</option>
+                    ))}
+                  </select>
+
+                  <select
+                    value={filters.lga}
+                    onChange={(e) => handleFilterChange('lga', e.target.value)}
+                    className="border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  >
+                    <option value="">Select LGA</option>
+                    {lgas.map(lga => (
+                      <option key={lga} value={lga}>{lga}</option>
+                    ))}
+                  </select>
+
+                  <select
+                    value={filters.lcda}
+                    onChange={(e) => handleFilterChange('lcda', e.target.value)}
+                    className="border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  >
+                    <option value="">Select LCDA</option>
+                    {lcdas.map(lcda => (
+                      <option key={lcda} value={lcda}>{lcda}</option>
+                    ))}
+                  </select>
+
+                  <select
+                    value={filters.currency}
+                    onChange={(e) => handleFilterChange('currency', e.target.value)}
+                    className="border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  >
+                    {currencies.map(curr => (
+                      <option key={curr} value={curr}>{curr}</option>
+                    ))}
+                  </select>
+                </div>
+
+                <div className="flex items-center space-x-4 mb-6">
+                  <button
+                    onClick={handleFilter}
+                    disabled={isLoading}
+                    className="px-6 py-2 bg-green-600 text-white rounded hover:bg-green-700 transition-colors flex items-center space-x-2 disabled:opacity-50"
+                  >
+                    <Search className="w-4 h-4" />
+                    <span>{isLoading ? 'Filtering...' : 'Filter'}</span>
+                  </button>
+
+                  <button
+                    onClick={handleReset}
+                    disabled={isLoading}
+                    className="px-6 py-2 bg-gray-300 text-gray-700 rounded hover:bg-gray-400 transition-colors flex items-center space-x-2 disabled:opacity-50"
+                  >
+                    <RotateCcw className="w-4 h-4" />
+                    <span>Reset</span>
+                  </button>
+                </div>
+              </div>
+            )}
+
+            {/* Report Table */}
+            <div className="overflow-x-auto">
+              <table className="w-full text-left border-collapse border border-gray-300">
+                <thead className="bg-gray-50">
+                  <tr>
+                    <th className="border border-gray-300 px-3 py-2 text-xs font-medium uppercase">Tax Payer Id</th>
+                    <th className="border border-gray-300 px-3 py-2 text-xs font-medium uppercase">Tax Payer Type</th>
+                    <th className="border border-gray-300 px-3 py-2 text-xs font-medium uppercase">Agency</th>
+                    <th className="border border-gray-300 px-3 py-2 text-xs font-medium uppercase">Revenue</th>
+                    <th className="border border-gray-300 px-3 py-2 text-xs font-medium uppercase">Outstanding</th>
+                    <th className="border border-gray-300 px-3 py-2 text-xs font-medium uppercase">Applied Period</th>
+                    <th className="border border-gray-300 px-3 py-2 text-xs font-medium uppercase">Assessment Reference</th>
+                    <th className="border border-gray-300 px-3 py-2 text-xs font-medium uppercase">Debt Source</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {currentDebts.length === 0 ? (
+                    <tr>
+                      <td colSpan={8} className="text-center py-6 text-gray-500">No data found.</td>
+                    </tr>
+                  ) : (
+                    currentDebts.map((debt, index) => (
+                      <tr key={index} className="odd:bg-white even:bg-gray-50">
+                        <td className="border border-gray-300 px-3 py-2 text-xs">{debt.taxPayerId}</td>
+                        <td className="border border-gray-300 px-3 py-2 text-xs">{debt.taxPayerType}</td>
+                        <td className="border border-gray-300 px-3 py-2 text-xs whitespace-pre-line">{debt.agency}</td>
+                        <td className="border border-gray-300 px-3 py-2 text-xs">{debt.revenue}</td>
+                        <td className="border border-gray-300 px-3 py-2 text-xs">{debt.outstanding}</td>
+                        <td className="border border-gray-300 px-3 py-2 text-xs">{debt.appliedPeriod}</td>
+                        <td className="border border-gray-300 px-3 py-2 text-xs">{debt.assessmentReference}</td>
+                        <td className="border border-gray-300 px-3 py-2 text-xs">{debt.debtSource}</td>
+                      </tr>
+                    ))
+                  )}
+                </tbody>
+              </table>
+            </div>
+
+            {/* Pagination */}
+            {debts.length > 0 && (
+              <div className="mt-4 flex justify-center space-x-2">
+                <button
+                  onClick={() => handlePageChange(Math.max(currentPage - 1, 1))}
+                  disabled={currentPage === 1}
+                  className="px-3 py-1 border rounded disabled:opacity-50"
+                >
+                  Prev
+                </button>
+
+                {Array.from({ length: totalPages }, (_, i) => i + 1).map(pageNum => (
+                  <button
+                    key={pageNum}
+                    onClick={() => handlePageChange(pageNum)}
+                    className={`px-3 py-1 border rounded ${pageNum === currentPage ? 'bg-blue-500 text-white' : ''}`}
+                  >
+                    {pageNum}
+                  </button>
+                ))}
+
+                <button
+                  onClick={() => handlePageChange(Math.min(currentPage + 1, totalPages))}
+                  disabled={currentPage === totalPages}
+                  className="px-3 py-1 border rounded disabled:opacity-50"
+                >
+                  Next
+                </button>
+              </div>
+            )}
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+
   // type ModalType =
   // | 'add-company'
   // | 'add-taxpayer'
@@ -4056,7 +4583,7 @@ const ETaxAdminDashboard: React.FC = () => {
   return (
     <div className="flex min-h-screen bg-gray-100">
       {/* Sidebar */}
-      <aside className={`bg-white shadow-md transition-width duration-300 ${sidebarCollapsed ? 'w-20' : 'w-64'}`}>
+      <aside className={`bg-white shadow-md transition-width duration-300 ${sidebarCollapsed ? 'w-20' : 'w-64'}`} style={{ minHeight: '100vh' }}>
         <div className="p-4 border-b flex items-center justify-between">
           {!sidebarCollapsed && (
             <h3 className="text-lg font-bold" style={{ color: '#102e4a' }}>
@@ -4085,7 +4612,7 @@ const ETaxAdminDashboard: React.FC = () => {
       </aside>
 
       {/* Main content area */}
-      <main className="flex-1 flex flex-col">
+      <main className="flex-1 flex flex-col" style={{ minHeight: '100vh' }}>
         <div className="p-4 border-b bg-white flex items-center justify-between">
           <div className="flex items-center space-x-3">
             {/* <button onClick={() => navigate('/')} className="text-sm text-blue-600 hover:underline">
@@ -4140,7 +4667,7 @@ const ETaxAdminDashboard: React.FC = () => {
             <Route path="payments" element={<GenerateNewBillInterface />} />
             <Route path="laspppa" element={<LASPPPARequestsInterface />} />
             <Route path="reports/directors" element={<DirectorsReport/>} />
-            <Route path="debts" element={<GenericContent title="Debts Management" description="Track and manage outstanding tax debts" icon={DollarSign}  />} />
+            <Route path="debts" element={<DebtsReport />} />
 
             <Route path="returns/individual" element={<GenericContent title="Revenue Management" description="Monitor and analyze revenue collections" icon={Banknote} />} />
             <Route path="returns/corporate" element={<GenericContent title="Revenue Management" description="Monitor and analyze revenue collections" icon={Banknote}/>} />
