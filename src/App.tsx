@@ -73,7 +73,6 @@ const App: React.FC = () => {
             </RequireAuth>
           }
         />
-
         {/* Catch-all: redirect unknown routes to landing (or to 404 page if you add one) */}
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>

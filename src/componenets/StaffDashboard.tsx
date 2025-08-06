@@ -3834,8 +3834,8 @@ type MenuItemType = {
 };
 
 const menuItems: MenuItemType[] = [
-  { key: 'dashboard', label: 'Dashboard', icon: Home, path: '/dashboard' },
-  { key: 'etax-statistics', label: 'eTax Statistics', icon: BarChart3, path: '/statistics' },
+  { key: 'dashboard', label: 'Dashboard', icon: Home, path: 'dashboard' },
+  { key: 'etax-statistics', label: 'eTax Statistics', icon: BarChart3, path: 'statistics' },
   {
     key: 'tax-payers',
     label: 'Tax Payers',
@@ -3848,16 +3848,16 @@ const menuItems: MenuItemType[] = [
       { key: 'corporate-payers', label: 'Corporate Payers', path: '/taxpayers/corporate' },
     ],
   },
-  { key: 'tax-verification', label: 'Tax Payer Verification', icon: UserCheck, path: '/verification' },
-  { key: 'tax-services', label: 'Tax Services', icon: FileText, path: '/services' },
-  { key: 'tax-offices', label: 'Tax Offices', icon: Building2, path: '/offices' },
-  { key: 'merge-requests', label: 'Merge Requests', icon: GitMerge, path: '/merge-requests' },
-  { key: 'tama-registration', label: 'Tama Registration', icon: Shield, path: '/tama-registration' },
+  { key: 'tax-verification', label: 'Tax Payer Verification', icon: UserCheck, path: 'verification' },
+  { key: 'tax-services', label: 'Tax Services', icon: FileText, path: 'services' },
+  { key: 'tax-offices', label: 'Tax Offices', icon: Building2, path: 'offices' },
+  { key: 'merge-requests', label: 'Merge Requests', icon: GitMerge, path: 'merge-requests' },
+  { key: 'tama-registration', label: 'Tama Registration', icon: Shield, path: 'tama-registration' },
   { key: 'rmu', label: 'RMU', icon: TrendingUp, hasSubmenu: true, submenu: [{ key: 'rmu-revenue', label: 'RMU Revenue', path: '/rmu/revenue' }] },
-  { key: 'payments', label: 'Payments', icon: CreditCard, path: '/payments' },
-  { key: 'laspppa', label: 'LASPPPA', icon: Shield, path: '/laspppa' },
+  { key: 'payments', label: 'Payments', icon: CreditCard, path: 'payments' },
+  { key: 'laspppa', label: 'LASPPPA', icon: Shield, path: 'laspppa' },
   { key: 'reports', label: 'Reports', icon: BarChart3, hasSubmenu: true, submenu: [{ key: 'directors', label: 'Directors', path: '/reports/directors' }] },
-  { key: 'debts', label: 'Debts', icon: DollarSign, path: '/debts' },
+  { key: 'debts', label: 'Debts', icon: DollarSign, path: 'debts' },
   {
     key: 'returns',
     label: 'Returns',
@@ -3879,9 +3879,9 @@ const menuItems: MenuItemType[] = [
       { key: 'corporate-assessments', label: 'Corporate', path: '/assessments/corporate' },
     ],
   },
-  { key: 'tax-audit', label: 'Tax Audit', icon: Calculator, path: '/tax-audit' },
-  { key: 'revenue', label: 'Revenue', icon: Banknote, path: '/revenue' },
-  { key: 'bills', label: 'Bills', icon: Receipt, path: '/bills' },
+  { key: 'tax-audit', label: 'Tax Audit', icon: Calculator, path: 'tax-audit' },
+  { key: 'revenue', label: 'Revenue', icon: Banknote, path: 'revenue' },
+  { key: 'bills', label: 'Bills', icon: Receipt, path: 'bills' },
   {
     key: 'ebs-reports',
     label: 'EBS Reports',
@@ -3893,13 +3893,13 @@ const menuItems: MenuItemType[] = [
       { key: 'trend-collection', label: 'Trend Collection', path: '/ebs-reports/trend-collection' },
     ],
   },
-  { key: 'transactions', label: 'Transactions', icon: ArrowRightLeft, path: '/transactions' },
-  { key: 'expatriates', label: 'Expatriates', icon: UserX, path: '/expatriates' },
-  { key: 'trend-collection', label: 'Trend Collection', icon: TrendingDown, path: '/trend-collection' },
-  { key: 'assessment-requests', label: 'Assessment Requests', icon: FileQuestion, path: '/assessment-requests' },
-  { key: 'egis', label: 'EGIS', icon: Globe, path: '/egis' },
+  { key: 'transactions', label: 'Transactions', icon: ArrowRightLeft, path: 'transactions' },
+  { key: 'expatriates', label: 'Expatriates', icon: UserX, path: 'expatriates' },
+  { key: 'trend-collection', label: 'Trend Collection', icon: TrendingDown, path: 'trend-collection' },
+  { key: 'assessment-requests', label: 'Assessment Requests', icon: FileQuestion, path: 'assessment-requests' },
+  { key: 'egis', label: 'EGIS', icon: Globe, path: 'egis' },
   { key: 'messages', label: 'Messages', icon: MessageSquare, hasSubmenu: true, submenu: [{ key: 'direct-messages', label: 'Direct Messages', path: '/messages/direct' }] },
-  { key: 'download-manual', label: 'Download Manual', icon: Download, path: '/download-manual' },
+  { key: 'download-manual', label: 'Download Manual', icon: Download, path: 'download-manual' },
 ];
 
 // -------------- MenuItem Component --------------
@@ -3925,12 +3925,15 @@ const MenuItem: React.FC<MenuItemProps> = ({
   const Icon = item.icon;
   const isExpanded = expandedItems[item.key];
   const isActive = activeItem === item.key;
+const navigate = useNavigate();
 
   const handleClick = () => {
     if (item.hasSubmenu) {
       toggleExpanded(item.key);
     } else {
       setActiveItem(item.key);
+      // Navigate to the route
+      navigate(`/staff-dashboard/${item.path}`);
     }
   };
 
@@ -3995,7 +3998,7 @@ const ETaxAdminDashboard: React.FC = () => {
   // const [modalType, setModalType] = useState<string>('');
 
   const location = useLocation();
-  const navigate = useNavigate();
+  // const navigate = useNavigate();
 
   useEffect(() => {
     // Strip base route for matching, assuming base is /staff-dashboard
@@ -4085,9 +4088,9 @@ const ETaxAdminDashboard: React.FC = () => {
       <main className="flex-1 flex flex-col">
         <div className="p-4 border-b bg-white flex items-center justify-between">
           <div className="flex items-center space-x-3">
-            <button onClick={() => navigate('/')} className="text-sm text-blue-600 hover:underline">
+            {/* <button onClick={() => navigate('/')} className="text-sm text-blue-600 hover:underline">
               Back to site
-            </button>
+            </button> */}
             <h4 className="font-semibold">Staff Dashboard</h4>
           </div>
           <div className="flex items-center space-x-3">
