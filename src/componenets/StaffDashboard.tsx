@@ -33,6 +33,9 @@ import {
   X,
   CheckCircle,
   ArrowLeft,
+  Filter,
+  Search,
+  RefreshCw,
 } from 'lucide-react';
 
 const ETaxAdminDashboard = () => {
@@ -2941,6 +2944,454 @@ const BulkIndividualRegistrationContent = () => {
 };
 
 
+ interface DirectorData {
+  taxId: string;
+  corporateId: string;
+  companyName: string;
+  state: string;
+  lga: string;
+  lcda: string;
+  startDate: string;
+  endDate: string;
+}
+
+const DirectorsReport: React.FC = () => {
+  const [filteredDirectors, setFilteredDirectors] = useState<DirectorData[]>([]);
+  const [filters, setFilters] = useState({
+    state: '',
+    lga: '',
+    lcda: '',
+    startDate: '',
+    endDate: '',
+    perPage: 20
+  });
+  const [showFilters, setShowFilters] = useState(false);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [isLoading, setIsLoading] = useState(false);
+
+  // Sample data for dropdowns and mock data
+  const states = ['Lagos', 'Abuja', 'Kano', 'Rivers', 'Ogun'];
+  const lgas = ['Ikorodu', 'Ikeja', 'Lagos Island', 'Lagos Mainland', 'Surulere'];
+  const lcdas = ['Ikorodu North', 'Ikorodu South', 'Ikorodu West', 'Ikorodu Central'];
+
+  // Mock director data
+  const mockDirectors: DirectorData[] = [
+    {
+      taxId: 'TX001234567',
+      corporateId: 'RC123456',
+      companyName: 'ABC Limited',
+      state: 'Lagos',
+      lga: 'Ikorodu',
+      lcda: 'Ikorodu North',
+      startDate: '2023-01-15',
+      endDate: '2025-12-31'
+    },
+    {
+      taxId: 'TX001234568',
+      corporateId: 'RC123457',
+      companyName: 'XYZ Nigeria Ltd',
+      state: 'Lagos',
+      lga: 'Ikeja',
+      lcda: 'Ikorodu South',
+      startDate: '2022-03-20',
+      endDate: '2024-12-31'
+    },
+    {
+      taxId: 'TX001234569',
+      corporateId: 'RC123458',
+      companyName: 'Global Tech Solutions',
+      state: 'Abuja',
+      lga: 'Lagos Island',
+      lcda: 'Ikorodu West',
+      startDate: '2023-06-10',
+      endDate: '2026-12-31'
+    },
+    {
+      taxId: 'TX001234570',
+      corporateId: 'RC123459',
+      companyName: 'Prime Industries',
+      state: 'Lagos',
+      lga: 'Ikorodu',
+      lcda: 'Ikorodu Central',
+      startDate: '2021-09-05',
+      endDate: '2024-12-31'
+    },
+    {
+      taxId: 'TX001234571',
+      corporateId: 'RC123460',
+      companyName: 'Stellar Enterprises',
+      state: 'Rivers',
+      lga: 'Surulere',
+      lcda: 'Ikorodu North',
+      startDate: '2022-11-12',
+      endDate: '2025-12-31'
+    }
+  ];
+
+  const handleFilterChange = (field: string, value: string | number) => {
+    setFilters(prev => ({ ...prev, [field]: value }));
+  };
+
+  const handleFilter = () => {
+    setIsLoading(true);
+
+    setTimeout(() => {
+      let filtered = [...mockDirectors];
+
+      if (filters.state) {
+        filtered = filtered.filter(director => director.state === filters.state);
+      }
+      if (filters.lga) {
+        filtered = filtered.filter(director => director.lga === filters.lga);
+      }
+      if (filters.lcda) {
+        filtered = filtered.filter(director => director.lcda === filters.lcda);
+      }
+      if (filters.startDate) {
+        filtered = filtered.filter(director => new Date(director.startDate) >= new Date(filters.startDate));
+      }
+      if (filters.endDate) {
+        filtered = filtered.filter(director => new Date(director.endDate) <= new Date(filters.endDate));
+      }
+
+      setFilteredDirectors(filtered);
+      setCurrentPage(1);
+      setIsLoading(false);
+    }, 1000);
+  };
+
+  const handleReset = () => {
+    setFilters({
+      state: '',
+      lga: '',
+      lcda: '',
+      startDate: '',
+      endDate: '',
+      perPage: 20
+    });
+    setFilteredDirectors([]);
+    setCurrentPage(1);
+  };
+
+  const handleLoadSampleData = () => {
+    setIsLoading(true);
+    setTimeout(() => {
+      setFilteredDirectors(mockDirectors);
+      setCurrentPage(1);
+      setIsLoading(false);
+    }, 800);
+  };
+
+  const handleExport = () => {
+    if (filteredDirectors.length === 0) {
+      alert('No data to export. Please filter data first.');
+      return;
+    }
+
+    // Create CSV content
+    const headers = ['Tax ID', 'Corporate ID', 'Company Name', 'State', 'LGA', 'LCDA', 'Start Date', 'End Date'];
+    const csvContent = [
+      headers.join(','),
+      ...filteredDirectors.map(director => [
+        director.taxId,
+        director.corporateId,
+        director.companyName,
+        director.state,
+        director.lga,
+        director.lcda,
+        director.startDate,
+        director.endDate
+      ].join(','))
+    ].join('\n');
+
+    // Download CSV
+    const blob = new Blob([csvContent], { type: 'text/csv' });
+    const url = window.URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `directors_report_${new Date().toISOString().split('T')[0]}.csv`;
+    a.click();
+    window.URL.revokeObjectURL(url);
+  };
+
+  // Pagination logic
+  const totalPages = Math.ceil(filteredDirectors.length / filters.perPage);
+  const startIndex = (currentPage - 1) * filters.perPage;
+  const endIndex = startIndex + filters.perPage;
+  const currentDirectors = filteredDirectors.slice(startIndex, endIndex);
+
+  const handlePageChange = (page: number) => {
+    setCurrentPage(page);
+  };
+
+  return (
+    <div className="min-h-screen bg-gray-100">
+      {/* Header */}
+      <div className="bg-white shadow-sm border-b" style={{ backgroundColor: 'rgb(16,46,74)' }}>
+        <div className="max-w-7xl mx-auto px-6 py-4 flex justify-between items-center">
+          <h1 className="text-2xl font-medium text-white">Directors Report</h1>
+          <div className="flex space-x-3">
+            <button
+              onClick={handleLoadSampleData}
+              disabled={isLoading}
+              className="px-4 py-2 bg-white text-gray-700 rounded-lg hover:bg-gray-100 transition-colors flex items-center space-x-2 disabled:opacity-50"
+            >
+              {isLoading ? <RefreshCw className="w-4 h-4 animate-spin" /> : <Search className="w-4 h-4" />}
+              <span>{isLoading ? 'Loading...' : 'Load Sample Data'}</span>
+            </button>
+            <button
+              onClick={handleExport}
+              className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors flex items-center space-x-2"
+            >
+              <Download className="w-4 h-4" />
+              <span>Export CSV</span>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <div className="max-w-7xl mx-auto px-6 py-8">
+        {/* Stats Card */}
+        <div className="bg-white rounded-lg shadow-sm p-6 mb-8">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center space-x-4">
+              <div className="w-16 h-16 rounded-lg flex items-center justify-center" style={{ backgroundColor: 'rgb(16,46,74)' }}>
+                <FileText className="w-8 h-8 text-white" />
+              </div>
+              <div>
+                <p className="text-sm text-gray-500 mb-1">Total Directors</p>
+                <p className="text-3xl font-bold" style={{ color: 'rgb(16,46,74)' }}>{filteredDirectors.length}</p>
+              </div>
+            </div>
+            <div className="text-right">
+              <p className="text-sm text-gray-500 mb-1">Filtered Results</p>
+              <p className="text-xl font-semibold text-gray-700">{currentDirectors.length} of {filteredDirectors.length}</p>
+            </div>
+          </div>
+        </div>
+
+        {/* Directors Report Section */}
+        <div className="bg-white rounded-lg shadow-sm">
+          <div className="p-6 border-b border-gray-200">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center space-x-3">
+                <div className="w-12 h-12 rounded-lg flex items-center justify-center" style={{ backgroundColor: 'rgb(16,46,74)' }}>
+                  <Users className="w-6 h-6 text-white" />
+                </div>
+                <h2 className="text-xl font-medium text-gray-800">Directors Report</h2>
+              </div>
+              <button
+                onClick={() => setShowFilters(!showFilters)}
+                className="px-4 py-2 rounded-lg transition-colors flex items-center space-x-2"
+                style={{
+                  backgroundColor: showFilters ? 'rgb(16,46,74)' : 'transparent',
+                  color: showFilters ? 'white' : 'rgb(16,46,74)',
+                  border: '1px solid rgb(16,46,74)'
+                }}
+              >
+                <Filter className="w-4 h-4" />
+                <span>{showFilters ? 'Hide Filters' : 'Show Filters'}</span>
+              </button>
+            </div>
+          </div>
+
+          <div className="p-6">
+            {/* Controls Row */}
+            <div className="flex items-center justify-between mb-6">
+              <div className="flex items-center space-x-4">
+                <div className="flex items-center space-x-2">
+                  <span className="text-sm text-gray-600">Per page</span>
+                  <select
+                    value={filters.perPage}
+                    onChange={(e) => handleFilterChange('perPage', parseInt(e.target.value))}
+                    className="border border-gray-300 rounded px-3 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  >
+                    <option value={10}>10</option>
+                    <option value={20}>20</option>
+                    <option value={50}>50</option>
+                    <option value={100}>100</option>
+                  </select>
+                </div>
+              </div>
+
+              <div className="flex items-center space-x-3">
+                <span className="text-sm text-gray-600">IKORODU TAX OFFICE</span>
+                <button
+                  onClick={() => setShowFilters(!showFilters)}
+                  className="text-gray-400 hover:text-gray-600"
+                >
+                  <Filter className="w-5 h-5" />
+                </button>
+              </div>
+            </div>
+
+            {/* Table Headers */}
+            <div className="grid grid-cols-5 gap-4 mb-4">
+              <div className="text-sm font-medium text-gray-600">Tax ID</div>
+              <div className="text-sm font-medium text-gray-600">Corporate Id</div>
+              <div className="text-sm font-medium text-gray-600">Company Name</div>
+              <div className="text-sm font-medium text-gray-600">State</div>
+              <div className="text-sm font-medium text-gray-600">LGA</div>
+            </div>
+
+            {/* Filter Section */}
+            {showFilters && (
+              <div className="border border-gray-200 rounded-lg p-6 mb-6 bg-gray-50">
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+                  <select
+                    value={filters.state}
+                    onChange={(e) => handleFilterChange('state', e.target.value)}
+                    className="border border-gray-300 rounded-lg px-4 py-2 bg-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  >
+                    <option value="">Select State</option>
+                    {states.map(state => (
+                      <option key={state} value={state}>{state}</option>
+                    ))}
+                  </select>
+
+                  <select
+                    value={filters.lga}
+                    onChange={(e) => handleFilterChange('lga', e.target.value)}
+                    className="border border-gray-300 rounded-lg px-4 py-2 bg-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  >
+                    <option value="">Select LGA</option>
+                    {lgas.map(lga => (
+                      <option key={lga} value={lga}>{lga}</option>
+                    ))}
+                  </select>
+
+                  <select
+                    value={filters.lcda}
+                    onChange={(e) => handleFilterChange('lcda', e.target.value)}
+                    className="border border-gray-300 rounded-lg px-4 py-2 bg-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  >
+                    <option value="">Select LCDA</option>
+                    {lcdas.map(lcda => (
+                      <option key={lcda} value={lcda}>{lcda}</option>
+                    ))}
+                  </select>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+                  <div className="relative">
+                    <Calendar className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
+                    <input
+                      type="date"
+                      value={filters.startDate}
+                      onChange={(e) => handleFilterChange('startDate', e.target.value)}
+                      placeholder="Start Date"
+                      className="border border-gray-300 rounded-lg pl-10 pr-4 py-2 w-full bg-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    />
+                  </div>
+
+                  <div className="relative">
+                    <Calendar className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
+                    <input
+                      type="date"
+                      value={filters.endDate}
+                      onChange={(e) => handleFilterChange('endDate', e.target.value)}
+                      placeholder="End Date"
+                      className="border border-gray-300 rounded-lg pl-10 pr-4 py-2 w-full bg-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    />
+                  </div>
+                </div>
+
+                <div className="flex justify-end space-x-3">
+                  <button
+                    onClick={handleReset}
+                    disabled={isLoading}
+                    className="px-6 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition-colors flex items-center space-x-2 disabled:opacity-50"
+                  >
+                    <RotateCcw className="w-4 h-4" />
+                    <span>RESET</span>
+                  </button>
+                  <button
+                    onClick={handleFilter}
+                    disabled={isLoading}
+                    className="px-6 py-2 text-white rounded-lg hover:opacity-90 transition-colors flex items-center space-x-2 disabled:opacity-50"
+                    style={{ backgroundColor: 'rgb(16,46,74)' }}
+                  >
+                    {isLoading ? <RefreshCw className="w-4 h-4 animate-spin" /> : <Filter className="w-4 h-4" />}
+                    <span>{isLoading ? 'FILTERING...' : 'FILTER'}</span>
+                  </button>
+                </div>
+              </div>
+            )}
+
+            {/* Data Table or Empty State */}
+            {filteredDirectors.length === 0 ? (
+              <div className="text-center py-12">
+                <div className="text-gray-400 mb-2">
+                  <FileText className="w-16 h-16 mx-auto mb-4 opacity-50" />
+                </div>
+                <p className="text-gray-500 text-lg mb-2">No directors data found</p>
+                <p className="text-gray-400 text-sm">
+                  Click "Load Sample Data" to see example data or use the filters to search for directors
+                </p>
+                <p className="text-gray-400 text-sm mt-4">
+                  Showing 0 to 0 of 0 entries
+                </p>
+              </div>
+            ) : (
+              <div className="space-y-3">
+                {/* Enhanced Table Headers */}
+                <div className="grid grid-cols-5 gap-4 py-3 px-4 rounded-lg" style={{ backgroundColor: 'rgba(16,46,74,0.1)' }}>
+                  <div className="text-sm font-semibold" style={{ color: 'rgb(16,46,74)' }}>Tax ID</div>
+                  <div className="text-sm font-semibold" style={{ color: 'rgb(16,46,74)' }}>Corporate Id</div>
+                  <div className="text-sm font-semibold" style={{ color: 'rgb(16,46,74)' }}>Company Name</div>
+                  <div className="text-sm font-semibold" style={{ color: 'rgb(16,46,74)' }}>State</div>
+                  <div className="text-sm font-semibold" style={{ color: 'rgb(16,46,74)' }}>LGA</div>
+                </div>
+
+                {/* Data Rows */}
+                {currentDirectors.map((director, index) => (
+                  <div key={index} className="grid grid-cols-5 gap-4 py-3 px-4 border-b border-gray-100 last:border-b-0 hover:bg-gray-50 transition-colors">
+                    <div className="text-sm text-gray-900 font-medium">{director.taxId}</div>
+                    <div className="text-sm text-gray-700">{director.corporateId}</div>
+                    <div className="text-sm text-gray-700">{director.companyName}</div>
+                    <div className="text-sm text-gray-700">{director.state}</div>
+                    <div className="text-sm text-gray-700">{director.lga}</div>
+                  </div>
+                ))}
+
+                {/* Pagination */}
+                <div className="flex justify-end mt-6 space-x-2">
+                  <button
+                    onClick={() => handlePageChange(currentPage - 1)}
+                    disabled={currentPage === 1}
+                    className="px-3 py-1 border rounded disabled:opacity-50"
+                  >
+                    Previous
+                  </button>
+                  {[...Array(totalPages)].map((_, i) => {
+                    const page = i + 1;
+                    return (
+                      <button
+                        key={page}
+                        onClick={() => handlePageChange(page)}
+                        className={`px-3 py-1 border rounded ${page === currentPage ? 'bg-blue-600 text-white' : 'hover:bg-gray-100'}`}
+                      >
+                        {page}
+                      </button>
+                    );
+                  })}
+                  <button
+                    onClick={() => handlePageChange(currentPage + 1)}
+                    disabled={currentPage === totalPages}
+                    className="px-3 py-1 border rounded disabled:opacity-50"
+                  >
+                    Next
+                  </button>
+                </div>
+              </div>
+            )}
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
+
   // Modal Component
   const Modal = ({ isOpen, onClose, type }: { isOpen: boolean; onClose: () => void; type: string }) => {
     if (!isOpen) return null;
@@ -3481,7 +3932,7 @@ const BulkIndividualRegistrationContent = () => {
       case 'laspppa':
         return <LASPPPARequestsInterface />;
       case 'directors':
-        return <GenericContent title="Directors Report" description="Corporate directors and compliance reporting" icon={BarChart3} />;
+        return <DirectorsReport/>;
       case 'debts':
         return <GenericContent title="Debts Management" description="Track and manage outstanding tax debts" icon={DollarSign} />;
       case 'individual-returns':
