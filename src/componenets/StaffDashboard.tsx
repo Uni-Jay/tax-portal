@@ -1,19 +1,19 @@
-import { useEffect, useState } from 'react';
-import { 
-  Home, 
+import React, { useEffect, useState } from 'react';
+import {
+  Home,
   RotateCcw,
   Bell,
-  BarChart3, 
-  Users, 
+  BarChart3,
+  Users,
   Building2,
-  GitMerge, 
-  FileText, 
+  GitMerge,
+  FileText,
   DollarSign,
-  MessageCircle, 
-  CreditCard, 
-  Shield, 
-  TrendingUp, 
-  UserCheck, 
+  MessageCircle,
+  CreditCard,
+  Shield,
+  TrendingUp,
+  UserCheck,
   Eye,
   Calendar,
   ClipboardList,
@@ -37,390 +37,306 @@ import {
   Search,
   RefreshCw,
 } from 'lucide-react';
+import {
+  NavLink,
+  Route,
+  Routes,
+  useNavigate,
+  useParams,
+  useLocation,
+  Navigate,
+} from 'react-router-dom';
 
-const ETaxAdminDashboard = () => {
-  const [activeItem, setActiveItem] = useState('dashboard');
-  const [expandedItems, setExpandedItems] = useState<Record<string, boolean>>({});
-  const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
-  const [showModal, setShowModal] = useState(false);
-  const [modalType, setModalType] = useState('');
-  const [notification, setNotification] = useState('');
+type SubMenuItem = {
+  key: string;
+  label: string;
+  path: string;
+};
 
-  const showNotification = (message: string) => {
-    setNotification(message);
-    setTimeout(() => setNotification(''), 3000);
-  };
+type MenuItemType = {
+  key: string;
+  label: string;
+  icon: React.ElementType;
+  path?: string;
+  hasSubmenu?: boolean;
+  submenu?: SubMenuItem[];
+};
 
-  const toggleExpanded = (itemKey: string) => {
-    setExpandedItems(prev => ({
-      ...prev,
-      [itemKey]: !prev[itemKey]
-    }));
-  };
+const menuItems: MenuItemType[] = [
+  { key: 'dashboard', label: 'Dashboard', icon: Home, path: '/dashboard' },
+  { key: 'etax-statistics', label: 'eTax Statistics', icon: BarChart3, path: '/statistics' },
+  {
+    key: 'tax-payers',
+    label: 'Tax Payers',
+    icon: Users,
+    hasSubmenu: true,
+    submenu: [
+      { key: 'individual-payers', label: 'Individual Payers', path: '/taxpayers/individual' },
+      { key: 'individual-inactive', label: 'Individual Payers (Inactive)', path: '/taxpayers/individual-inactive' },
+      { key: 'bulk-registration', label: 'Bulk Individual Registration', path: '/taxpayers/bulk-registration' },
+      { key: 'corporate-payers', label: 'Corporate Payers', path: '/taxpayers/corporate' },
+    ],
+  },
+  { key: 'tax-verification', label: 'Tax Payer Verification', icon: UserCheck, path: '/verification' },
+  { key: 'tax-services', label: 'Tax Services', icon: FileText, path: '/services' },
+  { key: 'tax-offices', label: 'Tax Offices', icon: Building2, path: '/offices' },
+  { key: 'merge-requests', label: 'Merge Requests', icon: GitMerge, path: '/merge-requests' },
+  { key: 'tama-registration', label: 'Tama Registration', icon: Shield, path: '/tama-registration' },
+  { key: 'rmu', label: 'RMU', icon: TrendingUp, hasSubmenu: true, submenu: [{ key: 'rmu-revenue', label: 'RMU Revenue', path: '/rmu/revenue' }] },
+  { key: 'payments', label: 'Payments', icon: CreditCard, path: '/payments' },
+  { key: 'laspppa', label: 'LASPPPA', icon: Shield, path: '/laspppa' },
+  { key: 'reports', label: 'Reports', icon: BarChart3, hasSubmenu: true, submenu: [{ key: 'directors', label: 'Directors', path: '/reports/directors' }] },
+  { key: 'debts', label: 'Debts', icon: DollarSign, path: '/debts' },
+  {
+    key: 'returns',
+    label: 'Returns',
+    icon: FileText,
+    hasSubmenu: true,
+    submenu: [
+      { key: 'individual-returns', label: 'Individual', path: '/returns/individual' },
+      { key: 'corporate-returns', label: 'Corporate', path: '/returns/corporate' },
+      { key: 'adequacy-checks', label: 'Adequacy Checks', path: '/returns/adequacy-checks' },
+    ],
+  },
+  {
+    key: 'assessments',
+    label: 'Assessments',
+    icon: ClipboardList,
+    hasSubmenu: true,
+    submenu: [
+      { key: 'individual-assessments', label: 'Individual', path: '/assessments/individual' },
+      { key: 'corporate-assessments', label: 'Corporate', path: '/assessments/corporate' },
+    ],
+  },
+  { key: 'tax-audit', label: 'Tax Audit', icon: Calculator, path: '/tax-audit' },
+  { key: 'revenue', label: 'Revenue', icon: Banknote, path: '/revenue' },
+  { key: 'bills', label: 'Bills', icon: Receipt, path: '/bills' },
+  {
+    key: 'ebs-reports',
+    label: 'EBS Reports',
+    icon: BarChart3,
+    hasSubmenu: true,
+    submenu: [
+      { key: 'transactions', label: 'Transactions', path: '/ebs-reports/transactions' },
+      { key: 'expatriates', label: 'Expatriates', path: '/ebs-reports/expatriates' },
+      { key: 'trend-collection', label: 'Trend Collection', path: '/ebs-reports/trend-collection' },
+    ],
+  },
+  { key: 'transactions', label: 'Transactions', icon: ArrowRightLeft, path: '/transactions' },
+  { key: 'expatriates', label: 'Expatriates', icon: UserX, path: '/expatriates' },
+  { key: 'trend-collection', label: 'Trend Collection', icon: TrendingDown, path: '/trend-collection' },
+  { key: 'assessment-requests', label: 'Assessment Requests', icon: FileQuestion, path: '/assessment-requests' },
+  { key: 'egis', label: 'EGIS', icon: Globe, path: '/egis' },
+  { key: 'messages', label: 'Messages', icon: MessageSquare, hasSubmenu: true, submenu: [{ key: 'direct-messages', label: 'Direct Messages', path: '/messages/direct' }] },
+  { key: 'download-manual', label: 'Download Manual', icon: Download, path: '/download-manual' },
+];
 
+// -------------- MenuItem Component --------------
+interface MenuItemProps {
+  item: MenuItemType;
+  level?: number;
+  activeItem: string;
+  expandedItems: Record<string, boolean>;
+  toggleExpanded: (key: string) => void;
+  setActiveItem: (key: string) => void;
+  sidebarCollapsed: boolean;
+}
 
+const MenuItem: React.FC<MenuItemProps> = ({
+  item,
+  level = 0,
+  activeItem,
+  expandedItems,
+  toggleExpanded,
+  setActiveItem,
+  sidebarCollapsed,
+}) => {
+  const Icon = item.icon;
+  const isExpanded = expandedItems[item.key];
+  const isActive = activeItem === item.key;
 
-  const menuItems = [
-    {
-      key: 'dashboard',
-      label: 'Dashboard',
-      icon: Home,
-      path: '/dashboard'
-    },
-    {
-      key: 'etax-statistics',
-      label: 'eTax Statistics',
-      icon: BarChart3,
-      path: '/statistics'
-    },
-    {
-      key: 'tax-payers',
-      label: 'Tax Payers',
-      icon: Users,
-      hasSubmenu: true,
-      submenu: [
-        { key: 'individual-payers', label: 'Individual Payers', path: '/taxpayers/individual' },
-        { key: 'individual-inactive', label: 'Individual Payers (Inactive)', path: '/taxpayers/individual-inactive' },
-        { key: 'bulk-registration', label: 'Bulk Individual Registration', path: '/taxpayers/bulk-registration' },
-        { key: 'corporate-payers', label: 'Corporate Payers', path: '/taxpayers/corporate' }
-      ]
-    },
-    {
-      key: 'tax-verification',
-      label: 'Tax Payer Verification',
-      icon: UserCheck,
-      path: '/verification'
-    },
-    {
-      key: 'tax-services',
-      label: 'Tax Services',
-      icon: FileText,
-      path: '/services'
-    },
-    {
-      key: 'tax-offices',
-      label: 'Tax Offices',
-      icon: Building2,
-      path: '/offices'
-    },
-    {
-      key: 'merge-requests',
-      label: 'Merge Requests',
-      icon: GitMerge,
-      path: '/merge-requests'
-    },
-    {
-      key: 'tama-registration',
-      label: 'Tama Registration',
-      icon: Shield,
-      path: '/tama-registration'
-    },
-    {
-      key: 'rmu',
-      label: 'RMU',
-      icon: TrendingUp,
-      hasSubmenu: true,
-      submenu: [
-        { key: 'rmu-revenue', label: 'RMU Revenue', path: '/rmu/revenue' }
-      ]
-    },
-    {
-      key: 'payments',
-      label: 'Payments',
-      icon: CreditCard,
-      path: '/payments'
-    },
-    {
-      key: 'laspppa',
-      label: 'LASPPPA',
-      icon: Shield,
-      path: '/laspppa'
-    },
-    {
-      key: 'reports',
-      label: 'Reports',
-      icon: BarChart3,
-      hasSubmenu: true,
-      submenu: [
-        { key: 'directors', label: 'Directors', path: '/reports/directors' }
-      ]
-    },
-    {
-      key: 'debts',
-      label: 'Debts',
-      icon: DollarSign,
-      path: '/debts'
-    },
-    {
-      key: 'returns',
-      label: 'Returns',
-      icon: FileText,
-      hasSubmenu: true,
-      submenu: [
-        { key: 'individual-returns', label: 'Individual', path: '/returns/individual' },
-        { key: 'corporate-returns', label: 'Corporate', path: '/returns/corporate' },
-        { key: 'adequacy-checks', label: 'Adequacy Checks', path: '/returns/adequacy-checks' }
-      ]
-    },
-    {
-      key: 'assessments',
-      label: 'Assessments',
-      icon: ClipboardList,
-      hasSubmenu: true,
-      submenu: [
-        { key: 'individual-assessments', label: 'Individual', path: '/assessments/individual' },
-        { key: 'corporate-assessments', label: 'Corporate', path: '/assessments/corporate' }
-      ]
-    },
-    {
-      key: 'tax-audit',
-      label: 'Tax Audit',
-      icon: Calculator,
-      path: '/tax-audit'
-    },
-    {
-      key: 'revenue',
-      label: 'Revenue',
-      icon: Banknote,
-      path: '/revenue'
-    },
-    {
-      key: 'bills',
-      label: 'Bills',
-      icon: Receipt,
-      path: '/bills'
-    },
-    {
-      key: 'ebs-reports',
-      label: 'EBS Reports',
-      icon: BarChart3,
-      hasSubmenu: true,
-      submenu: [
-        { key: 'transactions', label: 'Transactions', path: '/ebs-reports/transactions' },
-        { key: 'expatriates', label: 'Expatriates', path: '/ebs-reports/expatriates' },
-        { key: 'trend-collection', label: 'Trend Collection', path: '/ebs-reports/trend-collection' }
-      ]
-    },
-    {
-      key: 'transactions',
-      label: 'Transactions',
-      icon: ArrowRightLeft,
-      path: '/transactions'
-    },
-    {
-      key: 'expatriates',
-      label: 'Expatriates',
-      icon: UserX,
-      path: '/expatriates'
-    },
-    {
-      key: 'trend-collection',
-      label: 'Trend Collection',
-      icon: TrendingDown,
-      path: '/trend-collection'
-    },
-    {
-      key: 'assessment-requests',
-      label: 'Assessment Requests',
-      icon: FileQuestion,
-      path: '/assessment-requests'
-    },
-    {
-      key: 'egis',
-      label: 'EGIS',
-      icon: Globe,
-      path: '/egis'
-    },
-    {
-      key: 'messages',
-      label: 'Messages',
-      icon: MessageSquare,
-      hasSubmenu: true,
-      submenu: [
-        { key: 'direct-messages', label: 'Direct Messages', path: '/messages/direct' }
-      ]
-    },
-    {
-      key: 'download-manual',
-      label: 'Download Manual',
-      icon: Download,
-      path: '/download-manual'
+  const handleClick = () => {
+    if (item.hasSubmenu) {
+      toggleExpanded(item.key);
+    } else {
+      setActiveItem(item.key);
     }
+  };
+
+  return (
+    <div>
+      <div
+        onClick={handleClick}
+        className={`flex items-center justify-between px-4 py-3 cursor-pointer hover:bg-gray-50 ${
+          isActive ? 'bg-blue-50 border-r-4 border-blue-500' : ''
+        }`}
+        style={{ paddingLeft: `${level * 16}px` }}
+      >
+        <div className="flex items-center space-x-3">
+          <Icon size={18} />
+          {!sidebarCollapsed && <span className="font-medium">{item.label}</span>}
+        </div>
+        {!sidebarCollapsed && item.hasSubmenu && (
+          <div>{isExpanded ? <ChevronDown size={14} /> : <ChevronRight size={14} />}</div>
+        )}
+      </div>
+
+      {isExpanded && !sidebarCollapsed && item.submenu && (
+        <div className="ml-6 mt-1 space-y-1">
+          {item.submenu.map(sub => (
+            <NavLink
+              key={sub.key}
+              to={`/staff-dashboard${sub.path}`}
+              className={({ isActive }) =>
+                `block px-3 py-2 rounded text-sm ${
+                  isActive ? 'bg-blue-600 text-white' : 'text-gray-600 hover:bg-gray-100'
+                }`
+              }
+              onClick={() => setActiveItem(sub.key)}
+            >
+              {sub.label}
+            </NavLink>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+};
+
+// -------------- Placeholder Page --------------
+const PlaceholderPage: React.FC<{ title?: string }> = ({ title }) => (
+  <div className="p-8">
+    <h2 className="text-2xl font-semibold" style={{ color: '#102e4a' }}>
+      {title ?? 'Page'}
+    </h2>
+    <p className="mt-2 text-sm" style={{ color: '#6c757d' }}>
+      This is a placeholder. Replace with a real component.
+    </p>
+  </div>
+);
+
+
+
+// -------------- Main Dashboard Component --------------
+
+
+// -------------- TaxPayerProfileDetailContent placeholder --------------
+// const TaxPayerProfileDetailContent: React.FC<{
+//   taxpayerId: string;
+//   onBack: () => void;
+//   showNotification: (msg: string) => void;
+// }> = ({ taxpayerId, onBack }) => (
+//   <div className="p-8">
+//     <button onClick={onBack} className="mb-4 text-blue-600 underline">
+//       &larr; Back
+//     </button>
+//     <h1>Taxpayer Profile: {taxpayerId}</h1>
+//   </div>
+// );
+
+// -------------- Wrapper to read param --------------
+const RouteWrapperForTaxpayerProfile: React.FC = () => {
+  const { taxpayerId } = useParams<{ taxpayerId: string }>();
+  const navigate = useNavigate();
+  if (!taxpayerId) return <PlaceholderPage title="No taxpayer specified" />;
+  return <TaxPayerProfileDetailContent taxpayerId={taxpayerId} onBack={() => navigate(-1)} showNotification={console.log} />;
+}
+
+  // Content Components
+ const DashboardContent: React.FC = () => {
+  const navigate = useNavigate();
+
+  const stats = [
+    { title: 'Total Tax Payers', value: '24,567', change: '+12%', color: 'text-green-400', icon: Users },
+    { title: 'Monthly Revenue', value: '₦2.4B', change: '+8%', color: 'text-green-400', icon: DollarSign },
+    { title: 'Pending Returns', value: '1,234', change: '-5%', color: 'text-red-400', icon: FileText },
+    { title: 'Active Directors', value: '89', change: '+3%', color: 'text-green-400', icon: UserCheck }
   ];
 
-  type MenuItemType = {
-    key: string;
-    label: string;
-    icon: React.ElementType;
-    path?: string;
-    hasSubmenu?: boolean;
-    submenu?: Array<{
-      key: string;
-      label: string;
-      path: string;
-    }>;
-  };
+  const quickActions = [
+    { icon: UserCheck, label: 'Verify Tax Payer', to: '/staff-dashboard/verification' },
+    { icon: FileText, label: 'Generate Report', to: '/staff-dashboard/reports/directors' },
+    { icon: CreditCard, label: 'Process Payment', to: '/staff-dashboard/payments' },
+    { icon: Eye, label: 'View Analytics', to: '/staff-dashboard/statistics' }
+  ];
 
-  const MenuItem = ({ item, level = 0 }: { item: MenuItemType; level?: number }) => {
-    const Icon = item.icon;
-    const isExpanded = expandedItems[item.key];
-    const isActive = activeItem === item.key;
+  return (
+    <div className="p-8">
+      <div className="mb-8">
+        <h1 className="text-3xl font-bold mb-2" style={{ color: '#2f363dff' }}>Staff Admin Dashboard</h1>
+        <p style={{ color: '#6c757d' }}>Welcome to the E-TAX Staff Administration Portal</p>
+      </div>
 
-    const handleClick = () => {
-      if (item.hasSubmenu) {
-        toggleExpanded(item.key);
-      } else {
-        setActiveItem(item.key);
-      }
-    };
-
-    return (
-      <div>
-        <div
-          onClick={handleClick}
-          className={`flex items-center justify-between px-4 py-3 cursor-pointer transition-all duration-200 ${
-            isActive ? 'bg-blue-50 border-r-4 border-blue-500' : 'hover:bg-gray-50'
-          } ${level > 0 ? 'pl-12' : ''}`}
-          style={{ 
-            color: isActive ? '#102e4a' : '#6c757d' 
-          }}
-          onMouseEnter={(e) => !isActive && ((e.target as HTMLElement).style.color = '#102e4a')}
-          onMouseLeave={(e) => !isActive && ((e.target as HTMLElement).style.color = '#6c757d')}
-        >
-          <div className="flex items-center space-x-3">
-            {!sidebarCollapsed && <Icon size={20} />}
-            {!sidebarCollapsed && <span className="font-medium">{item.label}</span>}
-          </div>
-          {item.hasSubmenu && !sidebarCollapsed && (
-            <div className="text-sm">
-              {isExpanded ? <ChevronDown size={16} /> : <ChevronRight size={16} />}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+        {stats.map((stat, index) => {
+          const StatIcon = stat.icon;
+          return (
+            <div key={index} className="bg-white rounded-lg shadow-lg p-6 hover:shadow-xl transition-shadow">
+              <div className="flex items-center justify-between mb-4">
+                <div className="p-3 rounded-lg" style={{ backgroundColor: '#f8f9fa' }}>
+                  <StatIcon size={24} style={{ color: '#102e4a' }} />
+                </div>
+                <div className={`text-sm font-semibold ${stat.color}`}>
+                  {stat.change}
+                </div>
+              </div>
+              <div>
+                <p className="text-sm mb-1" style={{ color: '#6c757d' }}>{stat.title}</p>
+                <p className="text-2xl font-bold" style={{ color: '#102e4a' }}>{stat.value}</p>
+              </div>
             </div>
-          )}
-        </div>
-        
-        {item.hasSubmenu && isExpanded && !sidebarCollapsed && (
-          <div className="ml-8 mt-2 space-y-1">
-            {item.submenu?.map((subItem) => (
-              <div
-                key={subItem.key}
-                onClick={() => setActiveItem(subItem.key)}
-                className={`flex items-center px-4 py-2 cursor-pointer transition-all duration-200 rounded mx-2 ${
-                  activeItem === subItem.key ? 'text-white' : 'hover:bg-gray-100'
-                }`}
-                style={{
-                  backgroundColor: activeItem === subItem.key ? '#102e4a' : 'transparent',
-                  color: activeItem === subItem.key ? 'white' : '#6c757d'
-                }}
-                onMouseEnter={(e) => {
-                  if (activeItem !== subItem.key) {
-                    (e.target as HTMLElement).style.color = '#102e4a';
-                  }
-                }}
-                onMouseLeave={(e) => {
-                  if (activeItem !== subItem.key) {
-                    (e.target as HTMLElement).style.color = '#6c757d';
-                  }
-                }}
-              >
-                <span className="text-sm">{subItem.label}</span>
+          );
+        })}
+      </div>
+
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+        <div className="bg-white rounded-lg shadow-lg p-6">
+          <h3 className="text-xl font-semibold mb-4" style={{ color: '#102e4a' }}>Recent Activities</h3>
+          <div className="space-y-4">
+            {[
+              { text: 'New tax payer registered', time: '2 minutes ago', color: 'bg-green-400' },
+              { text: 'Payment processed', time: '15 minutes ago', color: 'bg-blue-400' },
+              { text: 'Return filed', time: '1 hour ago', color: 'bg-yellow-400' },
+              { text: 'Assessment completed', time: '2 hours ago', color: 'bg-purple-400' },
+              { text: 'Tax audit scheduled', time: '3 hours ago', color: 'bg-red-400' }
+            ].map((activity, idx) => (
+              <div key={idx} className="flex items-center space-x-3 p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors">
+                <div className={`w-2 h-2 ${activity.color} rounded-full`}></div>
+                <div className="flex-1">
+                  <p className="text-sm font-medium" style={{ color: '#102e4a' }}>{activity.text}</p>
+                  <p className="text-xs" style={{ color: '#6c757d' }}>{activity.time}</p>
+                </div>
               </div>
             ))}
           </div>
-        )}
-      </div>
-    );
-  };
-
-  // Content Components
-  const DashboardContent = () => {
-    const stats = [
-      { title: 'Total Tax Payers', value: '24,567', change: '+12%', color: 'text-green-400', icon: Users },
-      { title: 'Monthly Revenue', value: '₦2.4B', change: '+8%', color: 'text-green-400', icon: DollarSign },
-      { title: 'Pending Returns', value: '1,234', change: '-5%', color: 'text-red-400', icon: FileText },
-      { title: 'Active Directors', value: '89', change: '+3%', color: 'text-green-400', icon: UserCheck }
-    ];
-
-    return (
-      <div className="p-8">
-        <div className="mb-8">
-          <h1 className="text-3xl font-bold mb-2" style={{ color: '#2f363dff' }}>Staff Admin Dashboard</h1>
-          <p style={{ color: '#6c757d' }}>Welcome to the E-TAX Staff Administration Portal</p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-          {stats.map((stat, index) => {
-            const StatIcon = stat.icon;
-            return (
-              <div key={index} className="bg-white rounded-lg shadow-lg p-6 hover:shadow-xl transition-shadow">
-                <div className="flex items-center justify-between mb-4">
-                  <div className="p-3 rounded-lg" style={{ backgroundColor: '#f8f9fa' }}>
-                    <StatIcon size={24} style={{ color: '#102e4a' }} />
-                  </div>
-                  <div className={`text-sm font-semibold ${stat.color}`}>
-                    {stat.change}
-                  </div>
-                </div>
-                <div>
-                  <p className="text-sm mb-1" style={{ color: '#6c757d' }}>{stat.title}</p>
-                  <p className="text-2xl font-bold" style={{ color: '#102e4a' }}>{stat.value}</p>
-                </div>
-              </div>
-            );
-          })}
-        </div>
-
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-          <div className="bg-white rounded-lg shadow-lg p-6">
-            <h3 className="text-xl font-semibold mb-4" style={{ color: '#102e4a' }}>Recent Activities</h3>
-            <div className="space-y-4">
-              {[
-                { text: 'New tax payer registered', time: '2 minutes ago', color: 'bg-green-400' },
-                { text: 'Payment processed', time: '15 minutes ago', color: 'bg-blue-400' },
-                { text: 'Return filed', time: '1 hour ago', color: 'bg-yellow-400' },
-                { text: 'Assessment completed', time: '2 hours ago', color: 'bg-purple-400' },
-                { text: 'Tax audit scheduled', time: '3 hours ago', color: 'bg-red-400' }
-              ].map((activity, index) => (
-                <div key={index} className="flex items-center space-x-3 p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors">
-                  <div className={`w-2 h-2 ${activity.color} rounded-full`}></div>
-                  <div className="flex-1">
-                    <p className="text-sm font-medium" style={{ color: '#102e4a' }}>{activity.text}</p>
-                    <p className="text-xs" style={{ color: '#6c757d' }}>{activity.time}</p>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-
-          <div className="bg-white rounded-lg shadow-lg p-6">
-            <h3 className="text-xl font-semibold mb-4" style={{ color: '#102e4a' }}>Quick Actions</h3>
-            <div className="grid grid-cols-2 gap-4">
-              {[
-                { icon: UserCheck, label: 'Verify Tax Payer', onClick: () => setActiveItem('tax-verification') },
-                { icon: FileText, label: 'Generate Report', onClick: () => setActiveItem('reports') },
-                { icon: CreditCard, label: 'Process Payment', onClick: () => setActiveItem('payments') },
-                { icon: Eye, label: 'View Analytics', onClick: () => setActiveItem('etax-statistics') }
-              ].map((action, index) => {
-                const ActionIcon = action.icon;
-                return (
-                  <button 
-                    key={index}
-                    onClick={action.onClick}
-                    className="p-4 text-white rounded-lg hover:shadow-lg transition-all duration-200 flex flex-col items-center"
-                    style={{ backgroundColor: '#102e4a' }}
-                    onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#a682ff'}
-                    onMouseLeave={(e) => e.currentTarget.style.backgroundColor = '#102e4a'}
-                  >
-                    <ActionIcon className="mb-2" size={24} />
-                    <span className="text-sm font-medium text-center">{action.label}</span>
-                  </button>
-                );
-              })}
-            </div>
+        <div className="bg-white rounded-lg shadow-lg p-6">
+          <h3 className="text-xl font-semibold mb-4" style={{ color: '#102e4a' }}>Quick Actions</h3>
+          <div className="grid grid-cols-2 gap-4">
+            {quickActions.map((action, index) => {
+              const ActionIcon = action.icon;
+              return (
+                <button
+                  key={index}
+                  onClick={() => navigate(action.to)}
+                  className="p-4 text-white rounded-lg hover:shadow-lg transition-all duration-200 flex flex-col items-center"
+                  style={{ backgroundColor: '#102e4a' }}
+                  onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = '#a682ff')}
+                  onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = '#102e4a')}
+                >
+                  <ActionIcon className="mb-2" size={24} />
+                  <span className="text-sm font-medium text-center">{action.label}</span>
+                </button>
+              );
+            })}
           </div>
         </div>
       </div>
-    );
-  };
+    </div>
+  );
+};
+
 
   const ETaxStatisticsContent = () => {
     const statisticsData = [
@@ -1342,19 +1258,52 @@ const CorporateTaxPayerProfileDetailContent: React.FC<Profileprops> = ({
 
 
 
-  const TaxServicesInterface = () => {
+  type ShowNotificationFn = (msg: string, level?: 'info' | 'success' | 'error') => void;
+
+interface TaxServicesInterfaceProps {
+  /**
+   * Optional: used by parent to open a modal and set its type (e.g. 'reset-password', 'notify', etc.)
+   */
+  setModalType?: (type: string) => void;
+
+  /**
+   * Optional: notification function from parent (toast/snackbar). If not provided, falls back to alert().
+   */
+  showNotification?: ShowNotificationFn;
+}
+
+const TaxServicesInterface: React.FC<TaxServicesInterfaceProps> = ({
+  setModalType,
+  showNotification,
+}) => {
   const [taxPayerNumber, setTaxPayerNumber] = useState('');
   const [showActions, setShowActions] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
 
+  const notify = (msg: string, level: Parameters<ShowNotificationFn>[1] = 'info') => {
+    if (typeof showNotification === 'function') {
+      showNotification(msg, level);
+    } else {
+      // fallback so it still works during dev
+      // eslint-disable-next-line no-alert
+      alert(msg);
+    }
+  };
+
   const handleContinue = async () => {
     if (!taxPayerNumber.trim()) return;
-    
+
     setIsLoading(true);
-    // Simulate API call
-    await new Promise(resolve => setTimeout(resolve, 1000));
-    setIsLoading(false);
-    setShowActions(true);
+    try {
+      // Simulate API call
+      await new Promise((resolve) => setTimeout(resolve, 1000));
+      setShowActions(true);
+      notify('Taxpayer found', 'success');
+    } catch (err) {
+      notify('Failed to validate taxpayer', 'error');
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const handleBack = () => {
@@ -1363,15 +1312,28 @@ const CorporateTaxPayerProfileDetailContent: React.FC<Profileprops> = ({
   };
 
   const handleRevalidateId = () => {
-    alert('Revalidating ID...');
+    // Example: maybe you want to open a modal for revalidation:
+    if (setModalType) {
+      setModalType('revalidate-id');
+    } else {
+      notify('Revalidating ID...', 'info');
+    }
   };
 
   const handleResetPassword = () => {
-    alert('Resetting password...');
+    if (setModalType) {
+      setModalType('reset-password');
+    } else {
+      notify('Resetting password...', 'info');
+    }
   };
 
   const handleSendNotification = () => {
-    alert('Sending notification...');
+    if (setModalType) {
+      setModalType('send-notification');
+    } else {
+      notify('Sending notification...', 'info');
+    }
   };
 
   return (
@@ -1407,10 +1369,12 @@ const CorporateTaxPayerProfileDetailContent: React.FC<Profileprops> = ({
                   <h2 className="text-xl font-semibold text-gray-800">Tax Services For</h2>
                 </div>
               </div>
+
               {showActions && (
                 <button
                   onClick={handleBack}
                   className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+                  aria-label="Back"
                 >
                   <ArrowLeft className="w-5 h-5 text-gray-600" />
                 </button>
@@ -1432,7 +1396,7 @@ const CorporateTaxPayerProfileDetailContent: React.FC<Profileprops> = ({
                     className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent outline-none transition-all"
                   />
                 </div>
-                
+
                 <div className="flex justify-end pt-4">
                   <button
                     onClick={handleContinue}
@@ -1441,7 +1405,7 @@ const CorporateTaxPayerProfileDetailContent: React.FC<Profileprops> = ({
                   >
                     {isLoading ? (
                       <>
-                        <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                        <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
                         <span>Loading...</span>
                       </>
                     ) : (
@@ -1461,7 +1425,7 @@ const CorporateTaxPayerProfileDetailContent: React.FC<Profileprops> = ({
                     {taxPayerNumber}
                   </div>
                 </div>
-                
+
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4 pt-4">
                   <button
                     onClick={handleRevalidateId}
@@ -1470,7 +1434,7 @@ const CorporateTaxPayerProfileDetailContent: React.FC<Profileprops> = ({
                     <CheckCircle className="w-5 h-5" />
                     <span>REVALIDATE ID</span>
                   </button>
-                  
+
                   <button
                     onClick={handleResetPassword}
                     className="flex items-center justify-center space-x-2 px-6 py-4 bg-orange-500 text-white font-medium rounded-lg hover:bg-orange-600 transition-colors"
@@ -1478,7 +1442,7 @@ const CorporateTaxPayerProfileDetailContent: React.FC<Profileprops> = ({
                     <RotateCcw className="w-5 h-5" />
                     <span>RESET PASSWORD</span>
                   </button>
-                  
+
                   <button
                     onClick={handleSendNotification}
                     className="flex items-center justify-center space-x-2 px-6 py-4 bg-purple-600 text-white font-medium rounded-lg hover:bg-purple-700 transition-colors"
@@ -1501,20 +1465,52 @@ const CorporateTaxPayerProfileDetailContent: React.FC<Profileprops> = ({
       </div>
     </div>
   );
-  }
+};
 
   // Individual Tax Payers (Inactive) Content
-  const IndividualTaxPayersInactiveContent = () => {
+  interface IndividualTaxPayersInactiveContentProps {
+  showNotification?: ShowNotificationFn;
+  setModalType?: (type: string) => void;
+  setShowModal?: (open: boolean) => void;
+}
+
+type InactiveTaxpayer = {
+  id: string;
+  fullName: string;
+  email: string;
+  phoneNumber: string;
+  bvn: string;
+  sector: string;
+  address: string;
+  isActivated: boolean;
+};
+
+const IndividualTaxPayersInactiveContent: React.FC<IndividualTaxPayersInactiveContentProps> = ({
+  showNotification,
+  setModalType,
+  setShowModal,
+}) => {
+  // Local notification wrapper: prefer parent showNotification if provided
+  const notify: ShowNotificationFn = (msg, level = 'info') => {
+    if (typeof showNotification === 'function') {
+      showNotification(msg, level);
+    } else {
+      // fallback for dev
+      // eslint-disable-next-line no-alert
+      alert(msg);
+    }
+  };
+
   const [filters, setFilters] = useState({
     taxId: '',
     firstName: '',
     middleName: '',
     lastName: '',
     email: '',
-    phoneNumber: ''
+    phoneNumber: '',
   });
 
-  const [inactiveTaxpayers, setInactiveTaxpayers] = useState([
+  const [inactiveTaxpayers, setInactiveTaxpayers] = useState<InactiveTaxpayer[]>([
     {
       id: 'TEMP-VUU2T7QX7Q',
       fullName: 'Mrs. Abigail Davou Emmanuel',
@@ -1523,7 +1519,7 @@ const CorporateTaxPayerProfileDetailContent: React.FC<Profileprops> = ({
       bvn: 'N/A',
       sector: '',
       address: '1 PINEWOOD COURT, LEKKI PH 1\nState: Lagos\nLGA: Eti Osa\nLCDA: Iru Victoria Island',
-      isActivated: false
+      isActivated: false,
     },
     {
       id: 'TEMP-FHSMQCSSH1',
@@ -1533,7 +1529,7 @@ const CorporateTaxPayerProfileDetailContent: React.FC<Profileprops> = ({
       bvn: 'N/A',
       sector: '',
       address: 'AVIATION TANK FARM DEPOT ALONG MURITALA INTERNATIONAL AIRPORT WAY, NACHO BUSSTOP\nState: Lagos\nLGA: Ikeja\nLCDA: Ikeja',
-      isActivated: false
+      isActivated: false,
     },
     {
       id: 'TEMP-X6BTILSUMD',
@@ -1543,11 +1539,11 @@ const CorporateTaxPayerProfileDetailContent: React.FC<Profileprops> = ({
       bvn: 'N/A',
       sector: '',
       address: '4 VICTOR OKWODU STREET, BADORE\nState: Lagos\nLGA: Ibeju/Lekki\nLCDA: Ibeju',
-      isActivated: false
-    }
+      isActivated: false,
+    },
   ]);
 
-  const handleFilterChange = (field: string, value: string) => {
+  const handleFilterChange = (field: keyof typeof filters, value: string) => {
     setFilters(prev => ({ ...prev, [field]: value }));
   };
 
@@ -1558,34 +1554,41 @@ const CorporateTaxPayerProfileDetailContent: React.FC<Profileprops> = ({
       middleName: '',
       lastName: '',
       email: '',
-      phoneNumber: ''
+      phoneNumber: '',
     });
-    showNotification('Filters cleared');
+    notify('Filters cleared', 'info');
   };
 
   const handleFilter = () => {
     const hasFilters = Object.values(filters).some(value => value.trim() !== '');
     if (!hasFilters) {
-      showNotification('Please enter at least one filter criteria');
+      notify('Please enter at least one filter criteria', 'info');
       return;
     }
-    showNotification('Filtering inactive taxpayers...');
+    notify('Filtering inactive taxpayers...', 'info');
+
+    // TODO: replace with real API call that uses filters
+    // Example:
+    // fetch('/api/taxpayers/inactive?...')
+    //   .then(...)
   };
 
   const handleActivate = (taxpayerId: string) => {
-    setInactiveTaxpayers(prev => 
-      prev.map(taxpayer => 
-        taxpayer.id === taxpayerId 
-          ? { ...taxpayer, isActivated: true }
-          : taxpayer
-      )
+    setInactiveTaxpayers(prev =>
+      prev.map(t => (t.id === taxpayerId ? { ...t, isActivated: true } : t))
     );
-    showNotification(`Taxpayer ${taxpayerId} activated successfully`);
+    notify(`Taxpayer ${taxpayerId} activated successfully`, 'success');
   };
 
   const handleAddInactiveTaxpayer = () => {
-    setModalType('add-taxpayer');
-    setShowModal(true);
+    if (typeof setModalType === 'function' && typeof setShowModal === 'function') {
+      setModalType('add-taxpayer');
+      setShowModal(true);
+    } else {
+      // fallback: notify / console
+      notify('Open add-taxpayer modal (parent did not provide modal handlers)', 'info');
+      // You could also open a local modal here if you want
+    }
   };
 
   return (
@@ -1593,9 +1596,13 @@ const CorporateTaxPayerProfileDetailContent: React.FC<Profileprops> = ({
       {/* Header */}
       <div className="flex items-center justify-between mb-8">
         <h1 className="text-3xl font-bold" style={{ color: '#102e4a' }}>
-          Individual Tax Payers(Unactivated)
+          Individual Tax Payers (Unactivated)
         </h1>
-        <div className="w-10 h-10 rounded-full flex items-center justify-center" style={{ backgroundColor: '#f8f9fa' }}>
+        <div
+          className="w-10 h-10 rounded-full flex items-center justify-center"
+          style={{ backgroundColor: '#f8f9fa' }}
+          aria-hidden
+        >
           <Users style={{ color: '#102e4a' }} size={20} />
         </div>
       </div>
@@ -1611,10 +1618,12 @@ const CorporateTaxPayerProfileDetailContent: React.FC<Profileprops> = ({
               Individual Tax Payers (Unactivated)
             </h2>
           </div>
-          <button 
+
+          <button
             onClick={handleAddInactiveTaxpayer}
             className="w-12 h-12 bg-green-500 text-white rounded hover:bg-green-600 transition-all flex items-center justify-center text-xl font-bold"
             title="Add Inactive Taxpayer"
+            aria-label="Add Inactive Taxpayer"
           >
             +
           </button>
@@ -1623,28 +1632,75 @@ const CorporateTaxPayerProfileDetailContent: React.FC<Profileprops> = ({
         {/* Filters */}
         <div className="mb-6">
           <div className="mb-4">
-            <span className="text-sm font-medium" style={{ color: '#6c757d' }}>Filters:</span>
+            <span className="text-sm font-medium" style={{ color: '#6c757d' }}>
+              Filters:
+            </span>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
-            <input type="text" placeholder="Tax ID" value={filters.taxId} onChange={(e) => handleFilterChange('taxId', e.target.value)} className="p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" style={{ color: '#102e4a' }} />
-            <input type="text" placeholder="First Name" value={filters.firstName} onChange={(e) => handleFilterChange('firstName', e.target.value)} className="p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" style={{ color: '#102e4a' }} />
-            <input type="text" placeholder="Middle Name" value={filters.middleName} onChange={(e) => handleFilterChange('middleName', e.target.value)} className="p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" style={{ color: '#102e4a' }} />
-            <input type="text" placeholder="Last Name" value={filters.lastName} onChange={(e) => handleFilterChange('lastName', e.target.value)} className="p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" style={{ color: '#102e4a' }} />
-            <input type="email" placeholder="Email" value={filters.email} onChange={(e) => handleFilterChange('email', e.target.value)} className="p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" style={{ color: '#102e4a' }} />
-            <input type="text" placeholder="Phone Number" value={filters.phoneNumber} onChange={(e) => handleFilterChange('phoneNumber', e.target.value)} className="p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" style={{ color: '#102e4a' }} />
+            <input
+              type="text"
+              placeholder="Tax ID"
+              value={filters.taxId}
+              onChange={e => handleFilterChange('taxId', e.target.value)}
+              className="p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+              style={{ color: '#102e4a' }}
+            />
+            <input
+              type="text"
+              placeholder="First Name"
+              value={filters.firstName}
+              onChange={e => handleFilterChange('firstName', e.target.value)}
+              className="p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+              style={{ color: '#102e4a' }}
+            />
+            <input
+              type="text"
+              placeholder="Middle Name"
+              value={filters.middleName}
+              onChange={e => handleFilterChange('middleName', e.target.value)}
+              className="p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+              style={{ color: '#102e4a' }}
+            />
+            <input
+              type="text"
+              placeholder="Last Name"
+              value={filters.lastName}
+              onChange={e => handleFilterChange('lastName', e.target.value)}
+              className="p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+              style={{ color: '#102e4a' }}
+            />
+            <input
+              type="email"
+              placeholder="Email"
+              value={filters.email}
+              onChange={e => handleFilterChange('email', e.target.value)}
+              className="p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+              style={{ color: '#102e4a' }}
+            />
+            <input
+              type="text"
+              placeholder="Phone Number"
+              value={filters.phoneNumber}
+              onChange={e => handleFilterChange('phoneNumber', e.target.value)}
+              className="p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+              style={{ color: '#102e4a' }}
+            />
           </div>
 
           <div className="flex justify-end gap-4">
-            <button onClick={handleReset} className="px-6 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition-all font-medium">
+            <button
+              onClick={handleReset}
+              className="px-6 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition-all font-medium"
+            >
               RESET
             </button>
-            <button 
+            <button
               onClick={handleFilter}
               className="px-6 py-2 text-white rounded-lg hover:shadow-lg transition-all font-medium"
               style={{ backgroundColor: '#102e4a' }}
-              onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#a682ff'}
-              onMouseLeave={(e) => e.currentTarget.style.backgroundColor = '#102e4a'}
+              onMouseEnter={e => (e.currentTarget.style.backgroundColor = '#a682ff')}
+              onMouseLeave={e => (e.currentTarget.style.backgroundColor = '#102e4a')}
             >
               FILTER
             </button>
@@ -1656,31 +1712,55 @@ const CorporateTaxPayerProfileDetailContent: React.FC<Profileprops> = ({
           <table className="w-full">
             <thead style={{ backgroundColor: '#f8f9fa' }}>
               <tr>
-                <th className="px-6 py-4 text-left text-sm font-semibold" style={{ color: '#102e4a' }}>Tax Payer ID</th>
-                <th className="px-6 py-4 text-left text-sm font-semibold" style={{ color: '#102e4a' }}>Full Name</th>
-                <th className="px-6 py-4 text-left text-sm font-semibold" style={{ color: '#102e4a' }}>Email</th>
-                <th className="px-6 py-4 text-left text-sm font-semibold" style={{ color: '#102e4a' }}>Phone Number</th>
-                <th className="px-6 py-4 text-left text-sm font-semibold" style={{ color: '#102e4a' }}>BVN</th>
-                <th className="px-6 py-4 text-left text-sm font-semibold" style={{ color: '#102e4a' }}>Sector</th>
-                <th className="px-6 py-4 text-left text-sm font-semibold" style={{ color: '#102e4a' }}>Address</th>
-                <th className="px-6 py-4 text-left text-sm font-semibold" style={{ color: '#102e4a' }}>Action</th>
+                <th className="px-6 py-4 text-left text-sm font-semibold" style={{ color: '#102e4a' }}>
+                  Tax Payer ID
+                </th>
+                <th className="px-6 py-4 text-left text-sm font-semibold" style={{ color: '#102e4a' }}>
+                  Full Name
+                </th>
+                <th className="px-6 py-4 text-left text-sm font-semibold" style={{ color: '#102e4a' }}>
+                  Email
+                </th>
+                <th className="px-6 py-4 text-left text-sm font-semibold" style={{ color: '#102e4a' }}>
+                  Phone Number
+                </th>
+                <th className="px-6 py-4 text-left text-sm font-semibold" style={{ color: '#102e4a' }}>
+                  BVN
+                </th>
+                <th className="px-6 py-4 text-left text-sm font-semibold" style={{ color: '#102e4a' }}>
+                  Sector
+                </th>
+                <th className="px-6 py-4 text-left text-sm font-semibold" style={{ color: '#102e4a' }}>
+                  Address
+                </th>
+                <th className="px-6 py-4 text-left text-sm font-semibold" style={{ color: '#102e4a' }}>
+                  Action
+                </th>
               </tr>
             </thead>
             <tbody>
-              {inactiveTaxpayers.map((taxpayer) => (
+              {inactiveTaxpayers.map(taxpayer => (
                 <tr key={taxpayer.id} className="border-t border-gray-200 hover:bg-gray-50">
                   <td className="px-6 py-4">
                     <span className="text-blue-600 hover:underline cursor-pointer">{taxpayer.id}</span>
                   </td>
-                  <td className="px-6 py-4" style={{ color: '#102e4a' }}>{taxpayer.fullName}</td>
-                  <td className="px-6 py-4" style={{ color: '#6c757d' }}>{taxpayer.email}</td>
-                  <td className="px-6 py-4" style={{ color: '#6c757d' }}>{taxpayer.phoneNumber}</td>
-                  <td className="px-6 py-4" style={{ color: '#6c757d' }}>{taxpayer.bvn}</td>
-                  <td className="px-6 py-4" style={{ color: '#6c757d' }}>{taxpayer.sector}</td>
+                  <td className="px-6 py-4" style={{ color: '#102e4a' }}>
+                    {taxpayer.fullName}
+                  </td>
                   <td className="px-6 py-4" style={{ color: '#6c757d' }}>
-                    <div className="text-sm whitespace-pre-line max-w-xs">
-                      {taxpayer.address}
-                    </div>
+                    {taxpayer.email}
+                  </td>
+                  <td className="px-6 py-4" style={{ color: '#6c757d' }}>
+                    {taxpayer.phoneNumber}
+                  </td>
+                  <td className="px-6 py-4" style={{ color: '#6c757d' }}>
+                    {taxpayer.bvn}
+                  </td>
+                  <td className="px-6 py-4" style={{ color: '#6c757d' }}>
+                    {taxpayer.sector}
+                  </td>
+                  <td className="px-6 py-4" style={{ color: '#6c757d' }}>
+                    <div className="text-sm whitespace-pre-line max-w-xs">{taxpayer.address}</div>
                   </td>
                   <td className="px-6 py-4">
                     {taxpayer.isActivated ? (
@@ -1688,7 +1768,7 @@ const CorporateTaxPayerProfileDetailContent: React.FC<Profileprops> = ({
                         ACTIVATED
                       </span>
                     ) : (
-                      <button 
+                      <button
                         onClick={() => handleActivate(taxpayer.id)}
                         className="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600 transition-all font-medium"
                       >
@@ -3392,91 +3472,90 @@ const DirectorsReport: React.FC = () => {
   );
 };
 
+
   // Modal Component
-  const Modal = ({ isOpen, onClose, type }: { isOpen: boolean; onClose: () => void; type: string }) => {
-    if (!isOpen) return null;
+type NotifyFn = (message: string) => void;
 
-    const handleSubmit = (e: React.FormEvent) => {
-      e.preventDefault();
-      Notification({message: `${type.replace('-', ' ')} action completed successfully`});
+interface ModalProps {
+  isOpen: boolean;
+  onClose: () => void;
+  type: string;
+  showNotification?: NotifyFn;
+  onSave?: (payload: Record<string, any>) => void;
+}
 
-      onClose();
-    };
+/* Modal component (keeps your original form markup, simplified) */
+// const Modal: React.FC<ModalProps> = ({ isOpen, onClose, type, showNotification, onSave }) => {
+//   if (!isOpen) return null;
 
-    return (
-      <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-        <div className="bg-white rounded-lg p-6 w-96 max-w-lg">
-          <div className="flex justify-between items-center mb-4">
-            <h3 className="text-lg font-semibold" style={{ color: '#102e4a' }}>
-              {type === 'add-taxpayer' && 'Add New Taxpayer'}
-              {type === 'add-child' && 'Add Child'}
-              {type === 'add-spouse' && 'Add Spouse'}
-              {type === 'add-company' && 'Add New Company'}
-            </h3>
-            <button onClick={onClose} className="text-gray-500 hover:text-gray-700">
-              ✕
-            </button>
-          </div>
-          
-          <form onSubmit={handleSubmit}>
-            {type === 'add-taxpayer' && (
-              <>
-                <input className="w-full p-3 border rounded mb-3" placeholder="Full Name" required />
-                <input className="w-full p-3 border rounded mb-3" placeholder="Email" type="email" required />
-                <input className="w-full p-3 border rounded mb-3" placeholder="Phone Number" required />
-                <input className="w-full p-3 border rounded mb-3" placeholder="TIN Number" required />
-              </>
-            )}
-            
-            {type === 'add-child' && (
-              <>
-                <input className="w-full p-3 border rounded mb-3" placeholder="Child's Name" required />
-                <input className="w-full p-3 border rounded mb-3" placeholder="Date of Birth" type="date" required />
-                <select className="w-full p-3 border rounded mb-3" required>
-                  <option value="">Select Gender</option>
-                  <option value="male">Male</option>
-                  <option value="female">Female</option>
-                </select>
-              </>
-            )}
-            
-            {type === 'add-spouse' && (
-              <>
-                <input className="w-full p-3 border rounded mb-3" placeholder="Spouse's Name" required />
-                <input className="w-full p-3 border rounded mb-3" placeholder="TIN Number" />
-                <input className="w-full p-3 border rounded mb-3" placeholder="Phone Number" required />
-              </>
-            )}
+//   const notify = (message: string) => {
+//     if (typeof showNotification === 'function') {
+//       showNotification(message);
+//     } else {
+//       // fallback
+//       // eslint-disable-next-line no-alert
+//       alert(message);
+//     }
+//   };
 
-            {type === 'add-company' && (
-              <>
-                <input className="w-full p-3 border rounded mb-3" placeholder="Company Name" required />
-                <input className="w-full p-3 border rounded mb-3" placeholder="Registration Number" required />
-                <input className="w-full p-3 border rounded mb-3" placeholder="Email" type="email" required />
-                <input className="w-full p-3 border rounded mb-3" placeholder="Phone Number" required />
-              </>
-            )}
-            
-            <div className="flex gap-3 mt-4">
-              <button 
-                type="button" 
-                onClick={onClose}
-                className="flex-1 px-4 py-2 border border-gray-300 rounded hover:bg-gray-50"
-              >
-                Cancel
-              </button>
-              <button 
-                type="submit"
-                className="flex-1 px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600"
-              >
-                Save
-              </button>
-            </div>
-          </form>
-        </div>
-      </div>
-    );
-  };
+//   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+//     e.preventDefault();
+//     const form = e.currentTarget;
+//     const formData = Array.from(new FormData(form)).reduce<Record<string, any>>((acc, [k, v]) => {
+//       acc[k] = v;
+//       return acc;
+//     }, {});
+
+//     if (typeof onSave === 'function') onSave(formData);
+
+//     notify(`${type.replace(/-/g, ' ')} action completed successfully`);
+//     onClose();
+//   };
+
+//   return (
+//     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+//       <div className="bg-white rounded-lg p-6 w-11/12 sm:w-96 max-w-lg">
+//         <div className="flex justify-between items-center mb-4">
+//           <h3 className="text-lg font-semibold" style={{ color: '#102e4a' }}>
+//             {type === 'add-taxpayer' && 'Add New Taxpayer'}
+//             {type === 'add-child' && 'Add Child'}
+//             {type === 'add-spouse' && 'Add Spouse'}
+//             {type === 'add-company' && 'Add New Company'}
+//           </h3>
+//           <button onClick={onClose} className="text-gray-500 hover:text-gray-700" aria-label="Close modal">
+//             ✕
+//           </button>
+//         </div>
+
+//         <form onSubmit={handleSubmit}>
+//           {/* Example: render fields depending on type */}
+//           {type === 'add-taxpayer' && (
+//             <>
+//               <input name="fullName" className="w-full p-3 border rounded mb-3" placeholder="Full Name" required />
+//               <input name="email" className="w-full p-3 border rounded mb-3" placeholder="Email" type="email" required />
+//             </>
+//           )}
+
+//           {type === 'add-company' && (
+//             <>
+//               <input name="companyName" className="w-full p-3 border rounded mb-3" placeholder="Company Name" required />
+//               <input name="regNumber" className="w-full p-3 border rounded mb-3" placeholder="Registration Number" required />
+//             </>
+//           )}
+
+//           <div className="flex gap-3 mt-4">
+//             <button type="button" onClick={onClose} className="flex-1 px-4 py-2 border border-gray-300 rounded hover:bg-gray-50">
+//               Cancel
+//             </button>
+//             <button type="submit" className="flex-1 px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600">
+//               Save
+//             </button>
+//           </div>
+//         </form>
+//       </div>
+//     </div>
+//   );
+// };
 
   // Notification Component
   const Notification = ({ message }: { message: string }) => {
@@ -3897,156 +3976,229 @@ const DirectorsReport: React.FC = () => {
       </div>
     </div>
   );
-};
-
-
-  // Main content renderer
-  const renderContent = () => {
-    switch (activeItem) {
-      case 'dashboard':
-        return <DashboardContent />;
-      case 'etax-statistics':
-        return <ETaxStatisticsContent />;
-      case 'individual-payers':
-        return <IndividualTaxPayersContent />;
-      case 'corporate-payers':
-        return <CorporateTaxPayersContent />;
-      case 'individual-inactive':
-        return <IndividualTaxPayersInactiveContent />;
-      case 'bulk-registration':
-        return <BulkIndividualRegistrationContent />;
-      case 'tax-verification':
-        return <TaxPayerVerificationContent />;
-      case 'payments':
-        return <GenerateNewBillInterface />;
-      case 'tax-services':
-        return <TaxServicesInterface/>;
-      case 'tax-offices':
-        return <GenericContent title="Tax Offices" description="Manage tax office locations and staff assignments" icon={Building2} />;
-      case 'merge-requests':
-        return <MergeRequestsInterface/>;
-      case 'tama-registration':
-        return <GenericContent title="TAMA Registration" description="Tax Agent and Multiplier Agent registration system" icon={Shield} />;
-      case 'rmu-revenue':
-        return <GenericContent title="RMU Revenue" description="Revenue Mobilization Unit tracking and reports" icon={TrendingUp} />;
-      case 'laspppa':
-        return <LASPPPARequestsInterface />;
-      case 'directors':
-        return <DirectorsReport/>;
-      case 'debts':
-        return <GenericContent title="Debts Management" description="Track and manage outstanding tax debts" icon={DollarSign} />;
-      case 'individual-returns':
-      case 'corporate-returns':
-      case 'adequacy-checks':
-        return <GenericContent title="Tax Returns" description="Process and review individual and corporate tax returns" icon={FileText} />;
-      case 'individual-assessments':
-      case 'corporate-assessments':
-        return <GenericContent title="Tax Assessments" description="Create and manage tax assessments" icon={ClipboardList} />;
-      case 'tax-audit':
-        return <GenericContent title="Tax Audit" description="Conduct and manage tax audits" icon={Calculator} />;
-      case 'revenue':
-        return <GenericContent title="Revenue Management" description="Monitor and analyze revenue collections" icon={Banknote} />;
-      case 'bills':
-        return <GenericContent title="Bills Management" description="Generate and track tax bills" icon={Receipt} />;
-      case 'transactions':
-        return <GenericContent title="Transactions" description="View and manage all tax transactions" icon={ArrowRightLeft} />;
-      case 'expatriates':
-        return <GenericContent title="Expatriates Management" description="Manage expatriate tax obligations" icon={UserX} />;
-      case 'trend-collection':
-        return <GenericContent title="Trend Collection" description="Analyze tax collection trends and patterns" icon={TrendingDown} />;
-      case 'assessment-requests':
-        return <GenericContent title="Assessment Requests" description="Handle taxpayer assessment requests" icon={FileQuestion} />;
-      case 'egis':
-        return <GenericContent title="EGIS Integration" description="Electronic Government Information System" icon={Globe} />;
-      case 'direct-messages':
-        return <GenericContent title="Direct Messages" description="Internal communication system" icon={MessageSquare} />;
-      case 'download-manual':
-        return <GenericContent title="Download Manual" description="Access system manuals and documentation" icon={Download} />;
-      default:
-        return <DashboardContent />;
-    }
   };
 
+  // type ModalType =
+  // | 'add-company'
+  // | 'add-taxpayer'
+  // | 'edit-taxpayer'
+  // | 'delete-taxpayer';
+  
+const ETaxAdminDashboard: React.FC = () => {
+  const [activeItem, setActiveItem] = useState<string>('dashboard');
+  const [expandedItems, setExpandedItems] = useState<Record<string, boolean>>({});
+  const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
+  const [notification, setNotification] = useState('');
+  // const [showModal, setShowModal] = useState(false);
+  // const [modalType, setModalType] = useState<string>('');
+
+  const location = useLocation();
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    // Strip base route for matching, assuming base is /staff-dashboard
+    const activePath = location.pathname;
+
+    // Expand any parent menus if a submenu path is active
+    menuItems.forEach(item => {
+      if (item.hasSubmenu && item.submenu) {
+        const anyChildActive = item.submenu.some(s => activePath.startsWith(s.path));
+        setExpandedItems(prev => ({ ...prev, [item.key]: anyChildActive }));
+      }
+    });
+
+    // Find active main or submenu item based on current path
+    let matchedKey = '';
+    for (const item of menuItems) {
+      if (item.path === activePath) {
+        matchedKey = item.key;
+        break;
+      }
+      if (item.hasSubmenu && item.submenu) {
+        const foundSub = item.submenu.find(s => s.path === activePath);
+        if (foundSub) {
+          matchedKey = foundSub.key;
+          break;
+        }
+      }
+    }
+    if (matchedKey) setActiveItem(matchedKey);
+  }, [location.pathname]);
+
+  const toggleExpanded = (key: string) => {
+    setExpandedItems(prev => ({ ...prev, [key]: !prev[key] }));
+  };
+
+  const showNotification = (message: string) => {
+    setNotification(message);
+    setTimeout(() => setNotification(''), 3000);
+  };
+
+  // const handleModalSave = (payload: Record<string, any>) => {
+  //   // handle the saved form data (API call, store update, etc.)
+  //   console.log('Modal saved payload:', payload);
+  // };
+
+  // const openModal = (type: ModalType) => {
+  //   setModalType(type);
+  //   setShowModal(true);
+  // };
+
+
+
+
+
   return (
-    <div className="flex h-screen bg-white">
+    <div className="flex min-h-screen bg-gray-100">
       {/* Sidebar */}
-      <div 
-        className={`${sidebarCollapsed ? 'w-16' : 'w-80'} transition-all duration-300 flex flex-col shadow-lg bg-white border-r border-gray-200`}
-      >
-        {/* Header */}
-        <div className="flex items-center justify-between p-4 border-b border-gray-200">
+      <aside className={`bg-white shadow-md transition-width duration-300 ${sidebarCollapsed ? 'w-20' : 'w-64'}`}>
+        <div className="p-4 border-b flex items-center justify-between">
           {!sidebarCollapsed && (
-            <div className="flex items-center space-x-3">
-              <div className="w-10 h-10 rounded-lg flex items-center justify-center" style={{ backgroundColor: '#102e4a' }}>
-                <Shield style={{ color: 'white' }} size={24} />
-              </div>
-              <div>
-                <h1 className="font-bold text-lg" style={{ color: '#102e4a' }}>E-TAX</h1>
-                <p className="text-xs" style={{ color: '#6c757d' }}>Staff Portal</p>
-              </div>
-            </div>
+            <h3 className="text-lg font-bold" style={{ color: '#102e4a' }}>
+              E-TAX Staff
+            </h3>
           )}
-          <button
-            onClick={() => setSidebarCollapsed(!sidebarCollapsed)}
-            className="p-2 rounded-lg hover:bg-gray-100 transition-all duration-200"
-            style={{ color: '#102e4a' }}
-          >
-            {sidebarCollapsed ? <Menu size={20} /> : <X size={20} />}
+          <button onClick={() => setSidebarCollapsed(s => !s)} className="text-sm">
+            {sidebarCollapsed ? <Menu size={16} /> : <X size={16} />}
           </button>
         </div>
 
-        {/* User Profile */}
-        {!sidebarCollapsed && (
-          <div className="p-4 border-b border-gray-200">
-            <div className="flex items-center space-x-3">
-              <div className="w-12 h-12 rounded-full flex items-center justify-center" style={{ backgroundColor: '#f8f9fa' }}>
-                <Users style={{ color: '#102e4a' }} size={24} />
-              </div>
-              <div>
-                <h3 className="font-semibold" style={{ color: '#102e4a' }}>Admin User</h3>
-                <p className="text-sm" style={{ color: '#6c757d' }}>Staff Administrator</p>
-              </div>
-            </div>
-          </div>
-        )}
-
-        {/* Navigation */}
-        <nav className="flex-1 overflow-y-auto py-4">
-          {menuItems.map((item) => (
-            <MenuItem key={item.key} item={item} />
+        <nav className="p-2 space-y-1">
+          {menuItems.map(item => (
+            <MenuItem
+              key={item.key}
+              item={item}
+              level={0}
+              activeItem={activeItem}
+              expandedItems={expandedItems}
+              toggleExpanded={toggleExpanded}
+              setActiveItem={setActiveItem}
+              sidebarCollapsed={sidebarCollapsed}
+            />
           ))}
         </nav>
-      </div>
+      </aside>
 
-      {/* Main Content */}
-      <div className="flex-1 overflow-y-auto bg-gray-50">
-        {renderContent()}
-      </div>
+      {/* Main content area */}
+      <main className="flex-1 flex flex-col">
+        <div className="p-4 border-b bg-white flex items-center justify-between">
+          <div className="flex items-center space-x-3">
+            <button onClick={() => navigate('/')} className="text-sm text-blue-600 hover:underline">
+              Back to site
+            </button>
+            <h4 className="font-semibold">Staff Dashboard</h4>
+          </div>
+          <div className="flex items-center space-x-3">
+            <button
+              onClick={() => showNotification('Refreshed')}
+              className="flex items-center px-3 py-1 rounded bg-gray-100 hover:bg-gray-200 transition"
+              title="Refresh"
+            >
+              <RefreshCw size={16} />
+              <span className="ml-2 text-sm">Refresh</span>
+            </button>
+            <button
+              title="Messages"
+              aria-label="Messages"
+              className="p-2"
+              onClick={() => {/* ... */}}
+            >
+              <MessageCircle size={20} />
+            </button>
 
-      {/* Modal */}
-      <Modal 
-        isOpen={showModal} 
-        onClose={() => setShowModal(false)} 
-        type={modalType} 
-      />
+            <span title="Notifications" role="button" aria-label="Notifications" className="p-2">
+              <Bell size={20} />
+            </span>
+          </div>
+        </div>
 
-      {/* Notification */}
-      <Notification message={notification} />
+        <div className="flex-1 overflow-auto p-4 bg-gray-50">
+          <Routes>
+            <Route index element={<Navigate to="dashboard" replace />} />
+            <Route path="dashboard" element={<DashboardContent />} />
+            <Route path="statistics" element={<ETaxStatisticsContent/>} />
 
-      {/* CSS for animations */}
-      <style>
-        {`
-          @keyframes fade-in {
-            from { opacity: 0; transform: translateY(-20px); }
-            to { opacity: 1; transform: translateY(0); }
-          }
-          .animate-fade-in {
-            animation: fade-in 0.3s ease-out;
-          }
-        `}
-      </style>
+            {/* Taxpayers */}
+            <Route path="taxpayers/individual" element={<IndividualTaxPayersContent  />} />
+            <Route path="taxpayers/individual-inactive" element={<IndividualTaxPayersInactiveContent/>} />
+            <Route path="taxpayers/bulk-registration" element={<BulkIndividualRegistrationContent  />} />
+            <Route path="taxpayers/corporate" element={<CorporateTaxPayersContent  />} />
+
+            {/* Other routes */}
+            <Route path="verification" element={<TaxPayerVerificationContent/>} />
+            <Route path="services" element={<TaxServicesInterface/>} />
+            <Route path="offices" element={<GenericContent title="Tax Offices" description="Manage tax office locations and staff assignments" icon={Building2} />} />
+            <Route path="merge-requests" element={<MergeRequestsInterface />} />
+            <Route path="tama-registration" element={<GenericContent title="TAMA Registration" description="Tax Agent and Multiplier Agent registration system" icon={Shield} />} />
+            <Route path="rmu/revenue" element={<GenericContent title="RMU Revenue" description="Revenue Mobilization Unit tracking and reports" icon={TrendingUp} />} />
+
+            <Route path="payments" element={<GenerateNewBillInterface />} />
+            <Route path="laspppa" element={<LASPPPARequestsInterface />} />
+            <Route path="reports/directors" element={<DirectorsReport/>} />
+            <Route path="debts" element={<GenericContent title="Debts Management" description="Track and manage outstanding tax debts" icon={DollarSign}  />} />
+
+            <Route path="returns/individual" element={<GenericContent title="Revenue Management" description="Monitor and analyze revenue collections" icon={Banknote} />} />
+            <Route path="returns/corporate" element={<GenericContent title="Revenue Management" description="Monitor and analyze revenue collections" icon={Banknote}/>} />
+            <Route path="returns/adequacy-checks" element={<GenericContent title="Tax Returns" description="Process and review individual and corporate tax returns" icon={FileText} />} />
+
+            <Route path="assessments/individual" element={<GenericContent title="Tax Assessments" description="Create and manage tax assessments" icon={ClipboardList}/>} />
+            <Route path="assessments/corporate" element={<GenericContent title="Tax Assessments" description="Create and manage tax assessments" icon={ClipboardList} />} />
+
+            <Route path="tax-audit" element={<GenericContent title="Tax Audit" description="Conduct and manage tax audits" icon={Calculator}/>} />
+            <Route path="revenue" element={<GenericContent title="Revenue Management" description="Monitor and analyze revenue collections" icon={Banknote}/>} />
+            <Route path="bills" element={<GenericContent title="Bills Management" description="Generate and track tax bills" icon={Receipt} />} />
+            <Route path="ebs-reports/transactions" element={<GenericContent title="Transactions" description="View and manage all tax transactions" icon={ArrowRightLeft}/>} />
+            <Route path="ebs-reports/expatriates" element={<GenericContent title="Expatriates Management" description="Manage expatriate tax obligations" icon={UserX} />} />
+            <Route path="ebs-reports/trend-collection" element={<GenericContent title="Trend Collection" description="Analyze tax collection trends and patterns" icon={TrendingDown}/>} />
+            <Route path="transactions" element={<PlaceholderPage title="Transactions" />} />
+            <Route path="expatriates" element={<PlaceholderPage title="Expatriates" />} />
+            <Route path="trend-collection" element={<GenericContent title="Trend Collection" description="Analyze tax collection trends and patterns" icon={TrendingDown}/>} />
+            <Route path="assessment-requests" element={<GenericContent title="Assessment Requests" description="Handle taxpayer assessment requests" icon={FileQuestion} />} />
+            <Route path="egis" element={<GenericContent title="EGIS Integration" description="Electronic Government Information System" icon={Globe} />} />
+            <Route path="messages/direct" element={<GenericContent title="Direct Messages" description="Internal communication system" icon={MessageSquare}  />} />
+            <Route path="download-manual" element={<GenericContent title="Download Manual" description="Access system manuals and documentation" icon={Download} />} />
+
+            {/* Taxpayer profile wrapper */}
+            <Route path="taxpayers/profile/:taxpayerId" element={<RouteWrapperForTaxpayerProfile />} />
+
+            {/* Fallback 404 */}
+            <Route path="*" element={<PlaceholderPage title="404 — Staff page not found" />} />
+          </Routes>
+        </div>
+          
+        {/* <Modal
+          isOpen={showModal}
+          onClose={() => setShowModal(false)}
+          type={modalType}
+          showNotification={showNotification}
+          onSave={handleModalSave}
+        /> */}
+
+        {/* Notification */}
+        {notification && (
+          <div className="fixed bottom-6 right-6 bg-blue-600 text-white px-4 py-2 rounded shadow animate-fade-in">
+            {notification}
+          </div>
+        )}
+      </main>
+
+      {/* CSS animations */}
+      <style>{`
+        @keyframes fade-in {
+          from { opacity: 0; transform: translateY(20px); }
+          to { opacity: 1; transform: translateY(0); }
+        }
+        .animate-fade-in {
+          animation: fade-in 0.3s ease-out;
+        }
+        .transition-width {
+          transition-property: width;
+          transition-duration: 300ms;
+          transition-timing-function: ease;
+        }
+      `}</style>
     </div>
   );
-};
+}
 
 export default ETaxAdminDashboard;
