@@ -1,35 +1,84 @@
-import { BrowserRouter, Routes, Route } from 'react-router-dom';
+// src/App.tsx
+import React from 'react';
+import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+
+import IRSLandingPage from './pages/landing';
 import LoginPage from './pages/login';
 import RegistrationForm from './pages/registration';
+
 import TaxpayerDashboard from './componenets/taxpayerDashboard';
 import ConsultantDashboard from './componenets/ConsultantDashboard';
-import IRSLandingPage from './pages/landing';
 import ETaxDashboard from './componenets/CorporateDashboard';
 import ETaxAdminDashboard from './componenets/StaffDashboard';
 
-function App() {
-  return (
-    
-      <BrowserRouter>
-        <Routes>
-          <Route path="/" element={<IRSLandingPage />} />
-          <Route path='/login' element={<LoginPage/>}/>
-          <Route path='/register' element={<RegistrationForm/>}/>
-          <Route path='/taxpayer-dashboard' element={<TaxpayerDashboard/>}>
-            <Route index element={<TaxpayerDashboard />} />
-            <Route path='profile-management' element={<TaxpayerDashboard />} />
-            <Route path='view-profile' element={<TaxpayerDashboard />} />
-            <Route path='update-info' element={<TaxpayerDashboard />} />
-            <Route path='upload-documents' element={<TaxpayerDashboard />} />
-            <Route path='family-relations' element={<TaxpayerDashboard />} />
-          </Route>
-          <Route path='/corporate-dashboard' element={<ETaxDashboard/>} />
-          <Route path='/consultant-dashboard' element={<ConsultantDashboard/>} />
-          <Route path='/staff-dashboard' element={<ETaxAdminDashboard/>} />
+/**
+ * Simple auth-check helper.
+ * Replace `isAuthenticated()` with your real logic (AuthContext or Redux).
+ */
+const isAuthenticated = (): boolean => {
+  // Example: check for presence of token in localStorage
+  return Boolean(localStorage.getItem('token'));
+};
 
-        </Routes>
-      </BrowserRouter>
+/**
+ * RequireAuth wrapper component: if not authenticated, redirect to /login
+ * You can also pass a `redirectTo` prop if you want dynamic behaviour.
+ */
+const RequireAuth: React.FC<{ children: React.ReactElement }> = ({ children }) => {
+  if (!isAuthenticated()) {
+    return <Navigate to="/login" replace />;
+  }
+  return children;
+};
+
+const App: React.FC = () => {
+  return (
+    <BrowserRouter>
+      <Routes>
+        {/* Public routes */}
+        <Route path="/" element={<IRSLandingPage />} />
+        <Route path="/login" element={<LoginPage />} />
+        <Route path="/register" element={<RegistrationForm />} />
+
+        {/* Protected dashboard routes - wrap in RequireAuth */}
+        <Route
+          path="/taxpayer-dashboard/*"
+          element={
+            <RequireAuth>
+              <TaxpayerDashboard />
+            </RequireAuth>
+          }
+        />
+        <Route
+          path="/corporate-dashboard"
+          element={
+            <RequireAuth>
+              <ETaxDashboard />
+            </RequireAuth>
+          }
+        />
+        <Route
+          path="/consultant-dashboard"
+          element={
+            <RequireAuth>
+              <ConsultantDashboard />
+            </RequireAuth>
+          }
+        />
+        <Route
+          path="/staff-dashboard"
+          element={
+            <RequireAuth>
+              <ETaxAdminDashboard />
+            </RequireAuth>
+          }
+        />
+
+        {/* Catch-all: redirect unknown routes to landing (or to 404 page if you add one) */}
+        <Route path="*" element={<Navigate to="/" replace />} />
+      </Routes>
+    </BrowserRouter>
   );
-}
+};
 
 export default App;
